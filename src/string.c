@@ -20,3 +20,8 @@ void ft_puts(const char *s)
 	write(1, s, ft_strlen(s));
 	write(1, "\n", 1);
 }
+
+void ft_putnbr(int n)
+{
+	printf("%d", n);
+}
