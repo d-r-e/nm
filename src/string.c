@@ -1,4 +1,4 @@
-#include "../inc/nm.h"
+#include "../include/nm.h"
 
 size_t ft_strlen(const char *s)
 {

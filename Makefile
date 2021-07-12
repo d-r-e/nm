@@ -36,7 +36,7 @@ _OBJS	= $(patsubst src/%.c, %.o, $(SRC))
 OBJS	= $(addprefix $(OBJDIR), $(_OBJS))
 
 # compilation flags
-CFLAGS = -Wall -std=c99 -pedantic -g -I$(INCLDIR)
+CFLAGS = -Wall -Wextra -Werror
 OFLAGS =
 
 
