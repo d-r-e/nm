@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "../inc/nm.h"
 
 int main(int argc, char **argv)
 {
