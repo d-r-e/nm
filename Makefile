@@ -22,7 +22,7 @@ fclean: clean
 re: fclean all
 
 commit: re fclean
-	@git commit -am "auto commit by Darodrig `date +%d-%m-%Y` from $(`uname -n`)"
+	@git commit -am "auto commit by Darodrig `date +%d-%m-%Y` from `uname -n`"
 
 push: commit
 	git push
