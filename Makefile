@@ -1,6 +1,6 @@
 NAME=ft_nm
 
-SRC=src/main.c src/string.c
+SRC=src/main.c src/string.c 
 OBJ=obj/main.o obj/string.o
 
 
@@ -23,3 +23,6 @@ re: fclean all
 
 push: re fclean
 	@git commit -am "auto commit by Darodrig `date +%d-%m-%Y`"
+
+x: $(NAME)
+	@./$(NAME)

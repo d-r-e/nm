@@ -2,12 +2,17 @@
 
 size_t ft_strlen(const char *s)
 {
-	size_t i;
+	int i;
 
 	i = 0;
-	while (s[i])
+	while(s && s[i])
 		i++;
-	return (i);
+	return i;
+}
+
+void ft_putstr(const char *s)
+{
+	write(1, s, ft_strlen(s));
 }
 
 void ft_puts(const char *s)
