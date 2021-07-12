@@ -22,4 +22,4 @@ fclean: clean
 re: fclean all
 
 push: re fclean
-	git commit -am "auto push"
+	git commit -am "auto commit by Darodrig `date +%d-%m-%Y`"
