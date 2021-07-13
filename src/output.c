@@ -2,7 +2,7 @@
 
 int no_such_file(const char *s)
 {
-	ft_putstr("ft_nm: \'");
+	ft_putstr("nm: \'");
 	ft_putstr(s);
 	ft_putstr("\': ");
 	ft_puts(NO_SUCH_FILE);
@@ -11,7 +11,7 @@ int no_such_file(const char *s)
 
 int permission_denied(const char *s)
 {
-	ft_putstr("ft_nm: \'");
+	ft_putstr("nm: \'");
 	ft_putstr(s);
 	ft_putstr("\': ");
 	ft_puts(PERMISSION_DENIED);

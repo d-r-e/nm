@@ -11,7 +11,8 @@
 # include <sys/mman.h>
 # define NO_SUCH_FILE "No such file"
 # define PERMISSION_DENIED "Permission denied."
-
+# define FALSE 0
+# define TRUE 1
 /*
 ** libft
 */
@@ -32,5 +33,6 @@ int strerr(const char *s);
 /*
 ** ft_nm
 */
+int		is_elf(const char *memfile, struct stat *s);
 int		analyse(const char *s);
 #endif

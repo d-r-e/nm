@@ -29,5 +29,9 @@ push: commit
 	@git push
 
 x: $(NAME)
-	PATH=${PATH}:${PWD}
 	@./$(NAME)
+
+valgrind: re
+	@gcc test/test.c -o a.out
+	@valgrind --leak-check=full ./$(NAME)
+	@rm a.out
