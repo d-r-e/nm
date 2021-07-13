@@ -7,6 +7,8 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <errno.h>
+# include <sys/mman.h>
 # define NO_SUCH_FILE "No such file"
 # define PERMISSION_DENIED "Permission denied."
 
