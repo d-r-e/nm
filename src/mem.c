@@ -2,6 +2,6 @@
 
 int analyse(const char *s)
 {
-	printf(s);
+	ft_putstr(s);
 	return (0);
 }
