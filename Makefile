@@ -1,7 +1,7 @@
 NAME=ft_nm
 
-SRC=src/main.c src/string.c src/output.c
-OBJ=obj/main.o obj/string.o obj/output.o
+SRC=src/main.c src/string.c src/output.c src/mem.c
+OBJ=obj/main.o obj/string.o obj/output.o obj/mem.o
 
 
 $(NAME): $(OBJ)

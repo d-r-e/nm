@@ -27,4 +27,9 @@ int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int	no_such_file(const char *s);
 int permission_denied(const char *s);
 int strerr(const char *s);
+
+/*
+** ft_nm
+*/
+int		analyse(const char *s);
 #endif
