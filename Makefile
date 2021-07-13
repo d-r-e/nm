@@ -32,6 +32,6 @@ x: $(NAME)
 	@./$(NAME)
 
 valgrind: re
-	@gcc test/test.c -o a.out
-	@valgrind --leak-check=full ./$(NAME)
-	@rm a.out
+	@gcc test/test.c
+	valgrind --leak-check=full ./$(NAME) `(ls -1 test/*.out)` && echo SUCCESS || echo FAIL
+	@rm -f src/*.out
