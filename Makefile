@@ -1,7 +1,7 @@
 NAME=ft_nm
 
-SRC=src/main.c src/string.c 
-OBJ=obj/main.o obj/string.o
+SRC=src/main.c src/string.c src/output.c
+OBJ=obj/main.o obj/string.o obj/output.o
 
 
 $(NAME): $(OBJ)
@@ -25,7 +25,8 @@ commit: re fclean
 	@git commit -am "auto commit by Darodrig `date +%d-%m-%Y` from `uname -n`"
 
 push: commit
-	git push
+	@git push
 
 x: $(NAME)
+	PATH=${PATH}:${PWD}
 	@./$(NAME)

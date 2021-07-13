@@ -1,17 +1,19 @@
 #include "../include/nm.h"
 
+
+
 int nm(const char *path)
 {
 	int fd;
-	
+	struct stat s;
+	int status;
+
 	fd = open(path, O_RDONLY, NULL);
+	status = fstat(fd, &s);
+	if (status < 0)
+		return (permission_denied(path));
 	if (fd < 0)
-	{
-		ft_putstr("ft_nm: \'");
-		ft_putstr(path);
-		ft_puts("\': No such file");
-		return (-1);
-	}
+		return (no_such_file(path));
 	close(fd);
 	return(0);
 }
