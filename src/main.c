@@ -5,7 +5,7 @@ static int ft_nm(const char *path)
 	int fd;
 	struct stat s;
 	char *ptr = NULL;
-	int status = 0;
+	int status;
 
 	fd = open(path, O_RDONLY, NULL);
 	//printf("errno %d\n", errno);
@@ -15,19 +15,19 @@ static int ft_nm(const char *path)
 		return(no_such_file(path));
 	ft_bzero(&s, sizeof(s));
 	status = fstat(fd, &s);
-	printf("stmode: %d\n", s.st_mode);
+	//printf("stmode: %d\n", s.st_mode);
 	if (! (0x8000 & s.st_mode))
 	{
-		printf("%s: %s: not a regular file\n", BINARY, path);
+		fprintf(stderr, "%s: %s: not a regular file\n", BINARY, path);
 		return (-1);
 	}
 	//printf("Status: %d\nFD: %d\nErrno fstat: %d\n", status, fd, errno);
 	(void)status;
     ptr = mmap(0, s.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (is_elf(ptr, &s) == TRUE)
-		analyse_elf(ptr);
+		analyse_elf(ptr, path);
 	else
-		printf("%s: %s: file format not recognized\n", BINARY, path);
+		fprintf(stderr, "%s: %s: file format not recognized\n", BINARY, path);
 	munmap(ptr, s.st_size);
 	close(fd);
 	return(0);

@@ -2,14 +2,8 @@
 
 void	ft_bzero(void *s, size_t n)
 {
-	size_t	i;
-
-	i = 0;
-	while (i < n)
-	{
+	for (size_t i = 0; i < n; ++i)
 		((char *)s)[i] = 0;
-		i++;
-	}
 }
 
 char	*ft_strncpy(char *dest, const char *src, size_t n)

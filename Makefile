@@ -34,7 +34,7 @@ x: $(NAME)
 valgrind: re
 	@gcc test/test.c
 	valgrind --leak-check=full ./$(NAME) `(ls -1 test/*.out)` && echo SUCCESS || echo FAIL
-	@rm -f src/*.out
+	@rm -f src/*
 
 test: re
-	./$(NAME) `ls -1 test/*.out`
+	./$(NAME) test/**

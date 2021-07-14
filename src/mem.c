@@ -12,23 +12,20 @@ int is_elf(const char *memfile, struct stat *s)
 }
 
 void read_elf_header(const void* ptr) {
-  // Either Elf64_Ehdr or Elf32_Ehdr depending on architecture.
   ElfW(Ehdr) header;
 
   if(ptr) {
-    // read the header
     ft_memcpy(&header, ptr, sizeof(header));
-
-    // check so its really an elf file
     if (ft_memcmp(header.e_ident, ELFMAG, (long unsigned int)SELFMAG) == 0) {
        printf("YASS\n");
     }
   }
 }
 
-int analyse_elf(const char *s)
+int analyse_elf(const char *s, const char *path)
 {
-	
-	ft_puts(s);
+  (void)path;
+  printf("%s: %s: no symbols\n", BINARY, path);
+	(void)s;
 	return (0);
 }
