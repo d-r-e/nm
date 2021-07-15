@@ -38,3 +38,6 @@ valgrind: re
 
 test: re
 	./$(NAME) test/**
+
+pull: re fclean
+	git pull origin master
