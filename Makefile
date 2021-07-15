@@ -26,7 +26,7 @@ commit: re fclean
 	@git commit -am "auto commit by ${USER} `date +%d-%m-%Y` from `uname -n | cut -d. -f1`"
 
 push: commit
-	@git push
+	@git push origin master
 
 x: $(NAME)
 	@./$(NAME)
