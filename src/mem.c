@@ -40,7 +40,23 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 		write(1, "-", 1);
 	write(1, "\n", 1);
 	printf("--Magic file: %x\n", header.magic);
-	printf("--File type: %s\n", (header.filetype == 1 ? "object" : "executable"));
+	switch (header.filetype)
+	{
+		case 1:
+			printf("--Type: %s\n", "object");
+			break;
+		case 2:
+			printf("--Type: %s\n", "execut");
+			break;
+		case 3:
+			printf("--Type: %s\n", "library");
+			break;
+		case 4:
+			printf("--Type: %s\n", "core");
+			break;
+		default:
+			break;
+	}
 	printf("--ncmds: %d\n", header.ncmds);
 	for(int i = 0; i < 80; ++i)
 		write(1, "-", 1);
