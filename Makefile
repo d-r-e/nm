@@ -41,3 +41,21 @@ test: re
 
 pull: re fclean
 	git pull origin master
+
+activate_leaks: $(SRC)
+
+deactivate_leaks: $(SRC)
+
+onleaks:
+	@sed "s_\/\/system_system_g" src/main.c > src/main2.c
+	@mv src/main.c src/main_noleaks.c
+	@mv src/main2.c src/main.c
+offleaks:
+	@sed "s_system_\/\/system_g" src/main.c > src/main2.c
+	@mv src/main.c src/main_leaks.c
+	@mv src/main2.c src/main.c
+
+testleaks: $(NAME)
+	./$(NAME) test/*
+
+leaks: onleaks testleaks offleaks

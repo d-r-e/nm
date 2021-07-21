@@ -6,6 +6,7 @@ static int ft_nm(const char *path)
 	int status;
 	struct mach_header_64 header;
 
+	ft_bzero(&g_mach, sizeof(g_mach));
 	g_mach.fd = open(path, O_RDONLY, NULL);
 	//printf("errno %d\n", errno);
 	if (errno == 13)
@@ -14,7 +15,7 @@ static int ft_nm(const char *path)
 		return(no_such_file(path));
 	ft_bzero(&g_mach.s, sizeof(struct stat));
 	if (fstat(g_mach.fd, &g_mach.s))
-		return (-1);
+		return (close(g_mach.fd) & -1);
 	//printf("stmode: %d\n", s.st_mode);
 	if (! (0x8000 & g_mach.s.st_mode))
 	{
@@ -45,5 +46,6 @@ int main(int argc, char **argv)
 	{
 		for (int i = 1; i < argc; ++i)
 			ft_nm(argv[i]);
+		//system("leaks ft_nm");
 	}
 }
