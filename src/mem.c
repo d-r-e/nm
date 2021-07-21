@@ -36,9 +36,15 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 	struct mach_header_64 header;
 
 	ft_memcpy((void*)&header, memfile, sizeof(header));
-	printf("Magic file: %x\n", header.magic);
-	printf("File type: %d\n", header.filetype);
-	printf("ncmds: %d\n", header.ncmds);
+	for(int i = 0; i < 80; ++i)
+		write(1, "-", 1);
+	write(1, "\n", 1);
+	printf("--Magic file: %x\n", header.magic);
+	printf("--File type: %d\n", header.filetype);
+	printf("--ncmds: %d\n", header.ncmds);
+	for(int i = 0; i < 80; ++i)
+		write(1, "-", 1);
+	write(1, "\n", 1);
 	return(header);
 }
 

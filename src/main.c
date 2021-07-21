@@ -13,7 +13,8 @@ static int ft_nm(const char *path)
 	if (errno == 2)
 		return(no_such_file(path));
 	ft_bzero(&g_mach.s, sizeof(struct stat));
-	status = fstat(g_mach.fd, &g_mach.s);
+	if (fstat(g_mach.fd, &g_mach.s))
+		return (-1);
 	//printf("stmode: %d\n", s.st_mode);
 	if (! (0x8000 & g_mach.s.st_mode))
 	{
@@ -26,7 +27,9 @@ static int ft_nm(const char *path)
 	if (is_elf(ptr, &g_mach.s) == TRUE)
 		analyse_elf(ptr, path);
 	else if (is_mach(ptr, &g_mach.s) == 64)
+	{
 		header = get_mach_header64(ptr);
+	}
 	else
 		fprintf(stderr, "%s: %s: file format not recognized\n", BINARY, path);
 	munmap(ptr, g_mach.s.st_size);
