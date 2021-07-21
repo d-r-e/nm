@@ -10,6 +10,7 @@
 
 # include <errno.h>
 # include <sys/mman.h>
+# include <mach-o/loader.h>
 
 # define BINARY "nm"
 # define NO_SUCH_FILE "No such file"
@@ -40,6 +41,17 @@ int strerr(const char *s);
 ** ft_nm
 */
 int		is_elf(const char *memfile, struct stat *s);
+int     is_mach(const char *memfile, struct stat *s);
 int		analyse_elf(const char *s, const char *path);
-//void	read_elf_header(const void* elfFile);
+struct mach_header_64     get_mach_header64(const char *memfile);
+
+typedef struct mach {
+    int                     fd;
+    struct mach_header_64   header;
+    char                    *mem;
+    struct stat             s;
+} t_mach;
+
+t_mach g_mach;
+
 #endif
