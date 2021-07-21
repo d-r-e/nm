@@ -9,7 +9,7 @@ $(NAME): $(OBJ)
 
 $(OBJ): $(SRC)
 	gcc -Wall -Wextra -Werror -c $(SRC)
-	mv *.o obj
+	@mv *.o obj/
 
 all: $(NAME)
 
