@@ -33,14 +33,12 @@ int get_mach_header32(const char *memfile)
 
 struct mach_header_64 get_mach_header64(const char *memfile)
 {
-	struct mach_header_64 header;
-
-	ft_memcpy((void*)&header, memfile, sizeof(header));
+	ft_memcpy((void*)&g_mach.header, memfile, sizeof(g_mach.header));
 	for(int i = 0; i < 80; ++i)
 		write(1, "-", 1);
 	write(1, "\n", 1);
-	printf("--Magic file: %x\n", header.magic);
-	switch (header.filetype)
+	printf("--Magic file: %x\n", g_mach.header.magic);
+	switch (g_mach.header.filetype)
 	{
 		case 1:
 			printf("--Type: %s\n", "object");
@@ -57,11 +55,11 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 		default:
 			break;
 	}
-	printf("--ncmds: %d\n", header.ncmds);
+	printf("--ncmds: %d\n", g_mach.header.ncmds);
 	for(int i = 0; i < 80; ++i)
 		write(1, "-", 1);
 	write(1, "\n", 1);
-	return(header);
+	return(g_mach.header);
 }
 
 int analyse_elf(const char *s, const char *path)
@@ -70,5 +68,29 @@ int analyse_elf(const char *s, const char *path)
 	printf("%s: %s: no symbols\n", BINARY, path);
 	(void)s;
 	return (0);
+}
+
+int	analyse_mach64(void)
+{
+	struct load_command *ptr;
+
+	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header));
+
+	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
+	{
+		if (ptr->cmd == LC_SEGMENT_64)
+		{
+			struct segment_command_64 *segment = malloc(sizeof(struct segment_command_64));
+			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
+
+			printf("segname: %s\n", segment->segname);
+
+			free(segment);
+		}
+		if (ptr->cmd == LC_SEGMENT)
+			printf("cmd32\n");
+		ptr++;
+	}
+	return(0);
 }
  

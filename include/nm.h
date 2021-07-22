@@ -46,7 +46,7 @@ int		is_elf(const char *memfile, struct stat *s);
 int     is_mach(const char *memfile, struct stat *s);
 int		analyse_elf(const char *s, const char *path);
 struct mach_header_64     get_mach_header64(const char *memfile);
-
+int     analyse_mach64(void);
 typedef struct mach {
     int                     fd;
     struct mach_header_64   header;

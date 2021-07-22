@@ -2,9 +2,7 @@
 
 static int ft_nm(const char *path)
 {
-	char *ptr = NULL;
 	int status;
-	struct mach_header_64 header;
 
 	ft_bzero(&g_mach, sizeof(g_mach));
 	g_mach.fd = open(path, O_RDONLY, NULL);
@@ -24,16 +22,19 @@ static int ft_nm(const char *path)
 	}
 	//printf("Status: %d\ng_mach.fd: %d\nErrno fstat: %d\n", status, g_mach.fd, errno);
 	(void)status;
-    ptr = mmap(0, g_mach.s.st_size, PROT_READ, MAP_PRIVATE, g_mach.fd, 0);
-	if (is_elf(ptr, &g_mach.s) == TRUE)
-		analyse_elf(ptr, path);
-	else if (is_mach(ptr, &g_mach.s) == 64)
+    g_mach.mem = mmap(0, g_mach.s.st_size, PROT_READ, MAP_PRIVATE, g_mach.fd, 0);
+	if (g_mach.mem == MAP_FAILED)
+		return (strerr("Error: Not enough memory.\n"));
+	if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
+		analyse_elf(g_mach.mem, path);
+	else if (is_mach(g_mach.mem, &g_mach.s) == 64)
 	{
-		header = get_mach_header64(ptr);
+		get_mach_header64(g_mach.mem);
+		analyse_mach64();
 	}
 	else
 		fprintf(stderr, "%s: %s: file format not recognized\n", BINARY, path);
-	munmap(ptr, g_mach.s.st_size);
+	munmap(g_mach.mem, g_mach.s.st_size);
 	close(g_mach.fd);
 	return(0);
 }
