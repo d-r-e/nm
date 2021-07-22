@@ -79,18 +79,28 @@ int	analyse_mach64(void)
 	mem = (const unsigned char *)ptr;
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
-
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
 			struct segment_command_64 *segment = malloc(sizeof(struct segment_command_64));
 			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
-
+			printf("Load command %d\n", i);
 			printf("segname: %s\n", segment->segname);
 			printf("cmdsize %u\n", segment->cmdsize);
 			printf("addr %llx\n", segment->vmaddr);
 			printf("filesize %llu \n", segment->filesize);
 			printf("fileoff %llu \n", segment->fileoff);
+			printf("--------------------------------\n");
 			free(segment);
+		}
+		else if (ptr->cmd == LC_SYMTAB)
+		{
+			struct symtab_command cmd;
+			ft_memcpy(&cmd, ptr, sizeof(cmd));
+			printf("LC_SYMTAB\n");
+			printf("nsyms: %d\n", cmd.nsyms);
+			printf("cmdsize %u\n", cmd.cmdsize);
+			printf("symoff: %d\n", cmd.symoff);
+
 		}
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
