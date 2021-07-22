@@ -100,7 +100,19 @@ int	analyse_mach64(void)
 			printf("nsyms: %d\n", cmd.nsyms);
 			printf("cmdsize %u\n", cmd.cmdsize);
 			printf("symoff: %d\n", cmd.symoff);
-
+			printf("--------------------------------\n");
+		}
+		else if (ptr->cmd == LC_DYSYMTAB)
+		{
+			struct dysymtab_command cmd;
+			ft_memcpy(&cmd, ptr, sizeof(cmd));
+			printf("LC_DYSYMTAB\n");
+			printf("ilocalsym: %d\n", cmd.ilocalsym);
+			printf("nlocalsym: %d\n", cmd.nlocalsym);
+			printf("cmdsize %u\n", cmd.cmdsize);
+			printf("tocoff: %d\n", cmd.tocoff);
+			printf("ntoc: %d\n", cmd.ntoc);
+			printf("--------------------------------\n");
 		}
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
