@@ -73,23 +73,27 @@ int analyse_elf(const char *s, const char *path)
 int	analyse_mach64(void)
 {
 	struct load_command *ptr;
+	unsigned const char *mem;
 
 	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header));
-
+	mem = (const unsigned char *)ptr;
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
+
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
 			struct segment_command_64 *segment = malloc(sizeof(struct segment_command_64));
 			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
 
 			printf("segname: %s\n", segment->segname);
-
+			printf("cmdsize %u\n", segment->cmdsize);
+			printf("addr %llx\n", segment->vmaddr);
+			printf("filesize %llu \n", segment->filesize);
+			printf("fileoff %llu \n", segment->fileoff);
 			free(segment);
 		}
-		if (ptr->cmd == LC_SEGMENT)
-			printf("cmd32\n");
-		ptr++;
+		mem += ptr->cmdsize;
+		ptr = (struct load_command *)mem;
 	}
 	return(0);
 }
