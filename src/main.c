@@ -28,6 +28,8 @@ static int ft_nm(const char *path)
 		get_mach_header64(g_mach.mem);
 		analyse_mach64();
 	}
+	else if (is_mach(g_mach.mem, &g_mach.s) == 32)
+		printf("32 bits mach-o binary\n");
 	else
 		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
 	munmap(g_mach.mem, g_mach.s.st_size);
