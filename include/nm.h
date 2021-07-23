@@ -48,7 +48,7 @@ int                     is_mach(const char *memfile, struct stat *s);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(void);
-int                     read_symtab(const char *mem, uint32_t nsyms);
+int                     read_symstr(const char *mem, uint32_t nsyms);
 
 typedef struct mach {
     int                     fd;

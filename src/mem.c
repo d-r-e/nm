@@ -103,10 +103,10 @@ int	analyse_mach64(void)
 		{
 			struct symtab_command cmd;
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
-			printf("LC_SYMTAB\n");
-			printf("symoff: %d\n", cmd.symoff);
-			printf("stroff: %d\n", cmd.stroff);
-			read_symtab((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
+			// printf("LC_SYMTAB\n");
+			// printf("symoff: %d\n", cmd.symoff);
+			// printf("stroff: %d\n", cmd.stroff);
+			read_symstr((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
 			// printf("nsyms: %d\n", cmd.nsyms);
 			// printf("cmdsize %u\n", cmd.cmdsize);
 			// printf("--------------------------------\n");
@@ -129,7 +129,7 @@ int	analyse_mach64(void)
 	return(0);
 }
  
-int read_symtab(const char *mem, uint32_t nsyms)
+int read_symstr(const char *mem, uint32_t nsyms)
 {
 	// struct nlist symbol;
 	size_t	j;
