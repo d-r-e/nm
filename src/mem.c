@@ -137,15 +137,6 @@ int read_symtab(const char *mem, uint32_t nsyms)
 	(void)mem;
 	if (nsyms < 0)
 		return (-1);
-	for (int i = 0; i < 10000; i++)
-	{
-		if (ft_memcmp(mem + i, "_main", 5) == 0)
-		{
-			printf("string found at%d\n", i);
-			break;
-		}
-		
-	}
 	for (uint32_t i = 0; i < nsyms; ++i)
 	{
 		j = ft_strlen(mem);
