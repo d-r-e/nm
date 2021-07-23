@@ -37,6 +37,38 @@ int get_mach_header32(const char *memfile)
 	return(0);
 }
 
+int read_symstr(const char *mem, uint32_t nsyms)
+{
+	size_t	j;
+
+	if (nsyms < 0)
+		return (-1);
+	mem++;
+	for (uint32_t i = 0; i < nsyms; ++i)
+	{
+		j = ft_strlen(mem);
+		if (j)
+		printf("sym: %s\n", mem);
+		mem += j + 1;
+	}
+	return(0);
+}
+
+int read_symtable(const char *mem, uint32_t nsyms)
+{
+	struct nlist table;
+	const char *ptr;
+
+	ptr = mem;
+	for (uint32_t i = 0; i < nsyms; ++i)
+	{
+		ft_memcpy(&table, mem, sizeof(table));
+		//printf("%d\n", table.);
+		ptr+=sizeof(table);
+	}
+	return (0);
+}
+
 struct mach_header_64 get_mach_header64(const char *memfile)
 {
 	ft_memcpy((void*)&g_mach.header, memfile, sizeof(g_mach.header));
@@ -107,6 +139,7 @@ int	analyse_mach64(void)
 			// printf("symoff: %d\n", cmd.symoff);
 			// printf("stroff: %d\n", cmd.stroff);
 			read_symstr((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
+			read_symtable((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
 			// printf("nsyms: %d\n", cmd.nsyms);
 			// printf("cmdsize %u\n", cmd.cmdsize);
 			// printf("--------------------------------\n");
@@ -129,20 +162,3 @@ int	analyse_mach64(void)
 	return(0);
 }
  
-int read_symstr(const char *mem, uint32_t nsyms)
-{
-	// struct nlist symbol;
-	size_t	j;
-
-	(void)mem;
-	if (nsyms < 0)
-		return (-1);
-	for (uint32_t i = 0; i < nsyms; ++i)
-	{
-		j = ft_strlen(mem);
-		printf("%s\n", mem);
-		mem +=j + 1;
-	// 	printf("i:%d\n", i);
-	}
-	return(0);
-}
