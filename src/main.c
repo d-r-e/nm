@@ -6,21 +6,17 @@ static int ft_nm(const char *path)
 
 	ft_bzero(&g_mach, sizeof(g_mach));
 	g_mach.fd = open(path, O_RDONLY, NULL);
-	//printf("errno %d\n", errno);
-	if (errno == 13)
-		return(permission_denied(path));
-	if (errno == 2)
-		return(no_such_file(path));
+	if (g_mach.fd < 0)
+		return(file_error(path, NO_SUCH_FILE));
 	ft_bzero(&g_mach.s, sizeof(struct stat));
 	if (fstat(g_mach.fd, &g_mach.s))
 		return (close(g_mach.fd) & -1);
-	//printf("stmode: %d\n", s.st_mode);
 	if (! (0x8000 & g_mach.s.st_mode))
 	{
-		fprintf(stderr, "%s: %s: not a regular file\n", BINARY, path);
+		fprintf(stderr, "%s: %s: not a regular file.\n", BINARY, path);
+		close(g_mach.fd);
 		return (-1);
 	}
-	//printf("Status: %d\ng_mach.fd: %d\nErrno fstat: %d\n", status, g_mach.fd, errno);
 	(void)status;
     g_mach.mem = mmap(0, g_mach.s.st_size, PROT_READ, MAP_PRIVATE, g_mach.fd, 0);
 	if (g_mach.mem == MAP_FAILED)
@@ -33,7 +29,7 @@ static int ft_nm(const char *path)
 		analyse_mach64();
 	}
 	else
-		fprintf(stderr, "%s: %s: file format not recognized\n", BINARY, path);
+		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
 	munmap(g_mach.mem, g_mach.s.st_size);
 	close(g_mach.fd);
 	return(0);

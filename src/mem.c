@@ -81,7 +81,9 @@ int	analyse_mach64(void)
 	{
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
-			struct segment_command_64 *segment = malloc(sizeof(struct segment_command_64));
+			struct segment_command_64 *segment;
+			
+			segment = malloc(sizeof(struct segment_command_64));
 			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
 			printf("Load command %d\n", i);
 			printf("segname: %s\n", segment->segname);

@@ -43,6 +43,8 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 
 int strerr(const char *s)
 {
+	write(2, BINARY, ft_strlen(BINARY));
+	write(2, ": ", 2);
 	write(2, s, ft_strlen(s));
 	return (-1);
 }

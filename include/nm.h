@@ -8,12 +8,11 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 
-# include <errno.h>
 # include <sys/mman.h>
 # include <mach-o/loader.h>
 
 # define BINARY "nm"
-# define NO_SUCH_FILE "No such file"
+# define NO_SUCH_FILE "No such file."
 # define PERMISSION_DENIED "Permission denied."
 # define STAT_ERROR "Stat read error"
 # define FALSE 0
@@ -35,7 +34,7 @@ void	*ft_memcpy(void *str1, const void *str2, size_t n);
 /*
 ** output
 */
-int	no_such_file(const char *s);
+int	file_error(const char *file, const char *error);
 int permission_denied(const char *s);
 int strerr(const char *s);
 
