@@ -2,8 +2,6 @@
 
 static int ft_nm(const char *path)
 {
-	int status;
-
 	ft_bzero(&g_mach, sizeof(g_mach));
 	g_mach.fd = open(path, O_RDONLY, NULL);
 	if (g_mach.fd < 0)
@@ -17,7 +15,6 @@ static int ft_nm(const char *path)
 		close(g_mach.fd);
 		return (-1);
 	}
-	(void)status;
     g_mach.mem = mmap(0, g_mach.s.st_size, PROT_READ, MAP_PRIVATE, g_mach.fd, 0);
 	if (g_mach.mem == MAP_FAILED)
 		return (strerr("Error: Not enough memory.\n"));

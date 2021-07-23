@@ -6,10 +6,12 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <sys/types.h>
+# include <sys/mman.h>
 # include <sys/stat.h>
 
-# include <sys/mman.h>
 # include <mach-o/loader.h>
+# include <nlist.h>
+# include <stab.h>
 
 # define BINARY "nm"
 # define NO_SUCH_FILE "No such file."
@@ -41,11 +43,13 @@ int strerr(const char *s);
 /*
 ** ft_nm
 */
-int		is_elf(const char *memfile, struct stat *s);
-int     is_mach(const char *memfile, struct stat *s);
-int		analyse_elf(const char *s, const char *path);
-struct mach_header_64     get_mach_header64(const char *memfile);
-int     analyse_mach64(void);
+int                     is_elf(const char *memfile, struct stat *s);
+int                     is_mach(const char *memfile, struct stat *s);
+int                     analyse_elf(const char *s, const char *path);
+struct mach_header_64   get_mach_header64(const char *memfile);
+int                     analyse_mach64(void);
+int                     read_symtab(const char *mem, uint32_t nsyms);
+
 typedef struct mach {
     int                     fd;
     struct mach_header_64   header;

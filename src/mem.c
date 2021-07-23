@@ -43,7 +43,7 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 	for(int i = 0; i < 80; ++i)
 		write(1, "-", 1);
 	write(1, "\n", 1);
-	printf("--Magic file: %x\n", g_mach.header.magic);
+	// printf("--Magic file: %x\n", g_mach.header.magic);
 	switch (g_mach.header.filetype)
 	{
 		case 1:
@@ -87,10 +87,9 @@ int	analyse_mach64(void)
 	{
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
-			struct segment_command_64 *segment;
+			struct segment_command_64 segment;
 			
-			segment = malloc(sizeof(struct segment_command_64));
-			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
+			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
 			printf("LC_SEGMENT_64\n");
 			// printf("Load command %d\n", i);
 			// printf("segname: %s\n", segment->segname);
@@ -99,16 +98,17 @@ int	analyse_mach64(void)
 			// printf("filesize %llu \n", segment->filesize);
 			// printf("fileoff %llu \n", segment->fileoff);
 			// printf("--------------------------------\n");
-			free(segment);
 		}
 		else if (ptr->cmd == LC_SYMTAB)
 		{
 			struct symtab_command cmd;
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
 			printf("LC_SYMTAB\n");
+			printf("symoff: %d\n", cmd.symoff);
+			printf("stroff: %d\n", cmd.stroff);
+			read_symtab((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
 			// printf("nsyms: %d\n", cmd.nsyms);
 			// printf("cmdsize %u\n", cmd.cmdsize);
-			// printf("symoff: %d\n", cmd.symoff);
 			// printf("--------------------------------\n");
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
@@ -129,3 +129,29 @@ int	analyse_mach64(void)
 	return(0);
 }
  
+int read_symtab(const char *mem, uint32_t nsyms)
+{
+	// struct nlist symbol;
+	size_t	j;
+
+	(void)mem;
+	if (nsyms < 0)
+		return (-1);
+	for (int i = 0; i < 10000; i++)
+	{
+		if (ft_memcmp(mem + i, "_main", 5) == 0)
+		{
+			printf("string found at%d\n", i);
+			break;
+		}
+		
+	}
+	for (uint32_t i = 0; i < nsyms; ++i)
+	{
+		j = ft_strlen(mem);
+		printf("%s\n", mem);
+		mem +=j + 1;
+	// 	printf("i:%d\n", i);
+	}
+	return(0);
+}
