@@ -14,7 +14,9 @@ int is_elf(const char *memfile, struct stat *s)
 int is_mach(const char *memfile, struct stat *s)
 {
 	int mach32 = MH_MAGIC;
+	int mach23 = MH_CIGAM;
 	int mach64 = MH_MAGIC_64;
+	int mach46 = MH_CIGAM_64;
 
 	if (s->st_size < 4)
 		return (FALSE);
@@ -22,6 +24,10 @@ int is_mach(const char *memfile, struct stat *s)
 		return (32);
 	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach64)))
 		return (64);
+	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(mach23)))
+		return (23);
+	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach46)))
+		return (46);
 	return (FALSE);
 }
 
@@ -85,13 +91,14 @@ int	analyse_mach64(void)
 			
 			segment = malloc(sizeof(struct segment_command_64));
 			ft_memcpy(segment, ptr, sizeof(struct segment_command_64));
-			printf("Load command %d\n", i);
-			printf("segname: %s\n", segment->segname);
-			printf("cmdsize %u\n", segment->cmdsize);
-			printf("addr %llx\n", segment->vmaddr);
-			printf("filesize %llu \n", segment->filesize);
-			printf("fileoff %llu \n", segment->fileoff);
-			printf("--------------------------------\n");
+			printf("LC_SEGMENT_64\n");
+			// printf("Load command %d\n", i);
+			// printf("segname: %s\n", segment->segname);
+			// printf("cmdsize %u\n", segment->cmdsize);
+			// printf("addr %llx\n", segment->vmaddr);
+			// printf("filesize %llu \n", segment->filesize);
+			// printf("fileoff %llu \n", segment->fileoff);
+			// printf("--------------------------------\n");
 			free(segment);
 		}
 		else if (ptr->cmd == LC_SYMTAB)
@@ -99,22 +106,22 @@ int	analyse_mach64(void)
 			struct symtab_command cmd;
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
 			printf("LC_SYMTAB\n");
-			printf("nsyms: %d\n", cmd.nsyms);
-			printf("cmdsize %u\n", cmd.cmdsize);
-			printf("symoff: %d\n", cmd.symoff);
-			printf("--------------------------------\n");
+			// printf("nsyms: %d\n", cmd.nsyms);
+			// printf("cmdsize %u\n", cmd.cmdsize);
+			// printf("symoff: %d\n", cmd.symoff);
+			// printf("--------------------------------\n");
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
 			printf("LC_DYSYMTAB\n");
-			printf("ilocalsym: %d\n", cmd.ilocalsym);
-			printf("nlocalsym: %d\n", cmd.nlocalsym);
-			printf("cmdsize %u\n", cmd.cmdsize);
-			printf("tocoff: %d\n", cmd.tocoff);
-			printf("ntoc: %d\n", cmd.ntoc);
-			printf("--------------------------------\n");
+			// printf("ilocalsym: %d\n", cmd.ilocalsym);
+			// printf("nlocalsym: %d\n", cmd.nlocalsym);
+			// printf("cmdsize %u\n", cmd.cmdsize);
+			// printf("tocoff: %d\n", cmd.tocoff);
+			// printf("ntoc: %d\n", cmd.ntoc);
+			// printf("--------------------------------\n");
 		}
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
