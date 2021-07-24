@@ -151,8 +151,8 @@ int	analyse_mach64(void)
 			printf("LC_SEGMENT_64\n");
 			// printf("Load command %d\n", i);
 			printf("segname: %s\n", segment.segname);
-			printf("cmdsize %u\n", segment.cmdsize);
-			printf("vmaddr %llx\n", segment.vmaddr);
+			// printf("cmdsize %u\n", segment.cmdsize);
+			// printf("vmaddr %llx\n", segment.vmaddr);
 			printf("nsects %d\n", segment.nsects);
 			// for (int j = 0; j < segment.nsects; j++)
 			// {
@@ -168,13 +168,12 @@ int	analyse_mach64(void)
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
 			read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
 			//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
-			ft_puts(get_symstr(2));
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
-			printf("LC_DYSYMTAB\n");
+			printf("LC_DYSYMTAB: to be continued...\n");
 			// printf("ilocalsym: %d\n", cmd.ilocalsym);
 			// printf("nlocalsym: %d\n", cmd.nlocalsym);
 			// printf("cmdsize %u\n", cmd.cmdsize);
