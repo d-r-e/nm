@@ -1,14 +1,14 @@
 NAME=ft_nm
 
-SRC=src/main.c src/string.c src/output.c src/mem.c src/libft.c 
-OBJ=obj/main.o obj/string.o obj/output.o obj/mem.o obj/libft.o 
+SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c 
+OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o 
+INC=include/nm.h
+CFLAGS= -Wall -Wextra -Werror -Wformat-security
+$(NAME): $(OBJ) $(INC)
+	gcc $(CFLAGS) $(OBJ) -o $(NAME)
 
-
-$(NAME): $(OBJ)
-	gcc -Wall -Wextra -Werror $(OBJ) -o $(NAME)
-
-$(OBJ): $(SRC)
-	gcc -Wall -Wextra -Werror -c $(SRC)
+$(OBJ): $(SRC) 
+	gcc $(CFLAGS) -c $(SRC)
 	@mv *.o obj/
 
 all: $(NAME)
@@ -30,6 +30,11 @@ push: commit
 
 x: $(NAME)
 	@./$(NAME)
+s: $(NAME)
+	./$(NAME) $(NAME)
+
+ls: $(NAME)
+	./$(NAME) /bin/ls
 
 valgrind: re
 	@gcc test/test.c

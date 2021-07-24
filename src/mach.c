@@ -11,23 +11,23 @@ int is_elf(const char *memfile, struct stat *s)
 	return (TRUE);
 }
 
-int is_mach(const char *memfile, struct stat *s)
+unsigned int is_mach(const char *memfile, struct stat *s)
 {
-	int mach32 = MH_MAGIC;
-	int mach23 = MH_CIGAM;
-	int mach64 = MH_MAGIC_64;
-	int mach46 = MH_CIGAM_64;
+	uint32_t mach32 =	MH_MAGIC;
+	uint32_t mach64 =	MH_MAGIC_64;
+	uint32_t fatm32	=	FAT_MAGIC;
+	uint32_t fatm64	=	FAT_MAGIC_64;
 
 	if (s->st_size < 4)
 		return (FALSE);
 	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(mach32)))
-		return (32);
+		return (MH_MAGIC);
 	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach64)))
-		return (64);
-	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(mach23)))
-		return (23);
-	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach46)))
-		return (46);
+		return (MH_MAGIC_64);
+	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(fatm32)))
+		return (FAT_MAGIC);
+	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(fatm64)))
+		return (FAT_MAGIC_64);
 	return (FALSE);
 }
 
@@ -39,7 +39,7 @@ int get_mach_header32(const char *memfile)
 
 int read_symstr(const char *mem, uint32_t nsyms)
 {
-	size_t	j;
+	uint32_t	j;
 
 	if (nsyms < 0)
 		return (-1);
@@ -47,25 +47,50 @@ int read_symstr(const char *mem, uint32_t nsyms)
 	for (uint32_t i = 0; i < nsyms; ++i)
 	{
 		j = ft_strlen(mem);
-		if (j)
-		printf("sym: %s\n", mem);
+		printf("sym%d: %s\n", i, mem);
 		mem += j + 1;
 	}
 	return(0);
 }
 
-int read_symtable(const char *mem, uint32_t nsyms)
+const char  *get_symstr(uint32_t index)
 {
-	struct nlist table;
-	const char *ptr;
-
-	ptr = mem;
-	for (uint32_t i = 0; i < nsyms; ++i)
+	const char	*ptr;
+	size_t	j;
+	ptr = g_mach.mem + g_mach.symtab.stroff;
+	for (uint32_t i = 0; i < g_mach.symtab.nsyms; ++i)
 	{
-		ft_memcpy(&table, mem, sizeof(table));
-		//printf("%d\n", table.);
-		ptr+=sizeof(table);
+		j = ft_strlen(ptr);
+		if (i == index)
+		{
+			//printf("sym%d: %s\n", i, ptr);
+			if (ft_strlen(ptr))
+				return (ptr);
+		}
+		ptr += j + 1;
 	}
+	return (NULL);
+}
+
+int read_symtable_64(const char *mem, uint32_t nsyms)
+{
+	struct nlist_64 table;
+	const char *ptr;
+	uint32_t i;
+
+	if (!mem || nsyms < 0)
+		return(-1);
+	ptr = mem;
+	for (i = 0; i < nsyms; i++)
+	{
+		ft_bzero(&table, sizeof(table));
+		ft_memcpy(&table, ptr, sizeof(table));
+		printf("ntype:\t%d\n", table.n_type);
+		printf("n_strx:\t%d\n", table.n_un.n_strx);
+		ptr += sizeof(table);
+	}
+	//nlist("a.out", list);
+	
 	return (0);
 }
 
@@ -133,13 +158,13 @@ int	analyse_mach64(void)
 		}
 		else if (ptr->cmd == LC_SYMTAB)
 		{
-			struct symtab_command cmd;
-			ft_memcpy(&cmd, ptr, sizeof(cmd));
-			// printf("LC_SYMTAB\n");
-			// printf("symoff: %d\n", cmd.symoff);
-			// printf("stroff: %d\n", cmd.stroff);
-			read_symstr((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
-			read_symtable((char*)g_mach.mem + cmd.stroff, cmd.nsyms);
+			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+			// printf("LC_g_mach.symtab\n");
+			// printf("symoff: %d\n", g_mach.symtab.symoff);
+			// printf("stroff: %d\n", g_mach.symtab.stroff);
+			read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
+			read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+			ft_puts(get_symstr(2));
 			// printf("nsyms: %d\n", cmd.nsyms);
 			// printf("cmdsize %u\n", cmd.cmdsize);
 			// printf("--------------------------------\n");

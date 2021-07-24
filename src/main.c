@@ -20,12 +20,12 @@ static int ft_nm(const char *path)
 		return (strerr("Error: Not enough memory.\n"));
 	if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
 		analyse_elf(g_mach.mem, path);
-	else if (is_mach(g_mach.mem, &g_mach.s) == 64)
+	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC_64)
 	{
 		get_mach_header64(g_mach.mem);
 		analyse_mach64();
 	}
-	else if (is_mach(g_mach.mem, &g_mach.s) == 32)
+	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC)
 		printf("32 bits mach-o binary\n");
 	else
 		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
