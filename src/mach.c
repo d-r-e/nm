@@ -39,17 +39,11 @@ int get_mach_header32(const char *memfile)
 
 int read_symstr(const char *mem, uint32_t nsyms)
 {
-	uint32_t	j;
-
 	if (nsyms < 0)
 		return (-1);
 	mem++;
 	for (uint32_t i = 0; i < nsyms; ++i)
-	{
-		j = ft_strlen(mem);
-		printf("sym%d: %s\n", i, mem);
-		mem += j + 1;
-	}
+		ft_puts(get_symstr(i));
 	return(0);
 }
 
@@ -77,6 +71,7 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	struct nlist_64 table;
 	const char *ptr;
 	uint32_t i;
+	int ntypes[5] = {0x0, 0x2, 0xe, 0xc, 0xa};
 
 	if (!mem || nsyms < 0)
 		return(-1);
@@ -85,12 +80,18 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	{
 		ft_bzero(&table, sizeof(table));
 		ft_memcpy(&table, ptr, sizeof(table));
-		printf("ntype:\t%d\n", table.n_type);
+		printf("N_STAB:\t%d\n", table.n_type & N_STAB);
+		printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
+		if (table.n_type & N_TYPE)
+		{
+			for (int n = 0; n < 5; n++)
+				printf("N_TYPE:\t%d\n", table.n_type & N_TYPE & ntypes[n]);
+		}
+		printf("N_EXT:\t%d\n", table.n_type & N_EXT);
 		printf("n_strx:\t%d\n", table.n_un.n_strx);
 		ptr += sizeof(table);
 	}
 	//nlist("a.out", list);
-	
 	return (0);
 }
 
@@ -149,25 +150,25 @@ int	analyse_mach64(void)
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
 			printf("LC_SEGMENT_64\n");
 			// printf("Load command %d\n", i);
-			// printf("segname: %s\n", segment->segname);
-			// printf("cmdsize %u\n", segment->cmdsize);
-			// printf("addr %llx\n", segment->vmaddr);
-			// printf("filesize %llu \n", segment->filesize);
+			printf("segname: %s\n", segment.segname);
+			printf("cmdsize %u\n", segment.cmdsize);
+			printf("vmaddr %llx\n", segment.vmaddr);
+			printf("nsects %d\n", segment.nsects);
+			// for (int j = 0; j < segment.nsects; j++)
+			// {
+			// 	struct section_64 sect;
+
+			// }
+			// printf("filesize %llu \n", segment.filesize);
 			// printf("fileoff %llu \n", segment->fileoff);
 			// printf("--------------------------------\n");
 		}
 		else if (ptr->cmd == LC_SYMTAB)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			// printf("LC_g_mach.symtab\n");
-			// printf("symoff: %d\n", g_mach.symtab.symoff);
-			// printf("stroff: %d\n", g_mach.symtab.stroff);
 			read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
-			read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+			//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 			ft_puts(get_symstr(2));
-			// printf("nsyms: %d\n", cmd.nsyms);
-			// printf("cmdsize %u\n", cmd.cmdsize);
-			// printf("--------------------------------\n");
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{

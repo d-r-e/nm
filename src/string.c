@@ -17,6 +17,8 @@ void ft_putstr(const char *s)
 
 void ft_puts(const char *s)
 {
+	if (!s)
+		return;
 	write(1, s, ft_strlen(s));
 	write(1, "\n", 1);
 }

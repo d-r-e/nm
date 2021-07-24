@@ -12,7 +12,7 @@
 # include <mach-o/nlist.h>
 # include <mach-o/loader.h>
 # include <mach-o/fat.h>
-# include <stab.h>
+# include <mach-o/stab.h>
 
 # define BINARY "nm"
 # define NO_SUCH_FILE "No such file."
@@ -66,6 +66,8 @@ int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(void);
 int                     read_symstr(const char *mem, uint32_t nsyms);
+const char              *get_symstr(uint32_t index);
+
 int                     read_symtable_64(const char *mem, uint32_t nsyms);
 
 typedef struct mach {
