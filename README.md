@@ -1,7 +1,7 @@
 # Binary architecture analysis: nm & otool commands
 
 ![](img/mach-o.png)
-
+[source](https://www.youtube.com/watch?v=RInasZ0IwMA)
 ## nm command
 
 *nm* displays the name list (symbol table of nlist structures) of each object file in
