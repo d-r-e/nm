@@ -5,3 +5,5 @@ make
 for f in $FILES;do
     diff -i <(./$BIN $f 2>/dev/null| cat -e) <(otool -t $f 2>/dev/null| cat -e)
 done
+
+#diff <(./ft_nm /bin/*) <(otool -t /bin/*) 
