@@ -13,7 +13,7 @@ static int get_text_sect(struct section_64 sect)
 		lines++;
 	for (unsigned long long i = 0; i < lines; i++)
 	{
-		printf("00000001%0.8x      ", offset);
+		printf("00000001%0.8x\t", offset);
 		for (int n = 0; n < 16; ++n)
 		{
 			if (i * 16 + n == sect.size)

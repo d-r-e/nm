@@ -2,7 +2,7 @@
 
 int file_error(const char *file, const char *error)
 {
-	printf("%s: \'%s\': %s\n", BINARY, file, error);
+	fprintf(stderr,"%s: \'%s\': %s\n", BINARY, file, error);
 	return (-1);
 }
 
