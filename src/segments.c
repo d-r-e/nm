@@ -12,7 +12,8 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 	{
 		ft_bzero(&section, sizeof(section));
 		ft_memcpy(&section, ptr, sizeof(section));
-		printf("Section: %.16s\n", section.sectname);
+		if (!ft_strncmp(section.segname, "__TEXT", ft_strlen("__TEXT")))
+			printf("(__TEXT,%.16s)\n", section.sectname);
 		ptr += sizeof(section);
 	}
 	return (0);
