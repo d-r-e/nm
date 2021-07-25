@@ -1,7 +1,7 @@
 NAME=ft_nm
 
-SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c 
-OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o 
+SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c
+OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o
 INC=include/nm.h
 CFLAGS= -Wall -Wextra -Werror -Wformat-security
 $(NAME): $(OBJ) $(INC)

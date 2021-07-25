@@ -149,18 +149,17 @@ int	analyse_mach64(void)
 			
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
 			printf("LC_SEGMENT_64\n");
+			parse_segment((void*)ptr, segment);
 			// printf("Load command %d\n", i);
-			printf("segname: %s\n", segment.segname);
+			// printf("segname: %s\n", segment.segname);
 			// printf("cmdsize %u\n", segment.cmdsize);
 			// printf("vmaddr %llx\n", segment.vmaddr);
-			printf("nsects %d\n", segment.nsects);
+			// printf("nsects %d\n", segment.nsects);
 			// for (int j = 0; j < segment.nsects; j++)
 			// {
 			// 	struct section_64 sect;
 
 			// }
-			// printf("filesize %llu \n", segment.filesize);
-			// printf("fileoff %llu \n", segment->fileoff);
 			// printf("--------------------------------\n");
 		}
 		else if (ptr->cmd == LC_SYMTAB)
