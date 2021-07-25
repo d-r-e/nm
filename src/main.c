@@ -18,8 +18,8 @@ static int ft_nm(const char *path)
     g_mach.mem = mmap(0, g_mach.s.st_size, PROT_READ, MAP_PRIVATE, g_mach.fd, 0);
 	if (g_mach.mem == MAP_FAILED)
 		return (strerr("Error: Not enough memory.\n"));
-	if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
-		analyse_elf(g_mach.mem, path);
+	// if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
+	// 	analyse_elf(g_mach.mem, path);
 	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC_64)
 	{
 		get_mach_header64(g_mach.mem);

@@ -165,7 +165,7 @@ int	analyse_mach64(void)
 		else if (ptr->cmd == LC_SYMTAB)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
+			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
 			//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
