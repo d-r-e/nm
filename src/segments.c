@@ -22,6 +22,8 @@ static int get_text_sect(struct section_64 sect)
 			if (n != 15)
 				printf(" ");
 			ptr++;
+			if (i * 16 + n == sect.size - 1)
+				break;
 		}
 		printf("\n");
 		offset += 16;
