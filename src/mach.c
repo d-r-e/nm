@@ -148,8 +148,8 @@ int	analyse_mach64(void)
 			struct segment_command_64 segment;
 			
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
-			printf("LC_SEGMENT_64\n");
-			parse_segment((void*)mem, segment);
+			printf("LC_SEGMENT_64 %d\n", i);
+			parse_segment((void*)ptr, segment);
 			// printf("Load command %d\n", i);
 			// printf("segname: %s\n", segment.segname);
 			// printf("cmdsize %u\n", segment.cmdsize);
