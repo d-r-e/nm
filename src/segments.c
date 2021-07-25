@@ -7,23 +7,21 @@ static int get_text_sect(struct section_64 sect)
 	unsigned long long lines;
 
 	ptr = (unsigned char*)(sect.offset + g_mach.mem);
-	printf("__text size: %llu\n", sect.size);
 	offset= sect.offset;
 	lines = sect.size / 16;
 	if (sect.size % 16)
 		lines++;
-	printf("\tsize: %llu\n\tlines: %llu\n", sect.size, lines);
 	for (unsigned long long i = 0; i < lines; i++)
 	{
-		printf("00000001%0.8x\t", offset);
+		printf("00000001%0.8x      ", offset);
 		for (int n = 0; n < 16; ++n)
 		{
+			if (i * 16 + n == sect.size)
+				break;
 			printf("%.2x", *ptr);
-			if (n != 15)
+			if (n < 16)
 				printf(" ");
 			ptr++;
-			if (i * 16 + n == sect.size - 1)
-				break;
 		}
 		printf("\n");
 		offset += 16;

@@ -98,31 +98,31 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 struct mach_header_64 get_mach_header64(const char *memfile)
 {
 	ft_memcpy((void*)&g_mach.header, memfile, sizeof(g_mach.header));
-	for(int i = 0; i < 80; ++i)
-		write(1, "-", 1);
-	write(1, "\n", 1);
-	// printf("--Magic file: %x\n", g_mach.header.magic);
-	switch (g_mach.header.filetype)
-	{
-		case 1:
-			printf("--Type: %s\n", "object");
-			break;
-		case 2:
-			printf("--Type: %s\n", "execut");
-			break;
-		case 3:
-			printf("--Type: %s\n", "library");
-			break;
-		case 4:
-			printf("--Type: %s\n", "core");
-			break;
-		default:
-			break;
-	}
-	printf("--ncmds: %d\n", g_mach.header.ncmds);
-	for(int i = 0; i < 80; ++i)
-		write(1, "-", 1);
-	write(1, "\n", 1);
+	// for(int i = 0; i < 80; ++i)
+	// 	write(1, "-", 1);
+	// write(1, "\n", 1);
+	// // printf("--Magic file: %x\n", g_mach.header.magic);
+	// switch (g_mach.header.filetype)
+	// {
+	// 	case 1:
+	// 		printf("--Type: %s\n", "object");
+	// 		break;
+	// 	case 2:
+	// 		printf("--Type: %s\n", "execut");
+	// 		break;
+	// 	case 3:
+	// 		printf("--Type: %s\n", "library");
+	// 		break;
+	// 	case 4:
+	// 		printf("--Type: %s\n", "core");
+	// 		break;
+	// 	default:
+	// 		break;
+	// }
+	// printf("--ncmds: %d\n", g_mach.header.ncmds);
+	// for(int i = 0; i < 80; ++i)
+	// 	write(1, "-", 1);
+	// write(1, "\n", 1);
 	return(g_mach.header);
 }
 
@@ -148,7 +148,7 @@ int	analyse_mach64(void)
 			struct segment_command_64 segment;
 			
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
-			printf("LC_SEGMENT_64 %d\n", i);
+			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment((void*)ptr, segment);
 			// printf("Load command %d\n", i);
 			// printf("segname: %s\n", segment.segname);
@@ -171,8 +171,9 @@ int	analyse_mach64(void)
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
-			ft_memcpy(&cmd, ptr, sizeof(cmd));
-			printf("LC_DYSYMTAB: to be continued...\n");
+			(void)cmd;
+			// ft_memcpy(&cmd, ptr, sizeof(cmd));
+			// printf("LC_DYSYMTAB: to be continued...\n");
 			// printf("ilocalsym: %d\n", cmd.ilocalsym);
 			// printf("nlocalsym: %d\n", cmd.nlocalsym);
 			// printf("cmdsize %u\n", cmd.cmdsize);

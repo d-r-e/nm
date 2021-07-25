@@ -23,6 +23,7 @@ static int ft_nm(const char *path)
 	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC_64)
 	{
 		get_mach_header64(g_mach.mem);
+		printf("%s:\n", path);
 		analyse_mach64();
 	}
 	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC)
