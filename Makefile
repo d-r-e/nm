@@ -21,7 +21,7 @@ fclean: clean
 
 re: fclean all
 
-commit: re fclean
+commit: all fclean
 	@git add $(SRC) Makefile include/nm.h img
 	@git commit -am "auto commit by ${USER} `date +%d-%m-%Y` from `uname -n | cut -d. -f1`"
 
