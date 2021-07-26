@@ -1,4 +1,4 @@
-NAME=ft_nm
+NAME=ft_otool
 
 SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c
 OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o
