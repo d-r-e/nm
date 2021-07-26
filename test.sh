@@ -8,6 +8,11 @@ COLOR_YELLOW="$(tput setaf 3)"
 make
 RESULT=$(( 0 ))
 NFILES=$(($(find bin -type f  | wc -l)))
+
+function echo_green() {
+    echo $COLOR_GREEN $1 $COLOR_REST
+}
+
 for f in $FILES;do
     otool -t "${f}" >/dev/null
     if [ "$?" == "0" ]; then
@@ -23,7 +28,9 @@ for f in $FILES;do
         fi
     fi
 done
-echo "RESULT: $RESULT/$NFILES"
+echo_green "RESULT: $RESULT/$NFILES"
+if [ "${RESULT}" == "${NFILES}" ];then
+fi
 exit 0
 FILES=$(find /usr/bin -type f )
 for f in $FILES;do
