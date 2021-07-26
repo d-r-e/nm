@@ -1,19 +1,17 @@
 #include "../include/nm.h"
 
-int no_such_file(const char *s)
+int file_error(const char *file, const char *error)
 {
-	ft_putstr("nm: \'");
-	ft_putstr(s);
-	ft_putstr("\': ");
-	ft_puts(NO_SUCH_FILE);
+	fprintf(stderr,"%s: \'%s\': %s\n", BINARY, file, error);
 	return (-1);
 }
 
-int permission_denied(const char *s)
+int ft_strerr(const char *s)
 {
-	ft_putstr("nm: \'");
+	ft_putstr(BINARY);
+	ft_putstr(": \'");
 	ft_putstr(s);
 	ft_putstr("\': ");
-	ft_puts(PERMISSION_DENIED);
+	ft_puts(STAT_ERROR);
 	return (-1);
 }

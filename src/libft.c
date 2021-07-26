@@ -14,7 +14,6 @@ char	*ft_strncpy(char *dest, const char *src, size_t n)
 		dest[i] = src[i];
 	for ( ; i < n; i++)
 		dest[i] = '\0';
-
 	return dest;
 }
 
@@ -31,11 +30,8 @@ int		ft_memcmp(const void *s1, const void *s2, size_t n)
 	{
 		if (*str1 != *str2)
 			return (*str1 - *str2);
-		if (n)
-		{
 			str1++;
 			str2++;
-		}
 	}
 	return (0);
 }

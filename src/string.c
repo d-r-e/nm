@@ -17,6 +17,8 @@ void ft_putstr(const char *s)
 
 void ft_puts(const char *s)
 {
+	if (!s)
+		return;
 	write(1, s, ft_strlen(s));
 	write(1, "\n", 1);
 }
@@ -43,6 +45,8 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 
 int strerr(const char *s)
 {
+	write(2, BINARY, ft_strlen(BINARY));
+	write(2, ": ", 2);
 	write(2, s, ft_strlen(s));
 	return (-1);
 }

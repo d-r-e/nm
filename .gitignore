@@ -3,3 +3,4 @@
 ft_nm
 *.swp
 .vscode
+main_*leaks.c
