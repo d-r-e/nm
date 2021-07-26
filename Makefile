@@ -3,7 +3,7 @@ NAME=ft_otool
 SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c
 OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o
 INC=include/nm.h
-CFLAGS= -Wall -Wextra -Werror -Wformat-security
+CFLAGS= -Wall -Wextra -Werror -Wformat-security -fsanitize=address
 $(NAME): $(OBJ) $(INC)
 	gcc $(CFLAGS) $(OBJ) -o $(NAME)
 
@@ -14,10 +14,10 @@ $(OBJ): $(SRC)
 all: $(NAME)
 
 clean:
-	rm -f $(OBJ)
+	@rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 
@@ -42,7 +42,7 @@ valgrind: re
 	@rm -f src/*
 
 test: re
-	./$(NAME) test/**
+	./test.sh
 
 pull: re fclean
 	git pull origin master
@@ -63,4 +63,4 @@ offleaks:
 testleaks: $(NAME)
 	./$(NAME) test/*
 
-leaks: onleaks testleaks offleaks
+leaks: onleaks testleaks offleaks fclean
