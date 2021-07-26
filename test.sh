@@ -6,7 +6,7 @@ if [ ! -f $BIN ];then
     exit 1
 fi
 
-FILES=$(find /bin -type f )
+FILES=$(find /usr/libexec -type f )
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
@@ -36,8 +36,8 @@ function failure ()
 }
 
 for f in $FILES;do
-    otool -t "${f}" | grep "not an object" >/dev/null
-    if [ "$?" != "0" ]; then
+    file "${f}" | grep "Mach" &> /dev/null
+    if [ "$?" = "0" ]; then
         NFILES=$(($NFILES + 1))
         diff -i <(./$BIN "${f}" 2>/dev/null| cat -e) <(otool -t "${f}" 2>/dev/null| cat -e) >/dev/null
         if [ "$?" == "0" ];then 

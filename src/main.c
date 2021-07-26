@@ -28,6 +28,10 @@ static int ft_nm(const char *path)
 	}
 	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC)
 		printf("32 bits mach-o binary\n");
+	else if (is_mach(g_mach.mem, &g_mach.s) == FAT_MAGIC)
+		printf("32 bits fat binary\n");
+	else if (is_mach(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64)
+		printf("64 bits fat binary\n");
 	else
 		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
 	munmap(g_mach.mem, g_mach.s.st_size);

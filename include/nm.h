@@ -14,6 +14,8 @@
 # include <mach-o/loader.h>
 # include <mach-o/fat.h>
 # include <mach-o/stab.h>
+# include <mach-o/fat.h>
+# include <ar.h>
 
 # define BINARY "nm"
 # define NO_SUCH_FILE "No such file."

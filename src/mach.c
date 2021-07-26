@@ -18,17 +18,29 @@ unsigned int is_mach(const char *memfile, struct stat *s)
 	uint32_t fatm32	=	FAT_MAGIC;
 	uint32_t fatm64	=	FAT_MAGIC_64;
 
-	if (s->st_size < 4)
+	if (s->st_size < (off_t)sizeof(struct mach_header))
 		return (FALSE);
 	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(mach32)))
 		return (MH_MAGIC);
 	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach64)))
 		return (MH_MAGIC_64);
-	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(fatm32)))
+	if (!ft_memcmp((unsigned char*)&fatm32, memfile, sizeof(fatm32)))
 		return (FAT_MAGIC);
-	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(fatm64)))
+	if (!ft_memcmp((unsigned char*)&fatm64, memfile, sizeof(fatm64)))
 		return (FAT_MAGIC_64);
+	printf("%x\n", *memfile);
+	for (int i = 0; i < 5; ++i)
+	{
+		printf("%.2x ", (unsigned char)*(memfile++));
+	}
+	printf("\n");
 	return (FALSE);
+}
+
+int is_ar(const char *memfile)
+{
+	(void)memfile;
+	return(0);
 }
 
 int get_mach_header32(const char *memfile)
