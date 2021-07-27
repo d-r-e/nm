@@ -34,11 +34,6 @@ uint32_t get_magic(const char *memfile, struct stat *s)
 	return (FALSE);
 }
 
-int is_ar(const char *memfile)
-{
-	(void)memfile;
-	return(0);
-}
 
 int get_mach_header32(const char *memfile)
 {
