@@ -24,6 +24,7 @@
 # define FALSE 0
 # define TRUE 1
 
+# define ARCH_MAGIC 454545
 /*
 ** libft
 */
@@ -48,7 +49,8 @@ int	strerr(const char *s);
 ** ft_nm
 */
 int                     is_elf(const char *memfile, struct stat *s);
-unsigned int            is_mach(const char *memfile, struct stat *s);
+uint32_t	            get_magic(const char *memfile, struct stat *s);
+int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(void);

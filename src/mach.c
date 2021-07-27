@@ -11,26 +11,23 @@ int is_elf(const char *memfile, struct stat *s)
 	return (TRUE);
 }
 
-unsigned int is_mach(const char *memfile, struct stat *s)
+uint32_t get_magic(const char *memfile, struct stat *s)
 {
-	uint32_t mach32 =	MH_MAGIC;
-	uint32_t mach64 =	MH_MAGIC_64;
-	uint32_t fatm32	=	FAT_MAGIC;
-	uint32_t fatm64	=	FAT_MAGIC_64;
+	uint32_t magic[] = {MH_MAGIC, MH_MAGIC_64, FAT_MAGIC, FAT_MAGIC_64, };
+	const char magicstr[] = {ARMAG};
 
 	if (s->st_size < (off_t)sizeof(struct mach_header))
 		return (FALSE);
-	if (!ft_memcmp((unsigned char*)&mach32, memfile, sizeof(mach32)))
-		return (MH_MAGIC);
-	if (!ft_memcmp((unsigned char*)&mach64, memfile, sizeof(mach64)))
-		return (MH_MAGIC_64);
-	if (!ft_memcmp((unsigned char*)&fatm32, memfile, sizeof(fatm32)))
-		return (FAT_MAGIC);
-	if (!ft_memcmp((unsigned char*)&fatm64, memfile, sizeof(fatm64)))
-		return (FAT_MAGIC_64);
+	for (int i = 0; i < 4; ++i) {
+		if (!ft_memcmp((unsigned char*)&magic[i], memfile, sizeof(magic[i])))
+			return (magic[i]);
+	}
+	for (int i = 0; i < 1; ++i) {
+		if (!ft_memcmp(&magicstr[i], memfile, strlen(&magicstr[i])))
+			return ((uint32_t)ARCH_MAGIC);
+	}
 	printf("%x\n", *memfile);
-	for (int i = 0; i < 5; ++i)
-	{
+	for (int i = 0; i < 5; ++i) {
 		printf("%.2x ", (unsigned char)*(memfile++));
 	}
 	printf("\n");

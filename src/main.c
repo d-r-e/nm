@@ -20,19 +20,20 @@ static int ft_nm(const char *path)
 		return (strerr("Error: Not enough memory.\n"));
 	// if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
 	// 	analyse_elf(g_mach.mem, path);
-	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC_64)
-	{
-		get_mach_header64(g_mach.mem);
+	else if (get_magic(g_mach.mem, &g_mach.s) == MH_MAGIC_64) {
+		ft_memcpy((void*)&g_mach.header, g_mach.mem, sizeof(g_mach.header));
 		printf("%s:\n", path);
 		analyse_mach64();
-	}
-	else if (is_mach(g_mach.mem, &g_mach.s) == MH_MAGIC)
+	} else if (get_magic(g_mach.mem, &g_mach.s) == MH_MAGIC)
 		printf("32 bits mach-o binary\n");
-	else if (is_mach(g_mach.mem, &g_mach.s) == FAT_MAGIC)
+	else if (get_magic(g_mach.mem, &g_mach.s) == FAT_MAGIC)
 		printf("32 bits fat binary\n");
-	else if (is_mach(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64)
+	else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64)
 		printf("64 bits fat binary\n");
-	else
+	else if (get_magic(g_mach.mem, &g_mach.s ) == ARCH_MAGIC) {
+		printf("Arch file\n");
+		read_arch();
+	} else
 		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
 	munmap(g_mach.mem, g_mach.s.st_size);
 	close(g_mach.fd);

@@ -6,7 +6,7 @@ if [ ! -f $BIN ];then
     exit 1
 fi
 
-FILES=$(find /usr/libexec -type f )
+FILES=$(find /usr/libexec -type f | head -n20)
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
@@ -55,6 +55,7 @@ echo "RESULT: $RESULT/$NFILES"
 [ "${RESULT}" == "${NFILES}" ] && success || failure
 
 exit 0
+
 FILES=$(find /usr/bin -type f )
 for f in $FILES;do
     otool -t "${f}" &>/dev/null
