@@ -6,7 +6,7 @@ if [ ! -f $BIN ];then
     exit 1
 fi
 
-FILES=$(find /usr/libexec -type f | head -n20)
+FILES=$(find /usr/bin/** -type f )
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"

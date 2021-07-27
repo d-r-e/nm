@@ -14,7 +14,6 @@
 # include <mach-o/loader.h>
 # include <mach-o/fat.h>
 # include <mach-o/stab.h>
-# include <mach-o/fat.h>
 # include <ar.h>
 
 # define BINARY "nm"
@@ -25,6 +24,7 @@
 # define TRUE 1
 
 # define ARCH_MAGIC 454545
+# define CAFEBABE	0xBEBAFECA
 /*
 ** libft
 */
@@ -54,6 +54,7 @@ int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(void);
+int						analyse_mach32(void);
 
 /*
 ** Symbols
@@ -66,10 +67,13 @@ int			read_symtable_64(const char *mem, uint32_t nsyms);
 ** Segments & sections
 */
 int		parse_segment(const char *mem, struct segment_command_64 segment);
+int		parse_segment32(const char *mem, struct segment_command segment);
 
 typedef struct s_mach {
 	int						fd;
 	struct mach_header_64	header;
+	struct mach_header		header32;
+	size_t					header_size;
 	char					*mem;
 	struct stat				s;
 	struct symtab_command	symtab;

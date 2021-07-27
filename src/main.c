@@ -21,13 +21,22 @@ static int ft_nm(const char *path)
 	// if (is_elf(g_mach.mem, &g_mach.s) == TRUE)
 	// 	analyse_elf(g_mach.mem, path);
 	else if (get_magic(g_mach.mem, &g_mach.s) == MH_MAGIC_64) {
-		ft_memcpy((void*)&g_mach.header, g_mach.mem, sizeof(g_mach.header));
+		g_mach.header_size = sizeof(struct mach_header_64);
+		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
 		printf("%s:\n", path);
 		analyse_mach64();
 	} else if (get_magic(g_mach.mem, &g_mach.s) == MH_MAGIC)
 		printf("32 bits mach-o binary\n");
-	else if (get_magic(g_mach.mem, &g_mach.s) == FAT_MAGIC)
-		printf("32 bits fat binary\n");
+	else if (get_magic(g_mach.mem, &g_mach.s) == CAFEBABE)
+		printf("Mach-O universal binary\n");
+	else if (get_magic(g_mach.mem, &g_mach.s) == FAT_MAGIC){
+		printf("32 bits fat binary (cafebabe)\n");
+		g_mach.header_size = sizeof(struct mach_header);
+		ft_memcpy((void*)&g_mach.header32, g_mach.mem, sizeof(g_mach.header32));
+		printf("%s:\n", path);
+		ft_puts("HOLI");
+		analyse_mach32();
+	}
 	else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64)
 		printf("64 bits fat binary\n");
 	else if (get_magic(g_mach.mem, &g_mach.s ) == ARCH_MAGIC) {

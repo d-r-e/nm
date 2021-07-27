@@ -13,14 +13,14 @@ int is_elf(const char *memfile, struct stat *s)
 
 uint32_t get_magic(const char *memfile, struct stat *s)
 {
-	uint32_t magic[] = {MH_MAGIC, MH_MAGIC_64, FAT_MAGIC, FAT_MAGIC_64, };
+	uint32_t magic[5] = {MH_MAGIC, MH_MAGIC_64, FAT_MAGIC, FAT_MAGIC_64, CAFEBABE};
 	const char magicstr[] = {ARMAG};
 
 	if (s->st_size < (off_t)sizeof(struct mach_header))
 		return (FALSE);
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		if (!ft_memcmp((unsigned char*)&magic[i], memfile, sizeof(magic[i])))
-			return (magic[i]);
+		 	return (magic[i]);
 	}
 	for (int i = 0; i < 1; ++i) {
 		if (!ft_memcmp(&magicstr[i], memfile, strlen(&magicstr[i])))
@@ -33,7 +33,6 @@ uint32_t get_magic(const char *memfile, struct stat *s)
 	printf("\n");
 	return (FALSE);
 }
-
 
 int get_mach_header32(const char *memfile)
 {
@@ -136,6 +135,41 @@ int analyse_elf(const char *s, const char *path)
 	printf("%s: %s: no symbols\n", BINARY, path);
 	(void)s;
 	return (0);
+}
+
+int analyse_mach32(void)
+{
+	struct load_command *ptr;
+	unsigned const char *mem;
+
+	ft_puts("CARACOLI");
+	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header32));
+	mem = (const unsigned char *)ptr;
+	printf("ncmds=%u\n", g_mach.header32.ncmds);
+	ft_puts("CARACOLI");
+	for (uint32_t i = 0; i < g_mach.header32.ncmds; i++)
+	{
+		// if (ptr->cmd == LC_SEGMENT)
+		// {
+		// 	struct segment_command segment;
+			
+		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command));
+		// 	parse_segment32((void*)ptr, segment);
+		// }
+		// else if (ptr->cmd == LC_SYMTAB)
+		// {
+		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+		// }
+		// else if (ptr->cmd == LC_DYSYMTAB)
+		// {
+		// 	struct dysymtab_command cmd;
+		// 	(void)cmd;
+		// }
+		mem += ptr->cmdsize;
+		ptr = (struct load_command *)mem;
+	}
+	ft_puts("CARACOLI");
+	return(0);
 }
 
 int	analyse_mach64(void)
