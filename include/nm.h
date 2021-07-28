@@ -14,6 +14,7 @@
 # include <mach-o/loader.h>
 # include <mach-o/fat.h>
 # include <mach-o/stab.h>
+# include <mach-o/swap.h>
 # include <ar.h>
 
 # define BINARY "nm"
@@ -25,6 +26,9 @@
 
 # define ARCH_MAGIC 454545
 # define CAFEBABE	0xBEBAFECA
+// cputype 16777223 is “x86 64” (64 bit mode); 7 is “i386”
+# define X86_64 16777223
+# define I386 7
 /*
 ** libft
 */
