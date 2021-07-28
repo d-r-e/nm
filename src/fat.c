@@ -19,8 +19,8 @@ static void ft_swap_fat_arch_64(struct fat_arch_64 *arch)
 {
     arch->cputype = ft_ltob(arch->cputype);
     arch->cpusubtype = ft_ltob(arch->cpusubtype);
-    arch->offset = ft_lltob(arch->offset);
-    arch->size = ft_lltob(arch->size);
+    // arch->offset = ft_lltob(arch->offset);
+    // arch->size = ft_lltob(arch->size);
     arch->align = ft_ltob(arch->align);
 }
 
@@ -44,7 +44,7 @@ static void print_fat_arch64(struct fat_arch_64 arch)
 
 int is_x86(const char *ptr)
 {
-    int i386 = 0x07000000;
+    int i386 = 0x07000001;
 
     for(int i = 0; i < 4; ++i)
     {
@@ -56,7 +56,7 @@ int is_x86(const char *ptr)
 
 int is_x86_64(const char *ptr)
 {
-    int i386 = 0x07000001;
+    int i386 = 0x07000000;
 
     for(int i = 0; i < 4; ++i)
     {
@@ -80,7 +80,7 @@ int read_fat()
     //printf("sizeof fatheader%lu\n", sizeof(g_mach.fatheader));
     //printf("magic %X\n", g_mach.fatheader.magic);
     swap_fat_header(&g_mach.fatheader, LITTLE_ENDIAN);
-    //printf("nfat_arch %d\n", g_mach.fatheader.nfat_arch);
+    printf("nfat_arch %d\n", g_mach.fatheader.nfat_arch);
     ptr += sizeof(struct fat_header);
     for (i = 0; i < g_mach.fatheader.nfat_arch; ++i)
     {
@@ -94,10 +94,11 @@ int read_fat()
         printf("CPU_TYPE_X86: %x\n", CPU_TYPE_X86);
 
         if (is_x86(ptr)){
+            printf("x86!!!\n");
             ft_memcpy(&fat, ptr, sizeof(fat));
             ft_swap_fat_arch(&fat);
             print_fat_arch(fat);
-            printf("______________");
+            printf("______________\n");
             ptr += sizeof(fat);
         }
         else if (is_x86_64(ptr)){
@@ -106,9 +107,8 @@ int read_fat()
             ft_swap_fat_arch_64(&fat64);
             print_fat_arch64(fat64);
             ptr += sizeof(fat64);
-            printf("______________");
+            printf("______________\n");
         } else {
-            printf("Weird architecture\n");
             return (-1);
         }
     }
