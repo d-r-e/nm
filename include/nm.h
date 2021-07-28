@@ -27,8 +27,8 @@
 # define ARCH_MAGIC 454545
 # define CAFEBABE	0xBEBAFECA
 // cputype 16777223 is “x86 64” (64 bit mode); 7 is “i386”
-# define X86_64 16777223
-# define I386 7
+# define X86_64 0x07000000
+# define I386 0x07000001
 /*
 ** libft
 */
@@ -42,6 +42,8 @@ char					*ft_strncpy(char *dest, const char *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
 void					*ft_memcpy(void *str1, const void *str2, size_t n);
 unsigned int			ft_ltob(unsigned int little);
+unsigned long int		ft_lltob(unsigned long int little);
+
 /*
 ** output
 */

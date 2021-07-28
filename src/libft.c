@@ -58,8 +58,30 @@ void	*ft_memcpy(void *str1, const void *str2, size_t n)
 /*
  * little endian to big endian
 */
-unsigned int ft_ltob(unsigned int little)
+unsigned int ft_ltob(unsigned int n)
 {
-    return((little&0xff)<<24)+((little&0xff00)<<8)+((little&0xff0000)>>8)+      \
-                                                             ((little>>24)&0xff);
+	char lit[4];
+	char big[4];
+	int	ret;
+
+	ft_memcpy((char*)lit, (const char*)&n, 4);
+	big[0] = lit[3];
+	big[1] = lit[2];
+	big[2] = lit[1];
+	big[3] = lit[0];
+	ft_memcpy((char*)&ret, (const char*)big, 4);
+	return (ret);
+}
+
+unsigned long int ft_lltob(unsigned long int n)
+{
+	char lit[sizeof(unsigned long int)];
+	char big[sizeof(unsigned long int)];
+	unsigned long int	ret;
+
+	ft_memcpy((char*)lit, (const char*)&n, sizeof(unsigned long int));
+	for (unsigned int i = 0; i < sizeof(unsigned long int); ++i)
+		big[i] = lit[sizeof(unsigned long int) - i - 1];
+	ft_memcpy((char*)&ret, (const char*)big, sizeof(unsigned long int));
+	return (ret);
 }
