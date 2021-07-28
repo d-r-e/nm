@@ -1,7 +1,7 @@
 NAME=ft_otool
 
-SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c src/arch.c
-OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o obj/arch.o
+SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c src/arch.c src/fat.c
+OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o obj/arch.o obj/fat.o
 INC=include/nm.h
 CFLAGS= -Wall -Wextra -Werror -Wformat-security # -fsanitize=address -g
 $(NAME): $(OBJ) $(INC)

@@ -54,3 +54,12 @@ void	*ft_memcpy(void *str1, const void *str2, size_t n)
 	}
 	return (dest);
 }
+
+/*
+ * little endian to big endian
+*/
+unsigned int ft_ltob(unsigned int little)
+{
+    return((little&0xff)<<24)+((little&0xff00)<<8)+((little&0xff0000)>>8)+      \
+                                                             ((little>>24)&0xff);
+}

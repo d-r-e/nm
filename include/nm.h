@@ -37,7 +37,7 @@ void					ft_bzero(void *s, size_t n);
 char					*ft_strncpy(char *dest, const char *src, size_t n);
 int						ft_memcmp(const void *s1, const void *s2, size_t n);
 void					*ft_memcpy(void *str1, const void *str2, size_t n);
-
+unsigned int			ft_ltob(unsigned int little);
 /*
 ** output
 */
@@ -57,6 +57,11 @@ int                     analyse_mach64(void);
 int						analyse_mach32(void);
 
 /*
+ * fat file architecture
+*/
+int		read_fat(void);
+
+/*
 ** Symbols
 */
 int			read_symstr(const char *mem, uint32_t nsyms);
@@ -71,6 +76,7 @@ int		parse_segment32(const char *mem, struct segment_command segment);
 
 typedef struct s_mach {
 	int						fd;
+	struct fat_header		fatheader;
 	struct mach_header_64	header;
 	struct mach_header		header32;
 	size_t					header_size;

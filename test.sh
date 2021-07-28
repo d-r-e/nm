@@ -11,7 +11,9 @@ COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
 COLOR_YELLOW="$(tput setaf 3)"
+
 make
+
 RESULT=$(( 0 ))
 NFILES=$(( 0 ))
 
@@ -37,7 +39,7 @@ function failure ()
 
 for f in $FILES;do
     file "${f}" | grep "Mach" &> /dev/null
-    if [ "$?" = "0" ]; then
+    if [ "$?" == "0" ]; then
         NFILES=$(($NFILES + 1))
         diff -i <(./$BIN "${f}" 2>/dev/null| cat -e) <(otool -t "${f}" 2>/dev/null| cat -e) >/dev/null
         if [ "$?" == "0" ];then 
