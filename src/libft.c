@@ -75,13 +75,21 @@ unsigned int ft_ltob(unsigned int n)
 
 unsigned long int ft_lltob(unsigned long int n)
 {
-	char lit[sizeof(unsigned long int)];
-	char big[sizeof(unsigned long int)];
-	unsigned long int	ret;
+	char buf[8];
 
-	ft_memcpy((char*)lit, (const char*)&n, sizeof(unsigned long int));
-	for (unsigned int i = 0; i < sizeof(unsigned long int); ++i)
-		big[i] = lit[sizeof(unsigned long int) - i - 1];
-	ft_memcpy((char*)&ret, (const char*)big, sizeof(unsigned long int));
-	return (ret);
+// set the byte array from smallest to largest byte
+for(int i = 0; i < 8; ++i) {
+    buf[i] = (n >> i*8) & 0xFF;
+}
+
+// build the new long from largest to smallest byte (reversed)
+	unsigned long l = ((buf[0] & 0xFFL) << 56) | \
+         ((buf[2] & 0xFFL) << 40) | \
+         ((buf[1] & 0xFFL) << 48) | \
+         ((buf[3] & 0xFFL) << 32) | \
+         ((buf[4] & 0xFFL) << 24) | \
+         ((buf[5] & 0xFFL) << 16) | \
+         ((buf[6] & 0xFFL) <<  8) | \
+         ((buf[7] & 0xFFL) <<  0) ;
+	return (l);
 }
