@@ -19,19 +19,15 @@ char	*ft_strncpy(char *dest, const char *src, size_t n)
 
 int		ft_memcmp(const void *s1, const void *s2, size_t n)
 {
-	const unsigned char		*str1;
-	const unsigned char		*str2;
-
 	if (s1 == s2 || n == 0)
 		return (0);
-	str1 = (const unsigned char *)s1;
-	str2 = (const unsigned char *)s2;
 	while (n--)
 	{
-		if (*str1 != *str2)
-			return (*str1 - *str2);
-			str1++;
-			str2++;
+		if (*(char*)s1 != *(char*)s2){
+			return (*(char*)s1 - *(char*)s2);
+		}
+		s1++;
+		s2++;
 	}
 	return (0);
 }
@@ -75,21 +71,15 @@ unsigned int ft_ltob(unsigned int n)
 
 unsigned long int ft_lltob(unsigned long int n)
 {
-	char buf[8];
+	char lit[8];
+	char big[8];
+	long int	ret;
 
-// set the byte array from smallest to largest byte
-for(int i = 0; i < 8; ++i) {
-    buf[i] = (n >> i*8) & 0xFF;
-}
-
-// build the new long from largest to smallest byte (reversed)
-	unsigned long l = ((buf[0] & 0xFFL) << 56) | \
-         ((buf[2] & 0xFFL) << 40) | \
-         ((buf[1] & 0xFFL) << 48) | \
-         ((buf[3] & 0xFFL) << 32) | \
-         ((buf[4] & 0xFFL) << 24) | \
-         ((buf[5] & 0xFFL) << 16) | \
-         ((buf[6] & 0xFFL) <<  8) | \
-         ((buf[7] & 0xFFL) <<  0) ;
-	return (l);
+	ft_memcpy((char*)lit, (const char*)&n, 8);
+	for (int i = 0; i < 8; ++i)
+	{
+		big[i] = lit[7 - i];
+	}
+	ft_memcpy((char*)&ret, (const char*)big, 8);
+	return (ret);
 }
