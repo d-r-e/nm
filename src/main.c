@@ -24,11 +24,11 @@ static int ft_nm(const char *path)
 		g_mach.header_size = sizeof(struct mach_header_64);
 		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
 		printf("%s:\n", path);
-		analyse_mach64();
+		analyse_mach64((struct load_command *)((g_mach.mem) + sizeof(g_mach.header)));
 	} else if (magic == MH_MAGIC)
 		printf("32 bits mach-o binary\n");
 	else if (magic == CAFEBABE){
-		printf("Mach-O universal binary\n");
+		printf("%s:\n", path);
 		read_fat();
 	}
 	else if (magic == FAT_MAGIC){

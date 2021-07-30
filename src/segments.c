@@ -6,7 +6,7 @@ static int get_text_sect(struct section_64 sect)
 	int offset;
 	unsigned long long lines;
 
-	ptr = (unsigned char*)(sect.offset + g_mach.mem);
+	ptr = (unsigned char*)(sect.offset + g_mach.mem + g_mach.fatarch.offset);
 	offset= sect.offset;
 	lines = sect.size / 16;
 	if (sect.size % 16)
@@ -70,7 +70,7 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 	{
 		ft_bzero(&section, sizeof(section));
 		ft_memcpy(&section, ptr, sizeof(section));
-		if (!ft_strncmp(section.segname, "__TEXT", ft_strlen("__TEXT")))
+		if (!ft_strncmp(section.segname, "__TEXT", 6))
 		{
 			if (!ft_strncmp(section.sectname, "__text", 6))
 			{

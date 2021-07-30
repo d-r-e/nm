@@ -172,19 +172,17 @@ int analyse_mach32(void)
 	return(0);
 }
 
-int	analyse_mach64(void)
+int	analyse_mach64(struct load_command *ptr)
 {
-	struct load_command *ptr;
 	unsigned const char *mem;
 
-	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header));
 	mem = (const unsigned char *)ptr;
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
 			struct segment_command_64 segment;
-			
+			ft_bzero(&segment, sizeof(struct segment_command_64));
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
 			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment((void*)ptr, segment);

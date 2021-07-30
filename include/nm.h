@@ -59,7 +59,7 @@ uint32_t	            get_magic(const char *memfile, struct stat *s);
 int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
-int                     analyse_mach64(void);
+int                     analyse_mach64(struct load_command *ptr);
 int						analyse_mach32(void);
 
 /*
@@ -92,6 +92,7 @@ typedef struct s_mach {
 	struct mach_header_64	header;
 	struct mach_header		header32;
 	size_t					header_size;
+	struct fat_arch			fatarch;
 	char					*mem;
 	struct stat				s;
 	struct symtab_command	symtab;
