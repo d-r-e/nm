@@ -81,7 +81,8 @@ int read_fat()
     //printf("magic %X\n", g_mach.fatheader.magic);
     ft_swap_fat_header(&g_mach.fatheader);
     printf("nfat_arch %d\n", g_mach.fatheader.nfat_arch);
-    ptr += sizeof(struct fat_header);
+    ptr += 8;
+    int offset = 0;
     for (i = 0; i < g_mach.fatheader.nfat_arch; ++i)
     {
         // for(int i = 0; i < 4; ++i)
@@ -89,10 +90,16 @@ int read_fat()
         //     printf("%.2x ", (unsigned int)ptr[i]);
         // }
         printf("i:%i\n", i);
-        cpu_type_t cputype = CPU_TYPE_X86;
-        printf("%.8x\n", cputype);
-        printf("%.8x \n", *(int*)ptr);
-        if (is_x86(ptr)){
+        printf("CPUTYPE:%.8x\n", (unsigned int)ft_swapint(*ptr));
+        if (is_x86_64(ptr)){
+            ft_memcpy(&fat, ptr, sizeof(fat));
+            printf("x86_64!\n");
+            ft_swap_fat_arch_64(&fat);
+            print_fat_arch(fat);
+            offset += sizeof(fat64);
+            ptr += sizeof(struct fat_arch);
+            printf("offset %d\n", offset);
+        } else if (is_x86(ptr)){
             printf("x86!!!\n");
             ft_memcpy(&fat, ptr, sizeof(fat));
             // ft_swap_fat_arch(&fat);
@@ -100,19 +107,11 @@ int read_fat()
             ft_swap_fat_arch(&fat);
             print_fat_arch(fat);
             // printf("______________\n");
-            ptr += sizeof(struct fat_arch);
+            ptr += 20;
+            offset += sizeof(struct fat_arch_64);
+            printf("offset %d\n", offset);
         }
-        cputype = CPU_TYPE_X86_64;
-        printf("A:%.8x\n", ft_swapint(cputype));
-        printf("B:%.8x \n", *(int*)ptr);
-        if (is_x86_64(ptr)){
-            ft_memcpy(&fat64, ptr, sizeof(fat64));
-            printf("x86_64!\n");
-            ft_swap_fat_arch_64(&fat64);
-            print_fat_arch64(fat64);
-            ptr += sizeof(fat64);
-            printf("______________\n");
-        } else {
+         else {
             printf("Weird\n");
         }
     }

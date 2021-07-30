@@ -77,7 +77,6 @@ int			read_symtable_64(const char *mem, uint32_t nsyms);
 /*
  * BYTES
 */
-unsigned long	ft_swaplong(unsigned long inv);
 long long	ft_swaplonglong(long long inv);
 unsigned int	ft_swapint(unsigned int inv);
 

@@ -19,26 +19,14 @@ static char	*ft_strrev(char *str, size_t len)
 
 }
 
-unsigned long
-ft_swaplong(unsigned long inv)
-{
-    char swapped[sizeof(unsigned long)];
-    unsigned long ret;
-
-    ft_memcpy(swapped, &inv, sizeof(inv));
-    ft_strrev(swapped, sizeof(unsigned long));
-    ft_memcpy(&ret, swapped, sizeof(ret));
-    return(ret);
-}
-
 long long
-ft_swaplonglong(
-long long ll)
+ft_swaplonglong(long long ll)
 {
 	union {
 	    char c[8];
 	    long long ll;
 	} in, out;
+
 	in.ll = ll;
 	out.c[0] = in.c[7];
 	out.c[1] = in.c[6];
