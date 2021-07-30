@@ -6,28 +6,29 @@ static void ft_swap_fat_header(struct fat_header *fat)
     fat->nfat_arch = ft_swapint(fat->nfat_arch);
 }
 
-// static void ft_swap_fat_arch(struct fat_arch *arch)
-// {
-//     arch->cputype = ft_swapint(arch->cputype);
-//     arch->cpusubtype = ft_swapint(arch->cpusubtype);
-//     arch->offset = ft_swapint(arch->offset);
-//     arch->size = ft_swapint(arch->size);
-//     arch->align = ft_swapint(arch->align);
-// }
+static void ft_swap_fat_arch(struct fat_arch *arch)
+{
+    arch->cputype = ft_swapint(arch->cputype);
+    arch->cpusubtype = ft_swapint(arch->cpusubtype);
+    arch->offset = ft_swapint(arch->offset);
+    arch->size = ft_swapint(arch->size);
+    arch->align = ft_swapint(arch->align);
+}
 
 static void ft_swap_fat_arch_64(struct fat_arch_64 *arch)
 {
-    arch->cputype = ft_ltob(arch->cputype);
-    arch->cpusubtype = ft_ltob(arch->cpusubtype);
-    arch->offset = ft_lltob(arch->offset);
-    arch->size = ft_lltob(arch->size);
-    arch->align = ft_ltob(arch->align);
+    arch->cputype = ft_swapint(arch->cputype);
+    arch->cpusubtype = ft_swapint(arch->cpusubtype);
+    arch->offset = ft_swaplonglong(arch->offset);
+    arch->size = ft_swaplonglong(arch->size);
+    arch->align = ft_swapint(arch->align);
+    arch->reserved = ft_swapint(arch->reserved);
 }
 
 static void print_fat_arch(struct fat_arch arch)
 {
     printf("arch.cputype : %i\n", arch.cputype);
-    printf("arch.cpusubtype : %u\n", ft_swapint(arch.cpusubtype));
+    printf("arch.cpusubtype : %u\n", arch.cpusubtype);
     printf("arch.offset : %u\n", arch.offset);
     printf("arch.size : %u\n", arch.size);
     printf("arch.align : %u\n", arch.align);
@@ -43,19 +44,19 @@ static void print_fat_arch64(struct fat_arch_64 arch)
 
 int is_x86(const char *ptr)
 {
-    int i386 = 0x07000001;
+    cpu_type_t i386 = ft_swapint(CPU_TYPE_X86);
 
     for(int i = 0; i < 4; ++i)
     {
         if (((const char)ptr[i] != *((const char*)&i386 + i)))
-            return (0);
+            return (FALSE);
     }
-    return (1);
+    return (TRUE);
 }
 
 int is_x86_64(const char *ptr)
 {
-    int i386 = 0x07000000;
+    cpu_type_t i386 = ft_swapint(CPU_TYPE_X86_64);
 
     for(int i = 0; i < 4; ++i)
     {
@@ -96,16 +97,14 @@ int read_fat()
             ft_memcpy(&fat, ptr, sizeof(fat));
             // ft_swap_fat_arch(&fat);
             // ft_swap_fat_arch(&fat);
-            print_fat_arch(fat);
-
-            swap_fat_arch(&fat, i, LITTLE_ENDIAN);
+            ft_swap_fat_arch(&fat);
             print_fat_arch(fat);
             // printf("______________\n");
-            ptr += sizeof(fat);
+            ptr += sizeof(struct fat_arch);
         }
         cputype = CPU_TYPE_X86_64;
-        printf("%.8x\n", ft_swapint(cputype));
-        printf("%.8x \n", *(int*)ptr);
+        printf("A:%.8x\n", ft_swapint(cputype));
+        printf("B:%.8x \n", *(int*)ptr);
         if (is_x86_64(ptr)){
             ft_memcpy(&fat64, ptr, sizeof(fat64));
             printf("x86_64!\n");

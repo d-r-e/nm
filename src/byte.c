@@ -2,19 +2,21 @@
 
 static char	*ft_strrev(char *str, size_t len)
 {
-	size_t	i;
 	char	tmp;
+	size_t		i;
 
-	i = 0;
-	while (i < len)
+    len--;
+    i = 0;
+	while (len >= i)
 	{
 		tmp = str[i];
-		str[i] = str[len-1];
-		str[len-1] = tmp;
+		str[i] = str[len];
+		str[len] = tmp;
 		i++;
 		len--;
 	}
 	return (str);
+
 }
 
 unsigned long
@@ -29,16 +31,24 @@ ft_swaplong(unsigned long inv)
     return(ret);
 }
 
-unsigned long long
-ft_swaplonglong(unsigned long long inv)
+long long
+ft_swaplonglong(
+long long ll)
 {
-    char swapped[sizeof(unsigned long)];
-    unsigned long long ret;
-
-    ft_memcpy(swapped, &inv, sizeof(inv));
-    ft_strrev(swapped, sizeof(unsigned long long));
-    ft_memcpy(&ret, swapped, sizeof(ret));
-    return (ret);
+	union {
+	    char c[8];
+	    long long ll;
+	} in, out;
+	in.ll = ll;
+	out.c[0] = in.c[7];
+	out.c[1] = in.c[6];
+	out.c[2] = in.c[5];
+	out.c[3] = in.c[4];
+	out.c[4] = in.c[3];
+	out.c[5] = in.c[2];
+	out.c[6] = in.c[1];
+	out.c[7] = in.c[0];
+	return(out.ll);
 }
 
 unsigned int
