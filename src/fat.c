@@ -100,7 +100,7 @@ int read_fat()
             print_fat_arch(fat);
             ptr += 20;
             printf("sizeof fat64:%lu\n", sizeof(fat64));
-            printf("sizeof struct fat_arch_64:%u\n", sizeof(struct fat_arch_64));
+            printf("sizeof struct fat_arch_64:%lu\n", sizeof(struct fat_arch_64));
             printf("offset %d\n", offset);
         } else if (is_x86(ptr)){
             printf("x86!!!\n");
@@ -113,8 +113,8 @@ int read_fat()
             // printf("______________\n");
             ptr += sizeof(struct fat_arch);
             offset += sizeof(struct fat_arch);
-            printf("sizeof fat:%u\n", sizeof(fat));
-            printf("sizeof struct fat_arch:%u\n", sizeof(struct fat_arch));
+            printf("sizeof fat:%lu\n", sizeof(fat));
+            printf("sizeof struct fat_arch:%lu\n", sizeof(struct fat_arch));
             printf("offset %d\n", offset);
         }
          else {
