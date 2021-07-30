@@ -22,7 +22,6 @@ static void ft_swap_fat_arch_64(struct fat_arch_64 *arch)
     arch->offset = ft_swaplonglong(arch->offset);
     arch->size = ft_swaplonglong(arch->size);
     arch->align = ft_swapint(arch->align);
-    arch->reserved = ft_swapint(arch->reserved);
 }
 
 static void print_fat_arch(struct fat_arch arch)
@@ -81,7 +80,7 @@ int read_fat()
     //printf("magic %X\n", g_mach.fatheader.magic);
     ft_swap_fat_header(&g_mach.fatheader);
     printf("nfat_arch %d\n", g_mach.fatheader.nfat_arch);
-    ptr += 8;
+    ptr = (const char*)g_mach.mem + sizeof(g_mach.fatheader);
     int offset = 0;
     for (i = 0; i < g_mach.fatheader.nfat_arch; ++i)
     {
@@ -90,25 +89,32 @@ int read_fat()
         //     printf("%.2x ", (unsigned int)ptr[i]);
         // }
         printf("i:%i\n", i);
-        printf("CPUTYPE:%.8x\n", (unsigned int)ft_swapint(*ptr));
+        //printf("CPUTYPE:%.8x\n", (unsigned int)ft_swapint(*ptr));
         if (is_x86_64(ptr)){
+            printf("x86_64!!!\n");
+            ft_bzero(&fat, sizeof(fat));
             ft_memcpy(&fat, ptr, sizeof(fat));
-            printf("x86_64!\n");
-            ft_swap_fat_arch_64(&fat);
+            // ft_swap_fat_arch(&fat);
+            // ft_swap_fat_arch(&fat);
+            ft_swap_fat_arch(&fat);
             print_fat_arch(fat);
-            offset += sizeof(fat64);
-            ptr += sizeof(struct fat_arch);
+            ptr += 20;
+            printf("sizeof fat64:%lu\n", sizeof(fat64));
+            printf("sizeof struct fat_arch_64:%u\n", sizeof(struct fat_arch_64));
             printf("offset %d\n", offset);
         } else if (is_x86(ptr)){
             printf("x86!!!\n");
+            ft_bzero(&fat, sizeof(fat));
             ft_memcpy(&fat, ptr, sizeof(fat));
             // ft_swap_fat_arch(&fat);
             // ft_swap_fat_arch(&fat);
             ft_swap_fat_arch(&fat);
             print_fat_arch(fat);
             // printf("______________\n");
-            ptr += 20;
-            offset += sizeof(struct fat_arch_64);
+            ptr += sizeof(struct fat_arch);
+            offset += sizeof(struct fat_arch);
+            printf("sizeof fat:%u\n", sizeof(fat));
+            printf("sizeof struct fat_arch:%u\n", sizeof(struct fat_arch));
             printf("offset %d\n", offset);
         }
          else {

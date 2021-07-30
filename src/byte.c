@@ -1,24 +1,5 @@
 #include "../include/nm.h"
 
-static char	*ft_strrev(char *str, size_t len)
-{
-	char	tmp;
-	size_t		i;
-
-    len--;
-    i = 0;
-	while (len >= i)
-	{
-		tmp = str[i];
-		str[i] = str[len];
-		str[len] = tmp;
-		i++;
-		len--;
-	}
-	return (str);
-
-}
-
 long long
 ft_swaplonglong(long long ll)
 {
