@@ -179,6 +179,7 @@ int	analyse_mach64(struct load_command *ptr)
 	mem = (const unsigned char *)ptr;
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
+		//printf("%x\n", ptr->cmd);
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
 			struct segment_command_64 segment;
@@ -197,7 +198,27 @@ int	analyse_mach64(struct load_command *ptr)
 
 			// }
 			// printf("--------------------------------\n");
-		}
+		} 
+		//else if (ptr->cmd == LC_SEGMENT)
+		// {
+		// 	struct segment_command segment;
+		// 	printf("ASDFAS");
+		// 	ft_bzero(&segment, sizeof(struct segment_command));
+		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command));
+		// 	// printf("LC_SEGMENT_64 %d\n", i);
+		// 	//parse_segment((void*)ptr, segment);
+		// 	// printf("Load command %d\n", i);
+		// 	// printf("segname: %s\n", segment.segname);
+		// 	// printf("cmdsize %u\n", segment.cmdsize);
+		// 	// printf("vmaddr %llx\n", segment.vmaddr);
+		// 	// printf("nsects %d\n", segment.nsects);
+		// 	// for (int j = 0; j < segment.nsects; j++)
+		// 	// {
+		// 	// 	struct section_64 sect;
+
+		// 	// }
+		// 	// printf("--------------------------------\n");
+		// }
 		// else if (ptr->cmd == LC_SYMTAB)
 		// {
 		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));

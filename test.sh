@@ -9,6 +9,7 @@ fi
 FILES=$(find /usr/bin/** -type f 2>/dev/null)
 FILES+=" /usr/bin/python"
 FILES2=$(find /bin/** -type f 2>/dev/null)
+FILES3=$(find . -name "*.o" 2>/dev/null)
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
@@ -60,6 +61,7 @@ function test_files()
     echo "RESULT: $RESULT/$NFILES"
     [ "${RESULT}" == "${NFILES}" ] && success || failure
 }
+test_files $FILES3
 test_files $FILES
 test_files $FILES2
 

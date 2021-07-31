@@ -34,19 +34,20 @@ static int ft_nm(const char *path)
 		printf("%s:\n", path);
 		read_fat();
 	}
-	else if (magic == FAT_MAGIC){
-		printf("32 bits fat binary (cafebabe)\n");
-		g_mach.header_size = sizeof(struct mach_header);
-		ft_memcpy((void*)&g_mach.header32, g_mach.mem, sizeof(g_mach.header32));
-		printf("%s:\n", path);
-		ft_puts("HOLI");
-		analyse_mach32();
-	} else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64){
+	// else if (magic == FAT_MAGIC){
+	// 	printf("32 bits fat binary (cafebabe)\n");
+	// 	g_mach.header_size = sizeof(struct mach_header);
+	// 	ft_memcpy((void*)&g_mach.header32, g_mach.mem, sizeof(g_mach.header32));
+	// 	printf("%s:\n", path);
+	// 	ft_puts("HOLI");
+	// 	analyse_mach32();
+	// } 
+	else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64){
 		printf("64 bits fat binary\n");
 		read_fat();
 	} else if (get_magic(g_mach.mem, &g_mach.s ) == ARCH_MAGIC) {
 		printf("Arch file\n");
-		read_arch();
+		//read_arch();
 	} else {
 		fprintf(stderr, "%s: %s: file format not recognized.\n", BINARY, path);
 	}

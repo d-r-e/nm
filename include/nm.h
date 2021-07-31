@@ -56,7 +56,7 @@ int	strerr(const char *s);
 */
 int                     is_elf(const char *memfile, struct stat *s);
 uint32_t	            get_magic(const char *memfile, struct stat *s);
-int						read_arch(void);
+//int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(struct load_command *ptr);

@@ -58,13 +58,22 @@ static int get_text_sect32(struct section sect)
 	return(0);
 }
 
+void print_section(struct section_64 sect)
+{
+	printf("0x%.16llx\n", sect.addr);
+	printf("sect.offset %u \n", sect.offset);
+	printf("sect.align %u \n", sect.align);
+	printf("sect.flags %.8x \n", sect.flags);
+}
+
 int	parse_segment(const char *mem, struct segment_command_64 segment)
 {
-	unsigned char			*ptr;
+	unsigned const char			*ptr;
 	struct section_64	section;
 
 	if (segment.nsects < 0)
 		return (-1);
+	//printf("%d\n", segment.fileoff);
 	ptr = (unsigned char*)(mem + segment.fileoff + sizeof(segment));
 	for (uint32_t i = 0; i < segment.nsects; ++i)
 	{
