@@ -142,33 +142,33 @@ int analyse_mach32(void)
 	struct load_command *ptr;
 	unsigned const char *mem;
 
-	ft_puts("CARACOLI");
 	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header32));
 	mem = (const unsigned char *)ptr;
-	printf("ncmds=%u\n", g_mach.header32.ncmds);
-	ft_puts("CARACOLI");
+	// printf("ncmds=%u\n", g_mach.header32.ncmds);
 	for (uint32_t i = 0; i < g_mach.header32.ncmds; i++)
 	{
-		// if (ptr->cmd == LC_SEGMENT)
-		// {
-		// 	struct segment_command segment;
-			
-		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command));
-		// 	parse_segment32((void*)ptr, segment);
-		// }
-		// else if (ptr->cmd == LC_SYMTAB)
-		// {
-		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-		// }
-		// else if (ptr->cmd == LC_DYSYMTAB)
-		// {
-		// 	struct dysymtab_command cmd;
-		// 	(void)cmd;
-		// }
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
+		if (ptr->cmd == LC_SEGMENT)
+		{
+			struct segment_command segment;
+			ft_bzero(&segment, sizeof(struct segment_command));
+			ft_memcpy(&segment, ptr, sizeof(struct segment_command));
+			// printf("LC_SEGMENT_64 %d\n", i);
+			parse_segment32((void*)ptr, segment);
+			// printf("Load command %d\n", i);
+			//printf("segname: %s\n", segment.segname);
+			// printf("cmdsize %u\n", segment.cmdsize);
+			// printf("vmaddr %llx\n", segment.vmaddr);
+			// printf("nsects %d\n", segment.nsects);
+			// for (int j = 0; j < segment.nsects; j++)
+			// {
+			// 	struct section_64 sect;
+
+			// }
+			// printf("--------------------------------\n");
+		}
 	}
-	ft_puts("CARACOLI");
 	return(0);
 }
 
@@ -198,12 +198,12 @@ int	analyse_mach64(struct load_command *ptr)
 			// }
 			// printf("--------------------------------\n");
 		}
-		else if (ptr->cmd == LC_SYMTAB)
-		{
-			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
-			//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
-		}
+		// else if (ptr->cmd == LC_SYMTAB)
+		// {
+		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+		// 	//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
+		// 	//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+		// }
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;

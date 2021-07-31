@@ -29,34 +29,34 @@ static int get_text_sect(struct section_64 sect)
 	return(0);
 }
 
-// static int get_text_sect32(struct section sect)
-// {
-// 	const unsigned char *ptr;
-// 	int offset;
-// 	unsigned long long lines;
+static int get_text_sect32(struct section sect)
+{
+	const unsigned char *ptr;
+	unsigned int offset;
+	unsigned long long lines;
 
-// 	ptr = (unsigned char*)(sect.offset + g_mach.mem);
-// 	offset= sect.offset;
-// 	lines = sect.size / 16;
-// 	if (sect.size % 16)
-// 		lines++;
-// 	for (unsigned long long i = 0; i < lines; i++)
-// 	{
-// 		printf("00000001%0.8x\t", offset);
-// 		for (int n = 0; n < 16; ++n)
-// 		{
-// 			if (i * 16 + n == sect.size)
-// 				break;
-// 			printf("%.2x", *ptr);
-// 			if (n < 16)
-// 				printf(" ");
-// 			ptr++;
-// 		}
-// 		printf("\n");
-// 		offset += 16;
-// 	}
-// 	return(0);
-// }
+	ptr = (unsigned char*)(sect.offset + g_mach.mem);
+	offset= sect.offset;
+	lines = sect.size / 16;
+	if (sect.size % 16)
+		lines++;
+	for (unsigned long long i = 0; i < lines; i++)
+	{
+		printf("%0.8x\t", offset + 0x1000);
+		for (int n = 0; n < 16; ++n)
+		{
+			if (i * 16 + n == sect.size)
+				break;
+			printf("%.2x", *ptr);
+			if (n < 16)
+				printf(" ");
+			ptr++;
+		}
+		printf("\n");
+		offset += 16;
+	}
+	return(0);
+}
 
 int	parse_segment(const char *mem, struct segment_command_64 segment)
 {
@@ -100,7 +100,7 @@ int	parse_segment32(const char *mem, struct segment_command segment)
 			if (!ft_strncmp(section.sectname, "__text", 6))
 			{
 				printf("Contents of (__TEXT,%.16s) section\n", section.sectname);
-				//get_text_sect32(section);
+				get_text_sect32(section);
 			}
 		}
 		ptr += sizeof(section);

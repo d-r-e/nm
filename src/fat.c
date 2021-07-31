@@ -89,14 +89,17 @@ int read_fat()
             ft_bzero(&g_mach.fatarch, sizeof(g_mach.fatarch));
             ft_memcpy(&g_mach.fatarch, ptr, sizeof(g_mach.fatarch));
             ft_swap_fat_arch(&g_mach.fatarch);
-            //printf("%d\n", fat.cputype);
-            if (g_mach.fatarch.cputype != 7){
+            //printf("%i\n", g_mach.fatarch.cputype);
+            
+            if (g_mach.fatarch.cputype == 16777223){
+                //puts("entra");
             	g_mach.header_size = sizeof(struct mach_header_64);
                 ft_bzero(&g_mach.header, sizeof(g_mach.header));
                 ft_memcpy((void*)&g_mach.header, g_mach.mem + g_mach.fatarch.offset, sizeof(g_mach.header));
                 //printf("ncmds%d\n", g_mach.header.ncmds);
-                //print_fat_arch(g_mach.fatarch);
+                // hgeprint_fat_arch(g_mach.fatarch);
                 analyse_mach64((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header)));
+                //printf("entra\n");
             }
             //print_fat_arch(fat);
             // printf("______________\n");

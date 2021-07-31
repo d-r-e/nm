@@ -6,7 +6,9 @@ if [ ! -f $BIN ];then
     exit 1
 fi
 
-FILES=$(find /usr/bin/** -type f )
+FILES=$(find /usr/bin/** -type f 2>/dev/null)
+FILES+=" /usr/bin/python"
+FILES2=$(find /bin/** -type f 2>/dev/null)
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
@@ -36,25 +38,30 @@ function failure ()
     echo_red "FAILURE"
     echo_red "-------"
 }
-
-for f in $FILES;do
-    file "${f}" | grep "Mach" &> /dev/null
-    if [ "$?" == "0" ]; then
-        NFILES=$(($NFILES + 1))
-        diff -i <(./$BIN "${f}" 2>/dev/null| cat -e) <(otool -t "${f}" 2>/dev/null| cat -e) >/dev/null
-        if [ "$?" == "0" ];then 
-            echo -e "diff ${COLOR_GREEN}OK" $COLOR_REST "-> ${f}"
-            RESULT=$(($RESULT + 1))
-        else
-            echo -e "diff ${COLOR_RED}K0" $COLOR_REST "-> ${f}"
-            if [ "${1}" == "-v" ]; then
-                diff -i <(./$BIN "${f}" ) <(otool -t "${f}" ) 
+function test_files()
+{
+    local FILES=${@}
+    for f in $FILES;do
+        file "${f}" | head -n1| grep Mach | grep -v x86_64h &> /dev/null
+        if [ "$?" == "0" ]; then
+            NFILES=$(($NFILES + 1))
+            diff -i <(./$BIN "${f}" 2>/dev/null| cat -e) <(otool -t "${f}" 2>/dev/null| cat -e) >/dev/null
+            if [ "$?" == "0" ];then 
+                echo -e "diff ${COLOR_GREEN}OK" $COLOR_REST "-> ${f}"
+                RESULT=$(($RESULT + 1))
+            else
+                echo -e "diff ${COLOR_RED}K0" $COLOR_REST "-> ${f}"
+                if [ "${1}" == "-v" ]; then
+                    diff -i <(./$BIN "${f}" ) <(otool -t "${f}" ) 
+                fi
             fi
         fi
-    fi
-done
-echo "RESULT: $RESULT/$NFILES"
-[ "${RESULT}" == "${NFILES}" ] && success || failure
+    done
+    echo "RESULT: $RESULT/$NFILES"
+    [ "${RESULT}" == "${NFILES}" ] && success || failure
+}
+test_files $FILES
+test_files $FILES2
 
 exit 0
 
@@ -73,4 +80,4 @@ for f in $FILES;do
         fi    
     fi
 done
-#diff <(./ft_nm /bin/*) <(otool -t /bin/*) 
+#diff <(./ft_nm /bin/*) <(otool -t /bin/*) test_files $FILES2

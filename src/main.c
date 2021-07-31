@@ -25,9 +25,12 @@ static int ft_nm(const char *path)
 		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
 		printf("%s:\n", path);
 		analyse_mach64((struct load_command *)((g_mach.mem) + sizeof(g_mach.header)));
-	} else if (magic == MH_MAGIC)
-		printf("32 bits mach-o binary\n");
-	else if (magic == CAFEBABE){
+	} else if (magic == MH_MAGIC){
+		g_mach.header_size = sizeof(struct mach_header);
+		ft_memcpy((void*)&g_mach.header32, g_mach.mem, g_mach.header_size);
+		printf("%s:\n", path);
+		analyse_mach32();
+	} else if (magic == CAFEBABE){
 		printf("%s:\n", path);
 		read_fat();
 	}
