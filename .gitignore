@@ -3,5 +3,7 @@
 *.a
 ft_nm
 *.swp
+*.so
+*.dylib
 .vscode
 main_*leaks.c

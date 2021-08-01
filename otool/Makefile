@@ -4,7 +4,7 @@ SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c s
 OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o obj/arch.o obj/fat.o obj/byte.o
 INC=include/nm.h
 LIBFT=libft/libft.a
-CFLAGS= -g -Wall -Wextra -Werror -Wformat-security # -fsanitize=address -g
+CFLAGS= -O2 -Wall -Wextra -Werror -Wformat-security # -fsanitize=address -g
 
 $(NAME): $(OBJ) $(INC) $(LIBFT)
 	gcc $(CFLAGS) $(OBJ) -L libft/ -lft -o $(NAME)

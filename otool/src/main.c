@@ -38,8 +38,7 @@ static int ft_nm(const char *path)
 	} else if (magic == CAFEBABE){
 		printf("%s:\n", path);
 		read_fat();
-	}
-	else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64){
+	} else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64){
 		printf("64 bits fat binary\n");
 		read_fat();
 	} else if (get_magic(g_mach.mem, &g_mach.s ) == ARCH_MAGIC) {
@@ -59,10 +58,8 @@ int main(int argc, char **argv)
 		ft_nm("a.out");
 	if (argc > 1)
 	{
-		for (int i = 1; i < argc; ++i)
-		{
+		for (int i = 1; i < argc && i < 10; ++i)
 			ft_nm(argv[i]);
-		}
 		//system("leaks ft_otool");
 	}
 }

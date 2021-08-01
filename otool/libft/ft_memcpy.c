@@ -20,7 +20,6 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 	if ((void*)(src) >= (void*)(g_mach.mem) && (void*)(src) < (void*)(g_mach.mem + g_mach.s.st_size) && \
 	(void*)(src + n) > (void*)g_mach.mem + g_mach.s.st_size)
 		exit (-1);
-
 	i = 0;
 	while (i < n)
 	{

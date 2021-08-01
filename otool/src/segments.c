@@ -91,6 +91,7 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 			if (!ft_strncmp(section.sectname, "__text", 6))
 			{
 				printf("Contents of (__TEXT,%.16s) section\n", section.sectname);
+				ft_putstr("");
 				get_text_sect(segment, section);
 			}
 		}
