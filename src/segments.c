@@ -1,9 +1,10 @@
 #include "../include/nm.h"
 
-static int get_text_sect(struct section_64 sect)
+static int get_text_sect(struct segment_command_64 seg, struct section_64 sect)
 {
 	const unsigned char *ptr;
 	int offset;
+	int filetype;
 	unsigned long long lines;
 
 	ptr = (unsigned char*)(sect.offset + g_mach.mem + g_mach.fatarch.offset);
@@ -11,9 +12,14 @@ static int get_text_sect(struct section_64 sect)
 	lines = sect.size / 16;
 	if (sect.size % 16)
 		lines++;
+	filetype=g_mach.header.filetype - 1;
+	if (filetype == 0)
+	{
+		offset = seg.fileoff  - sect.offset;
+	}
 	for (unsigned long long i = 0; i < lines; i++)
 	{
-		printf("00000001%0.8x\t", offset);
+		printf("0000000%d%0.8x\t",filetype,  offset);
 		for (int n = 0; n < 16; ++n)
 		{
 			if (i * 16 + n == sect.size)
@@ -29,7 +35,7 @@ static int get_text_sect(struct section_64 sect)
 	return(0);
 }
 
-static int get_text_sect32(struct section sect)
+static int get_text_sect32( struct section sect)
 {
 	const unsigned char *ptr;
 	unsigned int offset;
@@ -84,7 +90,7 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 			if (!ft_strncmp(section.sectname, "__text", 6))
 			{
 				printf("Contents of (__TEXT,%.16s) section\n", section.sectname);
-				get_text_sect(section);
+				get_text_sect(segment, section);
 			}
 		}
 		ptr += sizeof(section);
