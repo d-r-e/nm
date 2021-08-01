@@ -83,15 +83,15 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	{
 		ft_bzero(&table, sizeof(table));
 		ft_memcpy(&table, ptr, sizeof(table));
-		printf("N_STAB:\t%d\n", table.n_type & N_STAB);
-		printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
+		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
+		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 		if (table.n_type & N_TYPE)
 		{
 			for (int n = 0; n < 5; n++)
 				printf("N_TYPE:\t%d\n", table.n_type & N_TYPE & ntypes[n]);
 		}
-		printf("N_EXT:\t%d\n", table.n_type & N_EXT);
-		printf("n_strx:\t%d\n", table.n_un.n_strx);
+		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
+		// printf("n_strx:\t%d\n", table.n_un.n_strx);
 		ptr += sizeof(table);
 	}
 	//nlist("a.out", list);
@@ -181,25 +181,25 @@ int	analyse_mach64(struct load_command *ptr)
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
 		//printf("%x\n", ptr->cmd);
-		if (ptr->cmd == LC_SEGMENT_64)
-		{
-			struct segment_command_64 segment;
-			ft_bzero(&segment, sizeof(struct segment_command_64));
-			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
-			// printf("LC_SEGMENT_64 %d\n", i);
-			parse_segment((void*)ptr, segment);
-			// printf("Load command %d\n", i);
-			// printf("segname: %s\n", segment.segname);
-			// printf("cmdsize %u\n", segment.cmdsize);
-			// printf("vmaddr %llx\n", segment.vmaddr);
-			// printf("nsects %d\n", segment.nsects);
-			// for (int j = 0; j < segment.nsects; j++)
-			// {
-			// 	struct section_64 sect;
+		// if (ptr->cmd == LC_SEGMENT_64)
+		// {
+		// 	struct segment_command_64 segment;
+		// 	ft_bzero(&segment, sizeof(struct segment_command_64));
+		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
+		// 	// printf("LC_SEGMENT_64 %d\n", i);
+		// 	parse_segment((void*)ptr, segment);
+		// 	// printf("Load command %d\n", i);
+		// 	// printf("segname: %s\n", segment.segname);
+		// 	// printf("cmdsize %u\n", segment.cmdsize);
+		// 	// printf("vmaddr %llx\n", segment.vmaddr);
+		// 	// printf("nsects %d\n", segment.nsects);
+		// 	// for (int j = 0; j < segment.nsects; j++)
+		// 	// {
+		// 	// 	struct section_64 sect;
 
-			// }
-			// printf("--------------------------------\n");
-		} 
+		// 	// }
+		// 	// printf("--------------------------------\n");
+		// } 
 		//else if (ptr->cmd == LC_SEGMENT)
 		// {
 		// 	struct segment_command segment;
@@ -220,12 +220,12 @@ int	analyse_mach64(struct load_command *ptr)
 		// 	// }
 		// 	// printf("--------------------------------\n");
 		// }
-		// else if (ptr->cmd == LC_SYMTAB)
-		// {
-		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-		// 	//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
-		// 	//read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
-		// }
+		if (ptr->cmd == LC_SYMTAB)
+		{
+			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
+			read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+		}
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
