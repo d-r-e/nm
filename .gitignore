@@ -2,6 +2,7 @@
 *.o
 *.a
 ft_nm
+ft_otool
 *.swp
 *.so
 *.dylib
