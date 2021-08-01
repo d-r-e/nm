@@ -74,7 +74,7 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 	if (segment.nsects < 0)
 		return (-1);
 	//printf("%d\n", segment.fileoff);
-	ptr = (unsigned char*)(mem + segment.fileoff + sizeof(segment));
+	ptr = (unsigned char*)(mem + sizeof(segment));
 	for (uint32_t i = 0; i < segment.nsects; ++i)
 	{
 		ft_bzero(&section, sizeof(section));

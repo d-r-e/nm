@@ -30,11 +30,8 @@ push: commit
 
 x: $(NAME)
 	@./$(NAME)
-s: $(NAME)
-	./$(NAME) $(NAME)
-
-ls: $(NAME)
-	./$(NAME) /bin/ls
+o: $(NAME)
+	./$(NAME) libft/ft_strlen.o
 
 valgrind: re
 	@gcc test/test.c
