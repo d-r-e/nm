@@ -74,22 +74,38 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	struct nlist_64 table;
 	const char *ptr;
 	uint32_t i;
-	int ntypes[5] = {0x0, 0x2, 0xe, 0xc, 0xa};
-
+	
 	if (!mem || nsyms < 0)
 		return(-1);
 	ptr = mem;
+	ft_puts("pind");
 	for (i = 0; i < nsyms; i++)
 	{
 		ft_bzero(&table, sizeof(table));
 		ft_memcpy(&table, ptr, sizeof(table));
 		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
-		if (table.n_type & N_TYPE)
-		{
-			for (int n = 0; n < 5; n++)
-				printf("N_TYPE:\t%d\n", table.n_type & N_TYPE & ntypes[n]);
-		}
+		switch (table.n_type & N_TYPE)
+			{
+				case (N_UNDF):
+					ft_putstr("U\t");
+					get_symstr(table.n_un.n_strx);
+					ft_puts("");
+					break;
+				case (N_ABS):
+					ft_puts("N_ABS");
+					break;
+				case (N_SECT):
+					ft_puts("N_SECT");
+					break;
+				case (N_PBUD):
+					ft_puts("N_PBUD");
+					break;
+	
+				default:
+					break;
+			}
+		
 		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
 		// printf("n_strx:\t%d\n", table.n_un.n_strx);
 		ptr += sizeof(table);

@@ -18,9 +18,11 @@ all: $(NAME)
 
 
 clean:
+	$(MAKE) clean -C libft
 	rm -f $(OBJ)
 
 fclean: clean
+	$(MAKE) fclean -C libft 
 	rm -f $(NAME)
 
 re: fclean all
@@ -37,8 +39,8 @@ push: commit
 
 x: $(NAME)
 	@./$(NAME)
-o: $(NAME)
-	./$(NAME) libft/ft_strlen.o
+h: $(NAME)
+	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
 
 l: $(NAME)
 	./$(NAME) libft/libft.a
