@@ -1,5 +1,6 @@
 *.out
 *.o
+*.a
 ft_nm
 *.swp
 .vscode
