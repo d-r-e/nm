@@ -3,23 +3,31 @@ MKFL=Makefile
 SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c src/arch.c src/fat.c src/byte.c
 OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o obj/arch.o obj/fat.o obj/byte.o
 INC=include/nm.h
+LIBFT=libft/libft.a
 CFLAGS= #-Wall -Wextra # -Werror -Wformat-security # -fsanitize=address -g
-$(NAME): $(OBJ) $(INC)
-	gcc $(CFLAGS) $(OBJ) -o $(NAME)
 
-$(OBJ): $(SRC) 
+$(NAME): $(OBJ) $(INC) $(LIBFT)
+	gcc $(CFLAGS) $(OBJ) -L libft/ -lft -o $(NAME)
+
+$(OBJ): $(SRC) $(INC)
 	gcc $(CFLAGS) -c $(SRC)
 	@mv *.o obj/
 
+
 all: $(NAME)
 
+
 clean:
-	@rm -f $(OBJ)
+	rm -f $(OBJ)
 
 fclean: clean
-	@rm -f $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
+
+$(LIBFT):
+	$(MAKE) -C libft
+	$(MAKE) -C libft clean
 
 commit: all fclean
 	@git add $(SRC) Makefile include/nm.h img
@@ -32,6 +40,9 @@ x: $(NAME)
 	@./$(NAME)
 o: $(NAME)
 	./$(NAME) libft/ft_strlen.o
+
+l: $(NAME)
+	./$(NAME) libft/libft.a
 
 valgrind: re
 	@gcc test/test.c

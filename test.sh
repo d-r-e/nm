@@ -5,17 +5,20 @@ if [ ! -f $BIN ];then
     echo "${BIN} not found."
     exit 1
 fi
+make
 
-FILES=$(find /usr/bin/** -type f 2>/dev/null)
-FILES+=" /usr/bin/python"
-FILES2=$(find /bin/** -type f 2>/dev/null)
-FILES3=$(find . -name "*.o" 2>/dev/null)
+
+FILES=$(find /usr/bin/** -type f 2>/dev/null )
+FILES_EXEC=$(find /bin/** -type f 2>/dev/null )
+FILES_O=$(find . -name "*.o" 2>/dev/null )
+FILES_SO=$(find /usr/lib/** -name "*.so" 2>/dev/null )
+
 COLOR_REST="$(tput sgr0)"
 COLOR_GREEN="$(tput setaf 2)" 
 COLOR_RED="$(tput setaf 1)"
 COLOR_YELLOW="$(tput setaf 3)"
 
-make
+
 
 RESULT=$(( 0 ))
 NFILES=$(( 0 ))
@@ -61,9 +64,10 @@ function test_files()
     echo "RESULT: $RESULT/$NFILES"
     [ "${RESULT}" == "${NFILES}" ] && success || failure
 }
-test_files $FILES3
+test_files $FILES_SO
+test_files $FILES_O
 test_files $FILES
-test_files $FILES2
+test_files $FILES_EXEC
 
 exit 0
 
@@ -82,4 +86,4 @@ for f in $FILES;do
         fi    
     fi
 done
-#diff <(./ft_nm /bin/*) <(otool -t /bin/*) test_files $FILES2
+#diff <(./ft_nm /bin/*) <(otool -t /bin/*) test_files $FILES_EXEC

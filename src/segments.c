@@ -14,9 +14,10 @@ static int get_text_sect(struct segment_command_64 seg, struct section_64 sect)
 		lines++;
 	filetype=g_mach.header.filetype - 1;
 	if (filetype == 0)
-	{
 		offset = seg.fileoff  - sect.offset;
-	}
+	if (filetype > 1)
+		filetype = 0;
+	//printf("flags: %x\n", sect.flags);
 	for (unsigned long long i = 0; i < lines; i++)
 	{
 		printf("0000000%d%0.8x\t",filetype,  offset);

@@ -17,7 +17,7 @@
 # include <mach-o/swap.h>
 # include <ar.h>
 
-# define BINARY "nm"
+# define BINARY "ft_otool"
 # define NO_SUCH_FILE "No such file."
 # define PERMISSION_DENIED "Permission denied."
 # define STAT_ERROR "Stat read error"
@@ -26,7 +26,6 @@
 
 # define ARCH_MAGIC 454545
 # define CAFEBABE	0xBEBAFECA
-// cputype 16777223 is “x86 64” (64 bit mode); 7 is “i386”
 # define X86_64 0x07000000
 # define I386 0x07000001
 /*
@@ -56,7 +55,7 @@ int	strerr(const char *s);
 */
 int                     is_elf(const char *memfile, struct stat *s);
 uint32_t	            get_magic(const char *memfile, struct stat *s);
-//int						read_arch(void);
+int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(struct load_command *ptr);
