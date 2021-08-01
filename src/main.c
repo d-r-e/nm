@@ -4,6 +4,9 @@ static int ft_nm(const char *path)
 {	uint32_t magic;
 
 	ft_bzero(&g_mach, sizeof(g_mach));
+	ft_bzero(&g_mach.fatheader, sizeof(g_mach.fatheader));
+	ft_bzero(&g_mach.header, sizeof(g_mach.header));
+	ft_bzero(&g_mach.header32, sizeof(g_mach.header32));
 	g_mach.fd = open(path, O_RDONLY, NULL);
 	if (g_mach.fd < 0)
 		return(file_error(path, NO_SUCH_FILE));
@@ -22,11 +25,13 @@ static int ft_nm(const char *path)
 	magic = get_magic(g_mach.mem, &g_mach.s);
 	if (magic == MH_MAGIC_64) {
 		g_mach.header_size = sizeof(struct mach_header_64);
+		ft_bzero(&g_mach.header,g_mach.header_size);
 		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
 		printf("%s:\n", path);
 		analyse_mach64((struct load_command *)((g_mach.mem) + sizeof(g_mach.header)));
 	} else if (magic == MH_MAGIC){
 		g_mach.header_size = sizeof(struct mach_header);
+		ft_bzero(&g_mach.header32, sizeof(g_mach.header32));
 		ft_memcpy((void*)&g_mach.header32, g_mach.mem, g_mach.header_size);
 		printf("%s:\n", path);
 		analyse_mach32();
@@ -55,7 +60,9 @@ int main(int argc, char **argv)
 	if (argc > 1)
 	{
 		for (int i = 1; i < argc; ++i)
+		{
 			ft_nm(argv[i]);
+		}
 		//system("leaks ft_otool");
 	}
 }

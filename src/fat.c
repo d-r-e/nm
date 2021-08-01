@@ -15,33 +15,33 @@ static void ft_swap_fat_arch(struct fat_arch *arch)
     arch->align = ft_swapint(arch->align);
 }
 
-static void ft_swap_fat_arch_64(struct fat_arch_64 *arch)
-{
-    arch->cputype = ft_swapint(arch->cputype);
-    arch->cpusubtype = ft_swapint(arch->cpusubtype);
-    arch->offset = ft_swaplonglong(arch->offset);
-    arch->size = ft_swaplonglong(arch->size);
-    arch->align = ft_swapint(arch->align);
-}
+// static void ft_swap_fat_arch_64(struct fat_arch_64 *arch)
+// {
+//     arch->cputype = ft_swapint(arch->cputype);
+//     arch->cpusubtype = ft_swapint(arch->cpusubtype);
+//     arch->offset = ft_swaplonglong(arch->offset);
+//     arch->size = ft_swaplonglong(arch->size);
+//     arch->align = ft_swapint(arch->align);
+// }
 
-static void print_fat_arch(struct fat_arch arch)
-{
-    printf("X32header\n");
-    printf("arch.cputype : %i\n", arch.cputype);
-    printf("arch.cpusubtype : %u\n", arch.cpusubtype);
-    printf("arch.offset : %u\n", arch.offset);
-    printf("arch.size : %u\n", arch.size);
-    printf("arch.align : %u\n", arch.align);
-}
-static void print_fat_arch64(struct fat_arch_64 arch)
-{
-    printf("X64header\n");
-    printf("arch.cputype : %u\n", arch.cputype);
-    printf("arch.cpusubtype : %u\n", arch.cpusubtype);
-    printf("arch.offset : %llu\n", arch.offset);
-    printf("arch.size : %llu\n", arch.size);
-    printf("arch.align : %u\n", arch.align);
-}
+// static void print_fat_arch(struct fat_arch arch)
+// {
+//     printf("X32header\n");
+//     printf("arch.cputype : %i\n", arch.cputype);
+//     printf("arch.cpusubtype : %u\n", arch.cpusubtype);
+//     printf("arch.offset : %u\n", arch.offset);
+//     printf("arch.size : %u\n", arch.size);
+//     printf("arch.align : %u\n", arch.align);
+// }
+// static void print_fat_arch64(struct fat_arch_64 arch)
+// {
+//     printf("X64header\n");
+//     printf("arch.cputype : %u\n", arch.cputype);
+//     printf("arch.cpusubtype : %u\n", arch.cpusubtype);
+//     printf("arch.offset : %llu\n", arch.offset);
+//     printf("arch.size : %llu\n", arch.size);
+//     printf("arch.align : %u\n", arch.align);
+// }
 
 int is_x86(const char *ptr)
 {
@@ -70,20 +70,18 @@ int is_x86_64(const char *ptr)
 int read_fat()
 {
     const char *ptr;
-    struct fat_arch     fat;
-    struct fat_arch_64  fat64;
     unsigned int        i = 0;
 
     ptr = (char*) g_mach.mem;
     if (g_mach.s.st_size < (off_t)sizeof(struct fat_header))
         return (-1);
+    ft_bzero(&g_mach.fatheader, sizeof(g_mach.fatheader));
     ft_memcpy((void*)&g_mach.fatheader, ptr, sizeof(g_mach.fatheader));
     //printf("sizeof fatheader%lu\n", sizeof(g_mach.fatheader));
     //printf("magic %X\n", g_mach.fatheader.magic);
     ft_swap_fat_header(&g_mach.fatheader);
     //printf("nfat_arch %d\n", g_mach.fatheader.nfat_arch);
     ptr = (const char*)g_mach.mem + sizeof(g_mach.fatheader);
-    int offset = 0;
     for (i = 0; i < g_mach.fatheader.nfat_arch; ++i)
     {
             ft_bzero(&g_mach.fatarch, sizeof(g_mach.fatarch));

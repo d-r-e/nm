@@ -14,7 +14,8 @@ fi
 
 FILES=$(find /usr/bin/** -type f 2>/dev/null | head -n $LEN )
 FILES_EXEC=$(find /bin/** -type f 2>/dev/null | head -n $LEN )
-FILES_O=$(find ./** -name "*.o" 2>/dev/null | head -n $LEN )
+FILES_O=$(find ~/.local/ -name "*.o" 2>/dev/null | head -n $LEN )
+FILES_O+=$(find . -name "*.o" 2>/dev/null )
 FILES_SO=$(find /usr/lib/** -name "*.so" 2>/dev/null | head -n $LEN )
 FILES_DYLIB=$(find /usr/lib/** -name "*.dylib" 2>/dev/null | head -n $LEN )
 OVERKILL="/usr/lib/libnetsnmp.5.2.1.dylib /usr/lib/libnetsnmp.5.dylib"
@@ -92,7 +93,6 @@ test_files $FILES_DYLIB
 test_files $FILES_O
 test_files $FILES
 test_files $FILES_EXEC
-test_files $FILES_A
 
 exit 0
 

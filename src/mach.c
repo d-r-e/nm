@@ -100,6 +100,7 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 
 struct mach_header_64 get_mach_header64(const char *memfile)
 {
+	ft_bzero(&g_mach.header, sizeof(g_mach.header));
 	ft_memcpy((void*)&g_mach.header, memfile, sizeof(g_mach.header));
 	// for(int i = 0; i < 80; ++i)
 	// 	write(1, "-", 1);
