@@ -100,10 +100,15 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 					break;
 				case (N_PBUD):
 					printf("%.16llx ", table.n_value);
-					printf("Pm %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					printf("P %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
-	
+				case (N_INDR):
+					printf("%.16llx ", table.n_value);
+					printf("I %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					break;
 				default:
+					printf("%.16llx ", table.n_value);
+					printf("? %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 			}
 		
