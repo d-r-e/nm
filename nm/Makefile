@@ -41,7 +41,8 @@ x: $(NAME)
 	@./$(NAME)
 h: $(NAME)
 	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
-
+o: $(NAME)
+	./$(NAME) test/nm test/o_helloworld.o && echo && nm test/o_helloworld.o
 l: $(NAME)
 	./$(NAME) libft/libft.a
 
