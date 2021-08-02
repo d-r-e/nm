@@ -47,6 +47,8 @@ h: $(NAME)
 o: $(NAME)
 	@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
 
+g: $(NAME)
+	@./$(NAME) /Users/darodrig/Desktop/nm-otool/kcosta/tests/ahah_gotcha.o
 
 valgrind: re
 	@gcc test/test.c

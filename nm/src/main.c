@@ -27,13 +27,11 @@ static int ft_nm(const char *path)
 		g_mach.header_size = sizeof(struct mach_header_64);
 		ft_bzero(&g_mach.header,g_mach.header_size);
 		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
-
 		analyse_mach64((struct load_command *)((g_mach.mem) + sizeof(g_mach.header)));
 	} else if (magic == MH_MAGIC){
 		g_mach.header_size = sizeof(struct mach_header);
 		ft_bzero(&g_mach.header32, sizeof(g_mach.header32));
 		ft_memcpy((void*)&g_mach.header32, g_mach.mem, g_mach.header_size);
-
 		analyse_mach32();
 	} else if (magic == CAFEBABE){
 		printf("%s:\n", path);

@@ -34,6 +34,11 @@ const char  *get_symstr(struct nlist_64 table)
 	return (g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 }
 
+const char  *get_symstr_32(struct nlist table)
+{
+	return (g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+}
+
 static char get_symbol_char(struct nlist_64 table)
 {
 	(void)table;
@@ -43,6 +48,29 @@ static char get_symbol_char(struct nlist_64 table)
 		return (c);
 
 	//printf("sectname: %s\n", g_mach.sections[table.n_sect - 1].sectname);
+
+	if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__text", 6))
+		c = 'T';
+	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__data", 6))
+		c = 'D';
+	else
+		c = 'S';
+	
+	if (!(table.n_type & N_EXT))
+		c -= 'A' - 'a';
+	return(c);
+}
+
+static char get_symbol_char_32(struct nlist table)
+{
+	(void)table;
+	char c = 'U';
+
+	if (table.n_sect > g_mach.nsects)
+		return (c);
+
+	//printf("sectname: %s\n", g_mach.sections[table.n_sect - 1].sectname);
+
 	if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__text", 6))
 		c = 'T';
 	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__data", 6))
@@ -81,25 +109,84 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 					}else{
 						printf("%17sU ","");
 					}
-					printf("%s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					printf("%s\n", get_symstr(table));
 					break;
 				case (N_ABS):
 					printf("%.16llx ", table.n_value);
-					printf("A %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					printf("A %s\n", get_symstr(table));
 					break;
 				case (N_SECT):
 					c = get_symbol_char(table);
 					printf("%.16llx ", table.n_value);
 					
-					printf("%c %s\n",c, g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					printf("%c %s\n",c, get_symstr(table));
 					break;
 				// case (N_PBUD):
 				// 	printf("%.16llx ", table.n_value);
-				// 	printf("P %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+				// 	printf("P %s\n", get_symstr(table));
 				// 	break;
 				case (N_INDR):
 					printf("%.16llx ", table.n_value);
-					printf("I %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					printf("I %s\n", get_symstr(table));
+					break;
+				default:
+					break;
+			}
+		
+		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
+		// printf("n_strx:\t%d\n", table.n_un.n_strx);
+		ptr += sizeof(table);
+	}
+	
+	//nlist("a.out", list);
+	return (0);
+}
+
+int read_symtable_32(const char *mem, uint32_t nsyms)
+{
+	struct nlist table;
+	const char *ptr;
+	uint32_t i;
+	char c = 'U';
+
+	if (!mem || nsyms < 0)
+		return(-1);
+	ptr = mem;
+	for (i = 0; i < nsyms; i++)
+	{
+		//ft_bzero(&table, sizeof(table));
+		ft_memcpy(&table, ptr, sizeof(table));
+		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
+		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
+		switch ((table.n_type & N_TYPE))
+			{
+				
+				case (N_UNDF):
+					c = 'U';
+					if (table.n_value){
+						printf("%.16x C ", table.n_value);
+					}else{
+						printf("%17sU ","");
+					}
+					printf("%s\n", get_symstr_32(table));
+					break;
+				case (N_ABS):
+					printf("%.16x ", table.n_value);
+					printf("A %s\n", get_symstr_32(table));
+					break;
+				case (N_SECT):
+					c = get_symbol_char_32(table);
+					printf("%.16x ", table.n_value);
+					
+					printf("%c %s\n",c, get_symstr_32(table));
+					break;
+				// case (N_PBUD):
+				// 	printf("%.16llx ", table.n_value);
+				// 	printf("P %s\n", get_symstr_32(table));
+				// 	break;
+				case (N_INDR):
+					printf("%.16x ", table.n_value);
+					printf("I %s\n", get_symstr_32(table));
 					break;
 				default:
 					break;
@@ -126,6 +213,8 @@ int analyse_mach32(void)
 	struct load_command *ptr;
 	unsigned const char *mem;
 
+
+	printf("%x\n", g_mach.header.cputype);
 	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header32));
 	mem = (const unsigned char *)ptr;
 	// printf("ncmds=%u\n", g_mach.header32.ncmds);
@@ -140,17 +229,12 @@ int analyse_mach32(void)
 			ft_memcpy(&segment, ptr, sizeof(struct segment_command));
 			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment32((void*)ptr, segment);
-			// printf("Load command %d\n", i);
-			//printf("segname: %s\n", segment.segname);
-			// printf("cmdsize %u\n", segment.cmdsize);
-			// printf("vmaddr %llx\n", segment.vmaddr);
-			// printf("nsects %d\n", segment.nsects);
-			// for (int j = 0; j < segment.nsects; j++)
-			// {
-			// 	struct section_64 sect;
-
-			// }
-			// printf("--------------------------------\n");
+		}
+		if (ptr->cmd == LC_SYMTAB)
+		{
+			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
+			read_symtable_32((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 		}
 	}
 	return(0);
@@ -172,34 +256,6 @@ int	analyse_mach64(struct load_command *ptr)
 			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment((void*)ptr, segment);
 		}
-		// 	// printf("Load command %d\n", i);
-		// 	// printf("segname: %s\n", segment.segname);
-		// 	// printf("cmdsize %u\n", segment.cmdsize);
-		// 	// printf("vmaddr %llx\n", segment.vmaddr);
-		// 	// printf("nsects %d\n", segment.nsects);
-		// 	// for (int j = 0; j < segment.nsects; j++)
-		// 	// {
-		// 	// 	struct section_64 sect;
-
-		// 	// }
-		// 	// printf("--------------------------------\n");
-		// } 
-		//else if (ptr->cmd == LC_SEGMENT)
-		// {
-		
-		//parse_segment((void*)ptr, segment);
-		// 	// printf("Load command %d\n", i);
-		// 	// printf("segname: %s\n", segment.segname);
-		// 	// printf("cmdsize %u\n", segment.cmdsize);
-		// 	// printf("vmaddr %llx\n", segment.vmaddr);
-		// 	// printf("nsects %d\n", segment.nsects);
-		// 	// for (int j = 0; j < segment.nsects; j++)
-		// 	// {
-		// 	// 	struct section_64 sect;
-
-		// 	// }
-		// 	// printf("--------------------------------\n");
-		// }
 		if (ptr->cmd == LC_SYMTAB)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
@@ -209,7 +265,7 @@ int	analyse_mach64(struct load_command *ptr)
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
-				
+
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
 			//printf("LC_DYSYMTAB: to be continued...\n");
 			// printf("ilocalsym: %d\n", cmd.ilocalsym);

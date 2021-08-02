@@ -97,6 +97,7 @@ typedef struct s_mach {
 	struct stat				s;
 	struct symtab_command	symtab;
 	struct section_64		*sections;
+	struct section			*sections32;
 	int						nsects;
 }	t_mach;
 

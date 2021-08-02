@@ -88,7 +88,6 @@ int read_fat()
             ft_memcpy(&g_mach.fatarch, ptr, sizeof(g_mach.fatarch));
             ft_swap_fat_arch(&g_mach.fatarch);
             //printf("%i\n", g_mach.fatarch.cputype);
-            
             if (g_mach.fatarch.cputype == 16777223){
                 //puts("entra");
             	g_mach.header_size = sizeof(struct mach_header_64);
@@ -105,6 +104,5 @@ int read_fat()
             //ft_puts("_______________________");
         
     }
-    return(0);
     return(0);
 }
