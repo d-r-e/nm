@@ -1,16 +1,5 @@
 #include "../include/nm.h"
 
-int is_elf(const char *memfile, struct stat *s)
-{
-	if (s->st_size < 4)
-		return (FALSE);
-	if (*memfile != 127)
-	 	return (FALSE);
-	if (ft_strncmp(memfile + 1, "ELF", 3))
-		return (FALSE);
-	return (TRUE);
-}
-
 uint32_t get_magic(const char *memfile, struct stat *s)
 {
 	uint32_t magic[5] = {MH_MAGIC, MH_MAGIC_64, FAT_MAGIC, FAT_MAGIC_64, CAFEBABE};
@@ -40,31 +29,17 @@ int get_mach_header32(const char *memfile)
 	return(0);
 }
 
-int read_symstr(const char *mem, uint32_t nsyms)
+const char  *get_symstr(struct nlist_64 table)
 {
-	if (nsyms < 0)
-		return (-1);
-	mem++;
-	for (uint32_t i = 0; i < nsyms; ++i)
-		ft_puts(get_symstr(i));
-	return(0);
+	return (g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 }
 
-const char  *get_symstr(uint32_t index)
+static char get_symbol_char(struct nlist_64 table)
 {
-	const char	*ptr;
-	size_t	j;
-	ptr = g_mach.mem + g_mach.symtab.stroff;
-	printf("");
-	for (uint32_t i = 0; i < g_mach.symtab.nsyms; ++i)
-	{
-		printf("index: %d, i: %d, value: %s\n", index, i, (ptr));
-		j = ft_strlen(ptr);
-		if (i == index && j)
-			return (ptr);
-		ptr += j+1;
-	}
-	return (NULL);
+	(void)table;
+	if (table.n_sect == NO_SECT)
+		return ('U');
+	return('C');
 }
 
 int read_symtable_64(const char *mem, uint32_t nsyms)
@@ -86,29 +61,29 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 			{
 				case (N_UNDF):
 					if (table.n_value)
-						printf("%.16llx\t", table.n_value);
+						printf("%.16llx ", table.n_value);
 					else
-						printf("%17s", "");
-					printf("U %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+						printf("%17s","");
+					char c = get_symbol_char(table);
+					printf("%c %s\n", c, g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_ABS):
-					ft_puts("N_ABS");
+					printf("%.16llx ", table.n_value);
+					printf("A %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_SECT):
 					printf("%.16llx ", table.n_value);
 					printf("T %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
-				case (N_PBUD):
-					printf("%.16llx ", table.n_value);
-					printf("P %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
-					break;
+				// case (N_PBUD):
+				// 	printf("%.16llx ", table.n_value);
+				// 	printf("P %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+				// 	break;
 				case (N_INDR):
 					printf("%.16llx ", table.n_value);
 					printf("I %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				default:
-					printf("%.16llx ", table.n_value);
-					printf("? %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 			}
 		
@@ -192,12 +167,12 @@ int	analyse_mach64(struct load_command *ptr)
 		// } 
 		//else if (ptr->cmd == LC_SEGMENT)
 		// {
-		// 	struct segment_command segment;
+		struct segment_command_64 segment;
 		// 	printf("ASDFAS");
 		// 	ft_bzero(&segment, sizeof(struct segment_command));
-		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command));
+		ft_memcpy(&segment, ptr, sizeof(struct segment_command));
 		// 	// printf("LC_SEGMENT_64 %d\n", i);
-		// 	//parse_segment((void*)ptr, segment);
+		//parse_segment((void*)ptr, segment);
 		// 	// printf("Load command %d\n", i);
 		// 	// printf("segname: %s\n", segment.segname);
 		// 	// printf("cmdsize %u\n", segment.cmdsize);

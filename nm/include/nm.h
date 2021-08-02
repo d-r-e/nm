@@ -71,7 +71,7 @@ int		read_fat(void);
 ** Symbols
 */
 int			read_symstr(const char *mem, uint32_t nsyms);
-const char	*get_symstr(uint32_t index);
+const char	*get_symstr(struct nlist_64 table);
 int			read_symtable_64(const char *mem, uint32_t nsyms);
 
 /*
@@ -96,6 +96,8 @@ typedef struct s_mach {
 	char					*mem;
 	struct stat				s;
 	struct symtab_command	symtab;
+	struct section_64		*sections;
+	int						nsects;
 }	t_mach;
 
 t_mach	g_mach;

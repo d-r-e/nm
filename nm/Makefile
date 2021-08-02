@@ -4,7 +4,7 @@ SRC=src/main.c src/string.c src/output.c src/mach.c src/libft.c src/segments.c s
 OBJ=obj/main.o obj/string.o obj/output.o obj/mach.o obj/libft.o obj/segments.o obj/arch.o obj/fat.o obj/byte.o
 INC=include/nm.h
 LIBFT=libft/libft.a
-CFLAGS= -O2 -Wall -Wextra -Werror -Wformat-security # -fsanitize=address -g
+CFLAGS= -O3 -Wall -Wextra -Werror -Wformat-security #  -fsanitize=address -g
 
 $(NAME): $(OBJ) $(INC) $(LIBFT)
 	gcc $(CFLAGS) $(OBJ) -L libft/ -lft -o $(NAME)
@@ -42,10 +42,10 @@ x: $(NAME)
 h: $(NAME)
 	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
 o: $(NAME)
-	./$(NAME) libft/ft_substr.o && echo && nm libft/ft_substr.o
+	@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
 
 l: $(NAME)
-	./$(NAME) libft/libft.a
+	diff `./$(NAME) /bin/ls` `nm --no-sort /bin/ls`
 
 valgrind: re
 	@gcc test/test.c
