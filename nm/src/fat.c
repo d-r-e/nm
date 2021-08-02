@@ -98,6 +98,15 @@ int read_fat()
                 analyse_mach64((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header)));
                 //printf("entra\n");
             }
+            else {
+                g_mach.header_size = sizeof(struct mach_header);
+                ft_bzero(&g_mach.header, sizeof(g_mach.header));
+                ft_memcpy((void*)&g_mach.header, g_mach.mem + g_mach.fatarch.offset, sizeof(g_mach.header));
+                //printf("ncmds%d\n", g_mach.header.ncmds);
+                // hgeprint_fat_arch(g_mach.fatarch);
+                analyse_mach32((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header)));
+                //printf("entra\n");
+            }
             //print_fat_arch(fat);
             // printf("______________\n");
             ptr += sizeof(struct fat_arch);

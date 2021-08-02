@@ -208,9 +208,8 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 	return(g_mach.header);
 }
 
-int analyse_mach32(void)
+int analyse_mach32(struct load_command *ptr)
 {
-	struct load_command *ptr;
 	unsigned const char *mem;
 
 
@@ -237,6 +236,8 @@ int analyse_mach32(void)
 			read_symtable_32((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 		}
 	}
+	if (g_mach.nsects)
+	  	free(g_mach.sections32);
 	return(0);
 }
 
@@ -259,25 +260,12 @@ int	analyse_mach64(struct load_command *ptr)
 		if (ptr->cmd == LC_SYMTAB)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
 			read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 		}
 		else if (ptr->cmd == LC_DYSYMTAB)
 		{
 			struct dysymtab_command cmd;
-
 			ft_memcpy(&cmd, ptr, sizeof(cmd));
-			//printf("LC_DYSYMTAB: to be continued...\n");
-			// printf("ilocalsym: %d\n", cmd.ilocalsym);
-			// printf("nlocalsym: %d\n", cmd.nlocalsym);
-			// printf("iextdefsym: %d\n", cmd.iextdefsym);
-			// printf("nextdefsym: %d\n", cmd.nextdefsym);
-			// printf("iundefsym: %d\n", cmd.iundefsym);
-			// printf("nundefsym: %d\n", cmd.nundefsym);
-			// printf("cmdsize %u\n", cmd.cmdsize);
-			// printf("tocoff: %d\n", cmd.tocoff);
-			// printf("ntoc: %d\n", cmd.ntoc);
-			// printf("--------------------------------\n");
 		}
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;

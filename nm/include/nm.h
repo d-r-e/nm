@@ -60,7 +60,7 @@ int						read_arch(void);
 int                     analyse_elf(const char *s, const char *path);
 struct mach_header_64   get_mach_header64(const char *memfile);
 int                     analyse_mach64(struct load_command *ptr);
-int						analyse_mach32(void);
+int						analyse_mach32(struct load_command *ptr);
 
 /*
  * fat file architecture
