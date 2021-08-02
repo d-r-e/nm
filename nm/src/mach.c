@@ -37,9 +37,22 @@ const char  *get_symstr(struct nlist_64 table)
 static char get_symbol_char(struct nlist_64 table)
 {
 	(void)table;
-	if (table.n_sect == NO_SECT)
-		return ('U');
-	return('C');
+	char c = 'U';
+
+	if (table.n_sect > g_mach.nsects)
+		return (c);
+
+	//printf("sectname: %s\n", g_mach.sections[table.n_sect - 1].sectname);
+	if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__text", 6))
+		c = 'T';
+	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__data", 6))
+		c = 'D';
+	else
+		c = 'S';
+	
+	if (!(table.n_type & N_EXT))
+		c -= 'A' - 'a';
+	return(c);
 }
 
 int read_symtable_64(const char *mem, uint32_t nsyms)
@@ -47,7 +60,8 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	struct nlist_64 table;
 	const char *ptr;
 	uint32_t i;
-	
+	char c = 'U';
+
 	if (!mem || nsyms < 0)
 		return(-1);
 	ptr = mem;
@@ -59,21 +73,25 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 		switch ((table.n_type & N_TYPE))
 			{
+				
 				case (N_UNDF):
-					if (table.n_value)
-						printf("%.16llx ", table.n_value);
-					else
-						printf("%17s","");
-					char c = get_symbol_char(table);
-					printf("%c %s\n", c, g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					c = 'U';
+					if (table.n_value){
+						printf("%.16llx C ", table.n_value);
+					}else{
+						printf("%17sU ","");
+					}
+					printf("%s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_ABS):
 					printf("%.16llx ", table.n_value);
 					printf("A %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_SECT):
+					c = get_symbol_char(table);
 					printf("%.16llx ", table.n_value);
-					printf("T %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+					
+					printf("%c %s\n",c, g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				// case (N_PBUD):
 				// 	printf("%.16llx ", table.n_value);
@@ -146,13 +164,14 @@ int	analyse_mach64(struct load_command *ptr)
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
 		//printf("%x\n", ptr->cmd);
-		// if (ptr->cmd == LC_SEGMENT_64)
-		// {
-		// 	struct segment_command_64 segment;
-		// 	ft_bzero(&segment, sizeof(struct segment_command_64));
-		// 	ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
-		// 	// printf("LC_SEGMENT_64 %d\n", i);
-		// 	parse_segment((void*)ptr, segment);
+		if (ptr->cmd == LC_SEGMENT_64)
+		{
+			struct segment_command_64 segment;
+			ft_bzero(&segment, sizeof(struct segment_command_64));
+			ft_memcpy(&segment, ptr, sizeof(struct segment_command_64));
+			// printf("LC_SEGMENT_64 %d\n", i);
+			parse_segment((void*)ptr, segment);
+		}
 		// 	// printf("Load command %d\n", i);
 		// 	// printf("segname: %s\n", segment.segname);
 		// 	// printf("cmdsize %u\n", segment.cmdsize);
@@ -167,11 +186,7 @@ int	analyse_mach64(struct load_command *ptr)
 		// } 
 		//else if (ptr->cmd == LC_SEGMENT)
 		// {
-		struct segment_command_64 segment;
-		// 	printf("ASDFAS");
-		// 	ft_bzero(&segment, sizeof(struct segment_command));
-		ft_memcpy(&segment, ptr, sizeof(struct segment_command));
-		// 	// printf("LC_SEGMENT_64 %d\n", i);
+		
 		//parse_segment((void*)ptr, segment);
 		// 	// printf("Load command %d\n", i);
 		// 	// printf("segname: %s\n", segment.segname);
@@ -211,6 +226,8 @@ int	analyse_mach64(struct load_command *ptr)
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
 	}
+	if (g_mach.nsects)
+	  	free(g_mach.sections);
 	return(0);
 }
  

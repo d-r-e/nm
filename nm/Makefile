@@ -38,14 +38,15 @@ push: commit
 	@git push origin master
 
 x: $(NAME)
-	@./$(NAME)
+		@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
+
+
 h: $(NAME)
 	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
+
 o: $(NAME)
 	@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
 
-l: $(NAME)
-	diff `./$(NAME) /bin/ls` `nm --no-sort /bin/ls`
 
 valgrind: re
 	@gcc test/test.c

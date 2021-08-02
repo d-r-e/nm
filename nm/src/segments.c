@@ -73,21 +73,23 @@ void print_section(struct section_64 sect)
 	printf("sect.flags %.8x \n", sect.flags);
 }
 
-// static void save_section(struct section_64 section)
-// {
-// 	struct section_64 *newsections;
+static void save_section(struct section_64 section)
+{
+	struct section_64 *newsections;
 
-// 	g_mach.nsects++;
-// 	newsections = malloc(sizeof(section) * g_mach.nsects);
-// 	if (!newsections)
-// 		exit (-1);
-// 	for (int i = 0; i < g_mach.nsects - 1; ++i)
-// 		ft_memcpy(&newsections[i], (void*)&g_mach.sections[i], sizeof(section));
-// 	ft_memcpy(&newsections[g_mach.nsects], (void*)&section, sizeof(section));
-// 	free(g_mach.sections);
-// 	g_mach.sections = newsections;
-// 	printf("newsections: %d\n", g_mach.nsects);
-// }
+	(void)section;
+	g_mach.nsects++;
+
+	newsections = malloc(sizeof(section) * g_mach.nsects);
+	if (!newsections)
+		exit (-1);
+	for (int i = 0; i < g_mach.nsects - 1; ++i)
+		ft_memcpy(&newsections[i], (void*)&g_mach.sections[i], sizeof(section));
+	ft_memcpy(&newsections[g_mach.nsects - 1], (void*)&section, sizeof(section));
+	if (g_mach.sections)
+ 		free(g_mach.sections);
+	g_mach.sections = newsections;
+}
 
 
 int	parse_segment(const char *mem, struct segment_command_64 segment)
@@ -103,7 +105,7 @@ int	parse_segment(const char *mem, struct segment_command_64 segment)
 	{
 		ft_bzero(&section, sizeof(section));
 		ft_memcpy(&section, ptr, sizeof(section));
-		//save_section(section);
+		save_section(section);
 		ptr += sizeof(section);
 	}
 	return (0);

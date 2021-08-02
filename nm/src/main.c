@@ -58,7 +58,6 @@ int main(int argc, char **argv)
 		ft_nm("a.out");
 	if (argc > 1)
 	{
-		ft_bzero(&g_mach, sizeof(g_mach));
 		for (int i = 1; i < argc && i < 10; ++i)
 			ft_nm(argv[i]);
 		//system(LEAKS);
