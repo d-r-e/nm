@@ -42,7 +42,8 @@ x: $(NAME)
 h: $(NAME)
 	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
 o: $(NAME)
-	./$(NAME) test/nm test/o_helloworld.o && echo && nm test/o_helloworld.o
+	./$(NAME) libft/ft_substr.o && echo && nm libft/ft_substr.o
+
 l: $(NAME)
 	./$(NAME) libft/libft.a
 
@@ -51,7 +52,7 @@ valgrind: re
 	valgrind --leak-check=full ./$(NAME) `(ls -1 test/*.out)` && echo SUCCESS || echo FAIL
 	@rm -f src/*
 
-test: re
+test: $(NAME) 
 	./test.sh
 
 pull: re fclean

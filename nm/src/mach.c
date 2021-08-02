@@ -82,10 +82,14 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 		ft_memcpy(&table, ptr, sizeof(table));
 		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
-		switch (table.n_type & N_TYPE)
+		switch ((table.n_type & N_TYPE))
 			{
 				case (N_UNDF):
-					//printf("U %s\n", get_symstr(table.n_un.n_strx));
+					if (table.n_value)
+						printf("%.16llx\t", table.n_value);
+					else
+						printf("%17s", "");
+					printf("U %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_ABS):
 					ft_puts("N_ABS");
@@ -95,7 +99,8 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 					printf("T %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 				case (N_PBUD):
-					ft_puts("N_PBUD");
+					printf("%.16llx ", table.n_value);
+					printf("Pm %s\n", g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
 					break;
 	
 				default:
@@ -106,6 +111,7 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 		// printf("n_strx:\t%d\n", table.n_un.n_strx);
 		ptr += sizeof(table);
 	}
+	
 	//nlist("a.out", list);
 	return (0);
 }
