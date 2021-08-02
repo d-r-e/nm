@@ -17,7 +17,8 @@
 # include <mach-o/swap.h>
 # include <ar.h>
 
-# define BINARY "ft_otool"
+# define BINARY "ft_nm"
+# define LEAKS "leaks ft_nm"
 # define NO_SUCH_FILE "No such file."
 # define PERMISSION_DENIED "Permission denied."
 # define STAT_ERROR "Stat read error"

@@ -60,6 +60,6 @@ int main(int argc, char **argv)
 	{
 		for (int i = 1; i < argc && i < 10; ++i)
 			ft_nm(argv[i]);
-		//system("leaks ft_otool");
+		//system(LEAKS);
 	}
 }
