@@ -80,8 +80,8 @@ function test_files()
     echo "RESULT: $RESULT/$NFILES"
     [ "${RESULT}" == "${NFILES}" ] && success || failure
 }
-# test_files $FILES_SO
-#test_files $FILES_DYLIB
+test_files $FILES_SO
+test_files $FILES_DYLIB
 test_files $FILES_O
 test_files $FILES
 test_files $FILES_EXEC
