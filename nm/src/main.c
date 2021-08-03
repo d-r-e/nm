@@ -4,14 +4,11 @@ static int ft_nm(const char *path)
 {	uint32_t magic;
 
 	ft_bzero(&g_mach, sizeof(g_mach));
-	// ft_bzero(&g_mach.fatheader, sizeof(g_mach.fatheader));
-	// ft_bzero(&g_mach.header, sizeof(g_mach.header));
-	// ft_bzero(&g_mach.header32, sizeof(g_mach.header32));
 	g_mach.fd = open(path, O_RDONLY, NULL);
 	if (g_mach.fd < 0)
 		return(file_error(path, NO_SUCH_FILE));
 	ft_bzero(&g_mach.s, sizeof(struct stat));
-	if (fstat(g_mach.fd, &g_mach.s))
+	if (fstat(g_mach.fd, &g_mach.s) || (size_t)g_mach.s.st_size < sizeof(g_mach.header))
 		return (close(g_mach.fd) & -1);
 	if (! (0x8000 & g_mach.s.st_mode))
 	{
@@ -53,7 +50,7 @@ int main(int argc, char **argv)
 {
 	if (argc == 1)
 		ft_nm("a.out");
-	if (argc > 1)
+	else
 	{
 		for (int i = 1; i < argc && i < 10; ++i)
 			ft_nm(argv[i]);

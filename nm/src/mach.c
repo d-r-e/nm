@@ -109,9 +109,14 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 		// printf("%.2lx\n", (ptr -g_mach.mem));
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 
-		if ((table.n_type & N_EXT) == 0 && ((table.n_type & N_TYPE) & N_UNDF))
-		 	printf("");
-		else {
+		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
+		
+		if ((table.n_type & N_PEXT) == 0 && (table.n_sect & NO_SECT) )
+		{
+			ft_putstr("");
+		}
+		else
+		{
 			switch ((table.n_type & N_TYPE))
 			{
 				case (N_STAB):
@@ -171,11 +176,9 @@ int read_symtable_32(const char *mem, uint32_t nsyms)
 		//ft_bzero(&table, sizeof(table));
 		ft_memcpy(&table, ptr, sizeof(table));
 		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
-		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 		
-		switch ((table.n_type & N_TYPE))
+			switch ((table.n_type & N_TYPE))
 			{
-				
 				case (N_UNDF):
 					c = 'U';
 					if (table.n_value){
@@ -192,7 +195,6 @@ int read_symtable_32(const char *mem, uint32_t nsyms)
 				case (N_SECT):
 					c = get_symbol_char_32(table);
 					printf("%.16x ", table.n_value);
-					
 					printf("%c %s\n",c, get_symstr_32(table));
 					break;
 				// case (N_PBUD):
