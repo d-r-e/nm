@@ -144,8 +144,8 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 				// 	printf("P %s\n", get_symstr(table));
 				// 	break;
 				case (N_INDR):
-					printf("%.16llx ", table.n_value);
-					printf("I %s\n", get_symstr(table));
+					printf("%17sI","");
+					printf(" %s (indirect for %s)\n",get_symstr(table) ,get_symstr(table));
 					break;
 				default:
 					break;
