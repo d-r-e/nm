@@ -6,7 +6,7 @@ INC=include/nm.h
 LIBFT=libft/libft.a
 CFLAGS= -O3 -Wall -Wextra -Werror -Wformat-security #  -fsanitize=address -g
 
-$(NAME): $(OBJ) $(INC) $(LIBFT)
+$(NAME): $(OBJ) $(INC) $(LIBFT) $(SRC)
 	gcc $(CFLAGS) $(OBJ) -L libft/ -lft -o $(NAME)
 
 $(OBJ): $(SRC) $(INC)
@@ -41,7 +41,7 @@ x: $(NAME)
 		@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
 
 
-h: $(NAME)
+h: $(NAME) $(SRC)
 	./$(NAME) test/bin_helloworld && echo && nm test/bin_helloworld
 
 o: $(NAME)
@@ -49,6 +49,9 @@ o: $(NAME)
 
 g: $(NAME)
 	@./$(NAME) /Users/darodrig/Desktop/nm-otool/kcosta/tests/ahah_gotcha.o
+
+sync: $(SYNC)
+	@./$(NAME) /bin/sync && echo _______________________ && nm --no-sort /bin/sync
 
 valgrind: re
 	@gcc test/test.c
@@ -61,8 +64,6 @@ test: $(NAME)
 pull: re fclean
 	git pull origin master
 
-sync: $(NAME) 
-	./$(NAME) sync
 
 activate_leaks: $(SRC)
 
@@ -81,3 +82,5 @@ testleaks: $(NAME)
 	./$(NAME) test/*
 
 leaks: onleaks testleaks offleaks fclean
+
+.PHONY: clean re all sync

@@ -34,7 +34,6 @@ static int ft_nm(const char *path)
 		ft_memcpy((void*)&g_mach.header, g_mach.mem, g_mach.header_size);
 		analyse_mach32((struct load_command *)((g_mach.mem) + sizeof(g_mach.header)));
 	} else if (magic == CAFEBABE){
-		printf("%s:\n", path);
 		read_fat();
 	} else if (get_magic(g_mach.mem, &g_mach.s ) == FAT_MAGIC_64){
 		printf("64 bits fat binary\n");

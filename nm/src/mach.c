@@ -31,7 +31,7 @@ int get_mach_header32(const char *memfile)
 
 const char  *get_symstr(struct nlist_64 table)
 {
-	return (g_mach.mem +g_mach.symtab.stroff + table.n_un.n_strx);
+	return (g_mach.mem +g_mach.fatarch.offset +g_mach.symtab.stroff + table.n_un.n_strx);
 }
 
 const char  *get_symstr_32(struct nlist table)
@@ -88,20 +88,22 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 	struct nlist_64 table;
 	const char *ptr;
 	uint32_t i;
-	char c = 'U';
+	char c = 'X';
 
 	if (!mem || nsyms < 0)
 		return(-1);
 	ptr = mem;
 	for (i = 0; i < nsyms; i++)
 	{
-		//ft_bzero(&table, sizeof(table));
+		ft_bzero(&table, sizeof(table));
 		ft_memcpy(&table, ptr, sizeof(table));
-		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
+		// printf("%.2lx\n", (ptr -g_mach.mem));
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
+
 		switch ((table.n_type & N_TYPE))
 			{
-				
+				case (N_STAB):
+					break;
 				case (N_UNDF):
 					c = 'U';
 					if (table.n_value){
@@ -160,7 +162,6 @@ int read_symtable_32(const char *mem, uint32_t nsyms)
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 		switch ((table.n_type & N_TYPE))
 			{
-				
 				case (N_UNDF):
 					c = 'U';
 					if (table.n_value){
@@ -211,16 +212,10 @@ struct mach_header_64 get_mach_header64(const char *memfile)
 int analyse_mach32(struct load_command *ptr)
 {
 	unsigned const char *mem;
-
-
-	printf("%x\n", g_mach.header.cputype);
-	ptr = (struct load_command *)((g_mach.mem) + sizeof(g_mach.header32));
 	mem = (const unsigned char *)ptr;
-	// printf("ncmds=%u\n", g_mach.header32.ncmds);
-	for (uint32_t i = 0; i < g_mach.header32.ncmds; i++)
+
+	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
-		mem += ptr->cmdsize;
-		ptr = (struct load_command *)mem;
 		if (ptr->cmd == LC_SEGMENT)
 		{
 			struct segment_command segment;
@@ -229,15 +224,21 @@ int analyse_mach32(struct load_command *ptr)
 			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment32((void*)ptr, segment);
 		}
-		if (ptr->cmd == LC_SYMTAB)
-		{
-			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			//read_symstr((char*)g_mach.mem + g_mach.symtab.stroff, g_mach.symtab.nsyms);
-			read_symtable_32((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
-		}
+		// if (ptr->cmd == LC_SYMTAB)
+		// {
+		// 	ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
+		// 	read_symtable_32((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+		// }
+		// else if (ptr->cmd == LC_DYSYMTAB)
+		// {
+		// 	struct dysymtab_command cmd;
+		// 	ft_memcpy(&cmd, ptr, sizeof(cmd));
+		// }
+		mem += ptr->cmdsize;
+		ptr = (struct load_command *)mem;
 	}
 	if (g_mach.nsects)
-	  	free(g_mach.sections32);
+	  	free(g_mach.sections);
 	return(0);
 }
 
@@ -248,7 +249,6 @@ int	analyse_mach64(struct load_command *ptr)
 	mem = (const unsigned char *)ptr;
 	for (uint32_t i = 0; i < g_mach.header.ncmds; i++)
 	{
-		//printf("%x\n", ptr->cmd);
 		if (ptr->cmd == LC_SEGMENT_64)
 		{
 			struct segment_command_64 segment;
@@ -257,16 +257,17 @@ int	analyse_mach64(struct load_command *ptr)
 			// printf("LC_SEGMENT_64 %d\n", i);
 			parse_segment((void*)ptr, segment);
 		}
+		
 		if (ptr->cmd == LC_SYMTAB)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
-			read_symtable_64((char*)g_mach.mem + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+			read_symtable_64((char*)g_mach.mem + g_mach.fatarch.offset + g_mach.symtab.symoff, g_mach.symtab.nsyms);
 		}
-		else if (ptr->cmd == LC_DYSYMTAB)
-		{
-			struct dysymtab_command cmd;
-			ft_memcpy(&cmd, ptr, sizeof(cmd));
-		}
+		// else if (ptr->cmd == LC_DYSYMTAB)
+		// {
+		// 	struct dysymtab_command cmd;
+		// 	ft_memcpy(&cmd, ptr, sizeof(cmd));
+		// }
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
 	}

@@ -26,22 +26,13 @@ static void ft_swap_fat_arch(struct fat_arch *arch)
 
 // static void print_fat_arch(struct fat_arch arch)
 // {
-//     printf("X32header\n");
 //     printf("arch.cputype : %i\n", arch.cputype);
 //     printf("arch.cpusubtype : %u\n", arch.cpusubtype);
 //     printf("arch.offset : %u\n", arch.offset);
 //     printf("arch.size : %u\n", arch.size);
 //     printf("arch.align : %u\n", arch.align);
 // }
-// static void print_fat_arch64(struct fat_arch_64 arch)
-// {
-//     printf("X64header\n");
-//     printf("arch.cputype : %u\n", arch.cputype);
-//     printf("arch.cpusubtype : %u\n", arch.cpusubtype);
-//     printf("arch.offset : %llu\n", arch.offset);
-//     printf("arch.size : %llu\n", arch.size);
-//     printf("arch.align : %u\n", arch.align);
-// }
+
 
 int is_x86(const char *ptr)
 {
@@ -88,25 +79,27 @@ int read_fat()
             ft_memcpy(&g_mach.fatarch, ptr, sizeof(g_mach.fatarch));
             ft_swap_fat_arch(&g_mach.fatarch);
             //printf("%i\n", g_mach.fatarch.cputype);
+            
             if (g_mach.fatarch.cputype == 16777223){
                 //puts("entra");
             	g_mach.header_size = sizeof(struct mach_header_64);
                 ft_bzero(&g_mach.header, sizeof(g_mach.header));
                 ft_memcpy((void*)&g_mach.header, g_mach.mem + g_mach.fatarch.offset, sizeof(g_mach.header));
                 //printf("ncmds%d\n", g_mach.header.ncmds);
-                // hgeprint_fat_arch(g_mach.fatarch);
-                analyse_mach64((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header)));
+                //print_fat_arch(g_mach.fatarch);
+                //printf("%lu\n", sizeof(g_mach.header)+  sizeof(g_mach.fatarch.offset));
+                analyse_mach64((struct load_command*)(g_mach.mem + g_mach.fatarch.offset  + sizeof(g_mach.header)));//+ sizeof(g_mach.header)+ g_mach.fatarch.offset));// + g_mach.fatarch.offset + sizeof(g_mach.header)));
                 //printf("entra\n");
             }
-            else {
-                g_mach.header_size = sizeof(struct mach_header);
-                ft_bzero(&g_mach.header, sizeof(g_mach.header));
-                ft_memcpy((void*)&g_mach.header, g_mach.mem + g_mach.fatarch.offset, sizeof(g_mach.header));
-                //printf("ncmds%d\n", g_mach.header.ncmds);
-                // hgeprint_fat_arch(g_mach.fatarch);
-                analyse_mach32((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header)));
-                //printf("entra\n");
-            }
+            // else {
+            //     g_mach.header_size = sizeof(struct mach_header);
+            //     ft_bzero(&g_mach.header32, sizeof(g_mach.header));
+            //     ft_memcpy((void*)&g_mach.header32, g_mach.mem + g_mach.fatarch.offset, sizeof(g_mach.header32));
+            //     printf("ncmds%d\n", g_mach.header32.ncmds);
+            //     print_fat_arch(g_mach.fatarch);
+            //     analyse_mach32((struct load_command*)(g_mach.mem + g_mach.fatarch.offset + sizeof(g_mach.header32)));
+            //     printf("entra\n");
+            // }
             //print_fat_arch(fat);
             // printf("______________\n");
             ptr += sizeof(struct fat_arch);
