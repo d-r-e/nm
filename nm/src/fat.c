@@ -89,6 +89,7 @@ int read_fat()
                 //print_fat_arch(g_mach.fatarch);
                 //printf("%lu\n", sizeof(g_mach.header)+  sizeof(g_mach.fatarch.offset));
                 analyse_mach64((struct load_command*)(g_mach.mem + g_mach.fatarch.offset  + sizeof(g_mach.header)));//+ sizeof(g_mach.header)+ g_mach.fatarch.offset));// + g_mach.fatarch.offset + sizeof(g_mach.header)));
+                return (0);
                 //printf("entra\n");
             }
             // else {
