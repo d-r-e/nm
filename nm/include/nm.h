@@ -99,6 +99,7 @@ typedef struct s_mach {
 	struct section_64		*sections;
 	struct section			*sections32;
 	int						nsects;
+	int						arg;
 }	t_mach;
 
 t_mach	g_mach;

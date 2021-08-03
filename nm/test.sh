@@ -76,7 +76,6 @@ function test_files()
                 fi
             fi
         fi
-
     done
     echo "RESULT: $RESULT/$NFILES"
     [ "${RESULT}" == "${NFILES}" ] && success || failure

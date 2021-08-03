@@ -1,9 +1,9 @@
 #include "../include/nm.h"
 
 static int ft_nm(const char *path)
-{	uint32_t magic;
+{
+	uint32_t magic;
 
-	ft_bzero(&g_mach, sizeof(g_mach));
 	g_mach.fd = open(path, O_RDONLY, NULL);
 	if (g_mach.fd < 0)
 		return(file_error(path, NO_SUCH_FILE));
@@ -52,8 +52,11 @@ int main(int argc, char **argv)
 		ft_nm("a.out");
 	else
 	{
-		for (int i = 1; i < argc && i < 10; ++i)
+		for (int i = 1; i < argc; ++i){
+			ft_bzero(&g_mach, sizeof(g_mach));
+			g_mach.arg = i;
 			ft_nm(argv[i]);
+		}
 		//system(LEAKS);
 	}
 	exit(0);

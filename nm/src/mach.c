@@ -15,11 +15,6 @@ uint32_t get_magic(const char *memfile, struct stat *s)
 		if (!ft_memcmp(&magicstr[i], memfile, strlen(&magicstr[i])))
 			return ((uint32_t)ARCH_MAGIC);
 	}
-	printf("%x\n", *memfile);
-	for (int i = 0; i < 5; ++i) {
-		printf("%.2x ", (unsigned char)*(memfile++));
-	}
-	printf("\n");
 	return (FALSE);
 }
 
@@ -111,7 +106,7 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 
 		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
 		
-		if ((table.n_type & N_PEXT) == 0 && (table.n_sect & NO_SECT) )
+		if ((table.n_type & N_STAB))
 		{
 			ft_putstr("");
 		}
