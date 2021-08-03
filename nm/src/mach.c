@@ -46,6 +46,8 @@ static char get_symbol_char(struct nlist_64 table)
 
 	if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__text", 6))
 		c = 'T';
+	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__bss", 5))
+		c = 'B';
 	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__data", 6))
 		c = 'D';
 	else
@@ -70,9 +72,11 @@ static char get_symbol_char_32(struct nlist table)
 		c = 'T';
 	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__data", 6))
 		c = 'D';
-	else
+	else if (!ft_strncmp(g_mach.sections[table.n_sect - 1].sectname, "__bss", 5))
+		c = 'B';
+	else{
 		c = 'S';
-	
+	}
 	if (!(table.n_type & N_EXT))
 		c -= 'A' - 'a';
 	return(c);
