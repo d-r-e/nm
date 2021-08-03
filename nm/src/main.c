@@ -59,4 +59,5 @@ int main(int argc, char **argv)
 			ft_nm(argv[i]);
 		//system(LEAKS);
 	}
+	exit(0);
 }

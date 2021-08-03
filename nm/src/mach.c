@@ -83,6 +83,15 @@ static char get_symbol_char_32(struct nlist table)
 	return(c);
 }
 
+// static void print_table(struct nlist_64 table)
+// {
+// 	printf("table.n_sect %u\n", table.n_sect);
+// 	printf("table.n_type %x\n", table.n_type);
+// 	printf("table.n_sect %u\n", table.n_sect);
+// 	printf("table.n_sect %u\n", table.n_sect);
+// 	printf("table.n_sect %u\n", table.n_sect);
+// }
+
 int read_symtable_64(const char *mem, uint32_t nsyms)
 {
 	struct nlist_64 table;
@@ -100,7 +109,10 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 		// printf("%.2lx\n", (ptr -g_mach.mem));
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
 
-		switch ((table.n_type & N_TYPE))
+		if ((table.n_type & N_EXT) == 0 && ((table.n_type & N_TYPE) & N_UNDF))
+		 	printf("");
+		else {
+			switch ((table.n_type & N_TYPE))
 			{
 				case (N_STAB):
 					break;
@@ -134,7 +146,7 @@ int read_symtable_64(const char *mem, uint32_t nsyms)
 				default:
 					break;
 			}
-		
+		}
 		// printf("N_EXT:\t%d\n", table.n_type & N_EXT);
 		// printf("n_strx:\t%d\n", table.n_un.n_strx);
 		ptr += sizeof(table);
@@ -160,8 +172,10 @@ int read_symtable_32(const char *mem, uint32_t nsyms)
 		ft_memcpy(&table, ptr, sizeof(table));
 		// printf("N_STAB:\t%d\n", table.n_type & N_STAB);
 		// printf("N_PEXT:\t%d\n", table.n_type & N_PEXT);
+		
 		switch ((table.n_type & N_TYPE))
 			{
+				
 				case (N_UNDF):
 					c = 'U';
 					if (table.n_value){
@@ -236,9 +250,9 @@ int analyse_mach32(struct load_command *ptr)
 		// }
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
+		if (g_mach.nsects)
+			free(g_mach.sections);
 	}
-	if (g_mach.nsects)
-	  	free(g_mach.sections);
 	return(0);
 }
 
@@ -262,6 +276,7 @@ int	analyse_mach64(struct load_command *ptr)
 		{
 			ft_memcpy(&g_mach.symtab, ptr, sizeof(g_mach.symtab));
 			read_symtable_64((char*)g_mach.mem + g_mach.fatarch.offset + g_mach.symtab.symoff, g_mach.symtab.nsyms);
+			break;
 		}
 		// else if (ptr->cmd == LC_DYSYMTAB)
 		// {
@@ -270,9 +285,9 @@ int	analyse_mach64(struct load_command *ptr)
 		// }
 		mem += ptr->cmdsize;
 		ptr = (struct load_command *)mem;
+		if (g_mach.nsects)
+			(void)(g_mach.sections);
 	}
-	if (g_mach.nsects)
-	  	free(g_mach.sections);
 	return(0);
 }
  
