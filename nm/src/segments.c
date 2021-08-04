@@ -118,5 +118,4 @@ int	parse_segment32(const char *mem, struct segment_command segment)
 		ptr += sizeof(section);
 	}
 	return (0);
-	return (0);
 }

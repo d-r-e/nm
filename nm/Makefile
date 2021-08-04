@@ -48,6 +48,7 @@ o: $(NAME)
 	@./$(NAME) libft/ft_memcpy.o && echo _______________________ && nm --no-sort libft/ft_memcpy.o
 
 g: $(NAME)
+	nm --no-sort /Users/darodrig/Desktop/nm-otool/kcosta/tests/ahah_gotcha.o
 	@./$(NAME) /Users/darodrig/Desktop/nm-otool/kcosta/tests/ahah_gotcha.o
 
 sync: $(SYNC)
