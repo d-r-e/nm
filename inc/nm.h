@@ -19,5 +19,14 @@
 # define FLAG_P 0x4
 # define FLAG_U 0x8
 
+typedef struct s_symbol
+{
+    Elf64_Sym *sym;
+    char *name;
+    char type;
+    char *value;
+    char *shndx;
+    struct s_symbol *next;
+} t_symbol;
 
 #endif

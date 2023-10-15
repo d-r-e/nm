@@ -4,7 +4,7 @@ INC = -I inc
 OBJ = $(SRC:.c=.o)
 CC = gcc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -O2 -g3
+CFLAGS = -Wall -Wextra -Werror -g3
 LIBFT = libft/libft.a
 MAKE = make -C
 
@@ -28,5 +28,10 @@ fclean: clean
 	$(RM) $(NAME)
 re: fclean all
 
+x: all
+	./$(NAME) $(NAME)
 test: $(NAME)
 	./test/test.sh
+
+
+.PHONY: test re all clean fclean
