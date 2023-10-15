@@ -7,4 +7,4 @@ ft_otool
 *.so
 *.dylib
 .vscode
-main_*leaks.c
+main_*leaks.c.idea
