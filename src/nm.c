@@ -225,8 +225,10 @@ static void _nm64(void *ptr, int flags, struct stat *statbuff, char *filename)
             while (symbols)
             {
                 if  (!flags){
-                    if (is_debug(*symbols->sym) || symbols->type == 'a')
+                    if (is_debug(*symbols->sym) || symbols->type == 'a'){
+                        symbols = symbols->next;
                         continue;
+                    }
                     if (symbols->type != 'U')
                         printf("%016lx %c %s\n", symbols->sym->st_value, symbols->type, symbols->name);
                     else
