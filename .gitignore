@@ -1,10 +1,11 @@
 *.out
 *.o
 *.a
-ft_nm
-ft_otool
+nm
 *.swp
 *.so
 *.dylib
 .vscode
+.idea
 main_*leaks.c.idea
+*.pdf

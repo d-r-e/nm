@@ -1,27 +1,32 @@
-FILES	= ft_nm ft_otool
-NM		= ft_nm
-OT		= ft_otool
+NAME = ft_nm
+SRC = src/nm.c
+INC = -I inc
+OBJ = $(SRC:.c=.o)
+CC = gcc
+RM = rm -f
+CFLAGS = -Wall -Wextra -Werror -O2 -g3
+LIBFT = libft/libft.a
+MAKE = make -C
 
-all:	$(FILES)
+$(NAME): $(LIBFT) $(SRC) $(OBJ)
+	gcc -o $(NAME) $(OBJ) -L libft -lft
 
-$(NM):
-	$(MAKE) -C nm
-	mv nm/ft_nm .
-$(OT):	
-	$(MAKE) -C otool
-	mv otool/ft_otool .
+$(LIBFT):
+	$(MAKE) libft
 
-clean:
-	$(MAKE) -C nm clean
-	$(MAKE) -C otool clean
-	
+all: $(NAME)
 
-fclean:	clean
-	$(MAKE) fclean -C nm 
-	$(MAKE) fclean -C otool
-	rm -f $(FILES)
+%.o: %.c
+	$(CC) $(CFLAGS) $(INC) -I libft -c $< -o $@
 
-re:		fclean all
+clean: 
+	$(MAKE) libft clean
+	$(RM) $(OBJ)
 
-test:	$(OT)
-	./test.sh
+fclean: clean
+	$(MAKE) libft fclean
+	$(RM) $(NAME)
+re: fclean all
+
+test: $(NAME)
+	./test/test.sh

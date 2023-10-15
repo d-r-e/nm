@@ -8,5 +8,3 @@
        the argument list.  In some cases, as with an object that has had strip(1) with its
        -T option used on the object, that can be different from the dyld information.  For
        that content, use dyldinfo(1).
-
-## otool command
