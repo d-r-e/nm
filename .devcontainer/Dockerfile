@@ -11,3 +11,5 @@ RUN apt-get update && apt-get install -yq \
     binwalk \
     build-essential \
     git
+RUN apt-get install -yq man
+RUN yes | unminimize

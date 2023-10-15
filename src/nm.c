@@ -37,14 +37,26 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr *shdr)
     switch (type)
     {
     case STT_NOTYPE:
-        c = 'U';
+        c = (shdr[sym.st_shndx].sh_type == SHT_NOBITS) ? 'B' : 'U';
+
         break;
     case STT_OBJECT:
-        c = 'D';
+        if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS && !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+            c = 'R';
+        else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+            c = 'B';
+        else
+            c = 'D';
         break;
     case STT_FUNC:
+        if ( !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+            c = 'R';
         if (sym.st_shndx == SHN_UNDEF)
             c = 'U';
+        else if (sym.st_shndx == SHN_ABS)
+            c = 'A';
+        else if (shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+            c = 'B';
         else
             c = 'T';
         break;
@@ -60,27 +72,8 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr *shdr)
         c = '?';
         break;
     }
-    if (type == STT_OBJECT && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
-        c = 'B';
-    if (bind == STB_WEAK)
-    {
-        switch (type)
-        {
-        case STT_OBJECT:
-            c = 'V';
-            break;
-        case STT_FUNC:
-            c = 'W';
-            break;
-        default:
-            c = '?';
-            break;
-        }
-    }
-
-    if (bind == STB_LOCAL && c != 'U' && c != 'W')
+    if (bind == STB_LOCAL || bind == STB_WEAK)
         c = ft_tolower(c);
-
     return c;
 }
 
@@ -224,12 +217,14 @@ static void _nm64(void *ptr, int flags, struct stat *statbuff, char *filename)
 
             while (symbols)
             {
-                if  (!flags){
-                    if (is_debug(*symbols->sym) || symbols->type == 'a'){
+                if (!flags)
+                {
+                    if (is_debug(*symbols->sym) || ft_strchr("a", symbols->type))
+                    {
                         symbols = symbols->next;
                         continue;
                     }
-                    if (symbols->type != 'U')
+                    if (!ft_strchr("Uw", symbols->type))
                         printf("%016lx %c %s\n", symbols->sym->st_value, symbols->type, symbols->name);
                     else
                         printf("%16c %c %s\n", ' ', symbols->type, symbols->name);
