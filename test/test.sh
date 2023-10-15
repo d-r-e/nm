@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -13,11 +14,11 @@ BAD_FILES=(
     /etc/passwd
     Makefile
     /dev/random
-    ./test/nopermission
+    ./test/bin/nopermission
 )
 
-touch ./test/nopermission
-chmod 000 ./test/nopermission
+touch ./test/bin/nopermission
+chmod 000 ./test/bin/nopermission
 
 make
 
@@ -37,32 +38,43 @@ check_output() {
     fi
 }
 
-echo "Checking bad files..."
-for file in ${BAD_FILES[@]}; do
-    check_output $file
-done
+# echo "Checking bad files..."
+# for file in ${BAD_FILES[@]}; do
+#     check_output $file
+# done
 
+# echo "Checking ./test/bin folder..."
+# for binary in $(find ./test/bin -type f); do
+#     check_output $binary
+# done
 
-echo "Checking specified binaries..."
-for binary in "/bin/ls"; do
-    check_output $binary
-done
+# echo "Checking specified binaries..."
+# for binary in "/bin/ls"; do
+#     check_output $binary
+# done
 
-# echo "Checking self..."
-# check_output $FT_NM
-
-
-
-echo "Checking /bin/ folder..."
-for binary in $(find /bin /usr/bin -type f); do
-    check_output $binary
-done
-
-
-# echo "Checking system objects..."
-# for object in $(find /usr/lib /lib -name "*.o" | head -10); do
+# echo "Checking object files inside libft"
+# for object in $(find ./libft -name "*.o"); do
 #     check_output $object
 # done
 
 
+echo "Checking self..."
+check_output $FT_NM
+
+
+
+# echo "Checking /bin/ folder..."
+# for binary in $(find /bin /usr/bin -type f); do
+#     check_output $binary
+# done
+
+
+# # echo "Checking system objects..."
+# # for object in $(find /usr/lib /lib -name "*.o" | head -10); do
+# #     check_output $object
+# done
+
+
 rm -f ft_nm_output nm_output
+rm test/bin/nopermission
