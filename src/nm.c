@@ -205,19 +205,26 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
     case STT_NOTYPE:
       if (sym.st_shndx == SHN_UNDEF)
         c = 'U';
-      // IF GLOBAL       PROGBITS OR init_array -> R
-      else if (bind == STB_LOCAL &&( shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
-        c = 'R';
-      else if ((bind == STB_WEAK || bind == STB_GLOBAL) && shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+      else if (bind == STB_LOCAL){
+        if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+          c = 'R';
+        else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
+          c = 'D';
+        else
+          c = '?';
+      } else if (bind == STB_WEAK &&
+                 (shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
+        c = 'W';
+      else if ((bind == STB_WEAK || bind == STB_GLOBAL) &&
+               (shdr[sym.st_shndx].sh_type == SHT_PROGBITS ||
+                shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
         c = 'D';
-    // else if notype, global and nobits, B
     else if (bind == STB_GLOBAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
         c = 'B';
         else c = '?';
       break;
     case STT_OBJECT:
-      // OBJECT          LOCAL     FINI_ARRAY -> D
-        if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
+        if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
             c = 'D';
       else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) c = 'D';
       else if (sym.st_shndx == SHN_UNDEF) c = 'U';
@@ -267,7 +274,11 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   if (sym.st_shndx == SHN_ABS) {
     c = 'A';
   }
-  if ((bind == STB_LOCAL || bind == STB_WEAK) && c != 'U' && c != 'V') {
+  // if weak and SHT_NULL, then uppercase W
+  if (type == STT_NOTYPE && bind == STB_WEAK && shdr[sym.st_shndx].sh_type == SHT_NULL) {
+    c = ft_tolower(c);
+  } else if ((bind == STB_LOCAL || (bind == STB_WEAK && c != 'W')) &&
+             c != 'U' && c != 'V') {
     c = ft_tolower(c);
   }
   return c;
@@ -400,9 +411,11 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
             symbols = symbols->next;
             continue;
           }
-          int bind = ELF64_ST_BIND(symbols->sym->st_info);
-          int type = ELF64_ST_TYPE(symbols->sym->st_info);
-          print_type_bind_shn(&shdr[symbols->sym->st_shndx], type, bind);
+
+            // print_type_bind_shn(&shdr[symbols->sym->st_shndx],
+            // ELF64_ST_TYPE(symbols->sym->st_info),
+            // ELF64_ST_BIND(symbols->sym->st_info));
+          (void)print_type_bind_shn;
           if (!ft_strchr("Uw", symbols->type))
             printf("%016lx %c %s\n", symbols->sym->st_value, symbols->type,
                    symbols->name);
