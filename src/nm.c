@@ -25,6 +25,177 @@ void _exit_cleanup(int fd, void* ptr, struct stat* statbuf, int exit_code) {
   exit(exit_code);
 }
 
+void print_type_bind_shn(Elf64_Shdr* shdr,
+                         unsigned char type,
+                         unsigned char bind) {
+  // Prints, for example, "OBJECT GLOBAL DEFAULT 2"
+  char* type_str;
+  char* bind_str;
+  char* shn_str;
+
+  switch (type) {
+    case STT_NOTYPE:
+      type_str = "NOTYPE";
+      break;
+    case STT_OBJECT:
+      type_str = "OBJECT";
+      break;
+    case STT_FUNC:
+      type_str = "FUNC";
+      break;
+    case STT_SECTION:
+      type_str = "SECTION";
+      break;
+    case STT_FILE:
+      type_str = "FILE";
+      break;
+    case STT_COMMON:
+      type_str = "COMMON";
+      break;
+    case STT_TLS:
+      type_str = "TLS";
+      break;
+    case STT_NUM:
+      type_str = "NUM";
+      break;
+    case STT_LOOS:
+      type_str = "LOOS";
+      break;
+    case STT_HIOS:
+      type_str = "HIOS";
+      break;
+    case STT_LOPROC:
+      type_str = "LOPROC";
+      break;
+    case STT_HIPROC:
+      type_str = "HIPROC";
+      break;
+    default:
+      type_str = "UNKNOWN";
+      break;
+  }
+
+  switch (bind) {
+    case STB_LOCAL:
+      bind_str = "LOCAL";
+      break;
+    case STB_GLOBAL:
+      bind_str = "GLOBAL";
+      break;
+    case STB_WEAK:
+      bind_str = "WEAK";
+      break;
+    case STB_NUM:
+      bind_str = "NUM";
+      break;
+    case STB_LOOS:
+      bind_str = "LOOS";
+      break;
+    case STB_HIOS:
+      bind_str = "HIOS";
+      break;
+    case STB_LOPROC:
+      bind_str = "LOPROC";
+      break;
+    case STB_HIPROC:
+      bind_str = "HIPROC";
+      break;
+    default:
+      bind_str = "UNKNOWN";
+      break;
+  }
+
+  if (shdr) {
+    switch (shdr->sh_type) {
+      case SHT_NULL:
+        shn_str = "NULL";
+        break;
+      case SHT_PROGBITS:
+        shn_str = "PROGBITS";
+        break;
+      case SHT_SYMTAB:
+        shn_str = "SYMTAB";
+        break;
+      case SHT_STRTAB:
+        shn_str = "STRTAB";
+        break;
+      case SHT_RELA:
+        shn_str = "RELA";
+        break;
+      case SHT_HASH:
+        shn_str = "HASH";
+        break;
+      case SHT_DYNAMIC:
+        shn_str = "DYNAMIC";
+        break;
+      case SHT_NOTE:
+        shn_str = "NOTE";
+        break;
+      case SHT_NOBITS:
+        shn_str = "NOBITS";
+        break;
+      case SHT_REL:
+        shn_str = "REL";
+        break;
+      case SHT_SHLIB:
+        shn_str = "SHLIB";
+        break;
+      case SHT_DYNSYM:
+        shn_str = "DYNSYM";
+        break;
+      case SHT_INIT_ARRAY:
+        shn_str = "INIT_ARRAY";
+        break;
+      case SHT_FINI_ARRAY:
+        shn_str = "FINI_ARRAY";
+        break;
+      case SHT_PREINIT_ARRAY:
+        shn_str = "PREINIT_ARRAY";
+        break;
+      case SHT_GROUP:
+        shn_str = "GROUP";
+        break;
+      case SHT_SYMTAB_SHNDX:
+        shn_str = "SYMTAB_SHNDX";
+        break;
+      case SHT_NUM:
+        shn_str = "NUM";
+        break;
+      case SHT_LOOS:
+        shn_str = "LOOS";
+        break;
+      case SHT_GNU_ATTRIBUTES:
+        shn_str = "GNU_ATTRIBUTES";
+        break;
+      case SHT_GNU_HASH:
+        shn_str = "GNU_HASH";
+        break;
+      case SHT_GNU_LIBLIST:
+        shn_str = "GNU_LIBLIST";
+        break;
+      case SHT_CHECKSUM:
+        shn_str = "CHECKSUM";
+        break;
+      case SHT_LOSUNW:
+        shn_str = "LOSUNW";
+        break;
+      case SHT_SUNW_COMDAT:
+        shn_str = "SUNW_COMDAT";
+        break;
+
+      case SHT_SUNW_syminfo:
+        shn_str = "SUNW_syminfo";
+        break;
+      default:
+        shn_str = "UNKNOWN";
+        break;
+    }
+  } else {
+    shn_str = "UNKNOWN";
+  }
+  printf("%10s %14s %14s ", type_str, bind_str, shn_str);
+}
+
 char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   char c;
   unsigned char type = ELF64_ST_TYPE(sym.st_info);
@@ -34,13 +205,22 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
     case STT_NOTYPE:
       if (sym.st_shndx == SHN_UNDEF)
         c = 'U';
-      else
-        c = '?';
+      // IF GLOBAL       PROGBITS OR init_array -> R
+      else if (bind == STB_LOCAL &&( shdr[sym.st_shndx].sh_type == SHT_PROGBITS || shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
+        c = 'R';
+      else if ((bind == STB_WEAK || bind == STB_GLOBAL) && shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+        c = 'D';
+    // else if notype, global and nobits, B
+    else if (bind == STB_GLOBAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+        c = 'B';
+        else c = '?';
       break;
-
     case STT_OBJECT:
-      if (sym.st_shndx == SHN_UNDEF)
-        c = 'U';
+      // OBJECT          LOCAL     FINI_ARRAY -> D
+        if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY)
+            c = 'D';
+      else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC) c = 'D';
+      else if (sym.st_shndx == SHN_UNDEF) c = 'U';
       else {
         switch (shdr[sym.st_shndx].sh_type) {
           case SHT_NOBITS:
@@ -84,15 +264,12 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
     } else if (type == STT_FUNC || type == STT_NOTYPE)
       c = 'W';
   }
-
   if (sym.st_shndx == SHN_ABS) {
     c = 'A';
   }
-
-  if (bind == STB_LOCAL && c != 'U' && c != 'V') {
+  if ((bind == STB_LOCAL || bind == STB_WEAK) && c != 'U' && c != 'V') {
     c = ft_tolower(c);
   }
-
   return c;
 }
 
@@ -223,6 +400,9 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
             symbols = symbols->next;
             continue;
           }
+          int bind = ELF64_ST_BIND(symbols->sym->st_info);
+          int type = ELF64_ST_TYPE(symbols->sym->st_info);
+          print_type_bind_shn(&shdr[symbols->sym->st_shndx], type, bind);
           if (!ft_strchr("Uw", symbols->type))
             printf("%016lx %c %s\n", symbols->sym->st_value, symbols->type,
                    symbols->name);
@@ -230,7 +410,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
             printf("%16c %c %s\n", ' ', symbols->type, symbols->name);
         }
         free(symbols->shndx);
-
         free(symbols->value);
         symbols = symbols->next;
       }
