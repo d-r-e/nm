@@ -208,15 +208,12 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
       else if (bind == STB_LOCAL) {
         if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) c = 'R';
         else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) c = 'D';
-        else
-          c = '?';
-      } else if (bind == STB_WEAK &&
-                 (shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
-        c = 'W';
-        else if (bind == STB_WEAK &&
-                 (shdr[sym.st_shndx].sh_type == SHT_NULL))
-        c = 'w';
-      else if ((bind == STB_WEAK || bind == STB_GLOBAL) &&
+        else c = '?';
+      } else if (bind == STB_WEAK){
+        if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) c = 'W';
+        else if (shdr[sym.st_shndx].sh_type == SHT_NULL) c = 'w';
+      } 
+      else if (bind == STB_GLOBAL &&
                (shdr[sym.st_shndx].sh_type == SHT_PROGBITS ||
                 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
         c = 'D';
@@ -227,9 +224,8 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
       break;
     case STT_OBJECT:
       if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
-                                shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
-        c = 'D';
-      else if (shdr[sym.st_shndx].sh_type == SHT_DYNAMIC)
+                                shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+                                shdr[sym.st_shndx].sh_type == SHT_DYNAMIC))
         c = 'D';
       else if (sym.st_shndx == SHN_UNDEF)
         return 'U';
@@ -252,7 +248,6 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
       }
       break;
     case STT_FUNC:
-      // IF  FUNC           WEAK           NULL -> w
       if (bind == STB_WEAK && shdr[sym.st_shndx].sh_type == SHT_NULL)
         c = 'w';
       else if (bind != STB_GLOBAL && shdr[sym.st_shndx].sh_type == SHT_NULL &&
@@ -294,10 +289,24 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   return c;
 }
 
-void _file_format_no_recognized(char* filename,
-                                int fd,
-                                void* ptr,
-                                struct stat* statbuf) {
+static
+void print_Elf64_Shdr(Elf64_Shdr * shdr){
+  printf("Elf64_Word  sh_name: %d\n", shdr->sh_name);
+  printf("Elf64_Word  sh_type: %d\n", shdr->sh_type);
+  printf("Elf64_Xword sh_flags: %ld\n", shdr->sh_flags);
+  printf("Elf64_Addr  sh_addr: %p\n", (void*)shdr->sh_addr);
+  printf("Elf64_Off   sh_offset: %ld\n", shdr->sh_offset);
+  printf("Elf64_Xword sh_size: %ld\n", shdr->sh_size);
+  printf("Elf64_Word  sh_link: %d\n", shdr->sh_link);
+  printf("Elf64_Word  sh_info: %d\n", shdr->sh_info);
+  printf("Elf64_Xword sh_addralign: %ld\n", shdr->sh_addralign);
+  printf("Elf64_Xword sh_entsize: %ld\n", shdr->sh_entsize);
+}
+
+    void _file_format_no_recognized(char* filename,
+                                    int fd,
+                                    void* ptr,
+                                    struct stat* statbuf) {
   fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
           filename);
   _exit_cleanup(fd, ptr, statbuf, EXIT_FAILURE);
@@ -322,13 +331,17 @@ static t_symbol* sort(t_symbol* symbols, int flags) {
       tmp = sorted;
       prev = NULL;
       while (tmp) {
-        if (flags & FLAG_R) {
-          if (ft_strcmp(symbols->name, tmp->name) > 0)
-            break;
-        } else {
-          if (ft_strcmp(symbols->name, tmp->name) < 0)
-            break;
+        int nameComparison;
+        if (flags & FLAG_R)
+          nameComparison = -ft_strcmp(symbols->name, tmp->name);
+       else 
+          nameComparison = ft_strcmp(symbols->name, tmp->name);
+        if (nameComparison < 0 ||
+            (nameComparison == 0 &&
+             symbols->sym->st_value < tmp->sym->st_value)) {
+          break;
         }
+
         prev = tmp;
         tmp = tmp->next;
       }
@@ -425,10 +438,15 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
         //   print_type_bind_shn(&shdr[symbols->sym->st_shndx],
         //   ELF64_ST_TYPE(symbols->sym->st_info),
         //   ELF64_ST_BIND(symbols->sym->st_info));
-          (void)print_type_bind_shn;
-          if (!ft_strchr("Uw", symbols->type))
-            printf("%016lx %c %s\n", symbols->sym->st_value, symbols->type,
-                   symbols->name);
+          (void)print_Elf64_Shdr;
+          if (!ft_strchr("Uw", symbols->type)){
+            printf("%016lx %c %s\n",
+                   symbols->sym->st_value, // + shdr[symbols->sym->st_shndx].sh_addr,
+                   symbols->type, symbols->name);
+                   (void)print_Elf64_Shdr;
+            // if (!ft_strcmp(symbols->name, "status"))
+            //     print_Elf64_Shdr(&shdr[symbols->sym->st_shndx]);
+          }
           else
             printf("%16c %c %s\n", ' ', symbols->type, symbols->name);
         }

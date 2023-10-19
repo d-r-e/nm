@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -38,30 +38,32 @@ check_output() {
     fi
 }
 
-# echo "Checking bad files..."
-# for file in ${BAD_FILES[@]}; do
-#     check_output $file
-# done
+echo "Checking bad files..."
+for file in ${BAD_FILES[@]}; do
+    check_output $file
+done
 
-# echo "Checking ./test/bin folder..."
-# for binary in $(find ./test/bin -type f); do
-#     check_output $binary
-# done
+echo "Checking ./test/bin folder..."
+for binary in $(find ./test/bin -type f); do
+    check_output $binary
+done
 
-# echo "Checking specified binaries..."
-# for binary in "/bin/ls"; do
-#     check_output $binary
-# done
+echo "Checking specified binaries..."
+for binary in "/bin/ls"; do
+    check_output $binary
+done
 
-# echo "Checking object files inside libft"
-# for object in $(find ./libft -name "*.o"); do
-#     check_output $object
-# done
+echo "Checking object files inside libft"
+for object in $(find ./libft -name "*.o"); do
+    check_output $object
+done
 
 
 echo "Checking self..."
 check_output $FT_NM
 
+echo "testing libpthread.so"
+check_output /usr/lib/x86_64-linux-gnu/libpthread.so
 
 
 # echo "Checking /bin/ folder..."
