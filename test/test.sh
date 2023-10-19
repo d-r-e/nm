@@ -34,7 +34,7 @@ check_output() {
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff nm_output ft_nm_output
+        diff -y nm_output ft_nm_output
     fi
 }
 
@@ -62,8 +62,16 @@ done
 echo "Checking self..."
 check_output $FT_NM
 
-echo "testing libpthread.so"
-check_output /usr/lib/x86_64-linux-gnu/libpthread.so
+echo "Checking test/bin/bash..."
+check_output ./test/bin/bash
+
+echo "Checking test/bin/**"
+for binary in $(find ./test/bin -type f); do
+    check_output $binary
+done
+
+# echo "testing libpthread.so"
+# check_output /usr/lib/x86_64-linux-gnu/libpthread.so
 
 
 # echo "Checking /bin/ folder..."

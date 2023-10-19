@@ -223,7 +223,9 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
         c = '?';
       break;
     case STT_OBJECT:
-      if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+      if (bind == STB_WEAK)
+       c = 'V';
+      else if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
                                 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
                                 shdr[sym.st_shndx].sh_type == SHT_DYNAMIC))
         c = 'D';
@@ -331,14 +333,22 @@ static t_symbol* sort(t_symbol* symbols, int flags) {
       tmp = sorted;
       prev = NULL;
       while (tmp) {
-        int nameComparison;
+        int str_cmp;
         if (flags & FLAG_R)
-          nameComparison = -ft_strcmp(symbols->name, tmp->name);
+          str_cmp = -ft_strcmp(symbols->name, tmp->name);
        else 
-          nameComparison = ft_strcmp(symbols->name, tmp->name);
-        if (nameComparison < 0 ||
-            (nameComparison == 0 &&
-             symbols->sym->st_value < tmp->sym->st_value)) {
+          str_cmp = ft_strcmp(symbols->name, tmp->name);
+        if (str_cmp < 0 || str_cmp == 0){
+          if (str_cmp == 0 && (flags & FLAG_R)) {
+            if (symbols->sym->st_value > tmp->sym->st_value)
+              break;
+          } else if (str_cmp == 0 && !(flags & FLAG_R)) {
+            if (symbols->sym->st_value < tmp->sym->st_value) {
+              break;
+            }
+          } else if (str_cmp < 0) {
+            break;
+          } 
           break;
         }
 
