@@ -29,6 +29,6 @@ typedef struct s_symbol
     struct s_symbol *next;
 } t_symbol;
 
-char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr);
+char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr);
 void print_Elf64_Shdr(Elf64_Shdr* shdr);
 #endif

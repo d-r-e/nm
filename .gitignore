@@ -10,3 +10,4 @@ nm
 main_*leaks.c.idea
 *.pdf
 ft_nm
+test/glibc/**

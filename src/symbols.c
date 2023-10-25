@@ -1,6 +1,6 @@
 #include <nm.h>
 
-char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
+char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   char c;
   unsigned char type = ELF64_ST_TYPE(sym.st_info);
   unsigned char bind = ELF64_ST_BIND(sym.st_info);
@@ -29,12 +29,16 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
         c = '?';
       break;
     case STT_OBJECT:
+      // printf("%08x\n",  sym.st_other);
+      // printf("%d\n",ELF64_ST_VISIBILITY(sym.st_other));
       if (bind == STB_WEAK) c = 'V';
       else if (bind == STB_LOCAL &&
                (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
                 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
                 shdr[sym.st_shndx].sh_type == SHT_DYNAMIC))
         c = 'D';
+      else if (bind == STB_GLOBAL && ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN && !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+        c = 'R';          
       else if (sym.st_shndx == SHN_UNDEF)
         return 'U';
       else {
@@ -80,12 +84,9 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
     if (sym.st_shndx == SHN_UNDEF)
       c = 'W';
   }
-  //       c = 'W';
-  //   }
   if (sym.st_shndx == SHN_ABS) {
     c = 'A';
   }
-  // if weak and SHT_NULL, then uppercase W
   if (type == STT_NOTYPE && bind == STB_WEAK &&
       shdr[sym.st_shndx].sh_type == SHT_NULL) {
     c = ft_tolower(c);
@@ -99,7 +100,6 @@ char get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 void print_type_bind_shn(Elf64_Shdr* shdr,
                          unsigned char type,
                          unsigned char bind) {
-  // Prints, for example, "OBJECT GLOBAL DEFAULT 2"
   char* type_str;
   char* bind_str;
   char* shn_str;
