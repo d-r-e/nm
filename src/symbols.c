@@ -5,8 +5,12 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   unsigned char type = ELF64_ST_TYPE(sym.st_info);
   unsigned char bind = ELF64_ST_BIND(sym.st_info);
 
+  // return 'C';
   switch (type) {
     case STT_NOTYPE:
+      if (!sym.st_value && bind != STB_WEAK){
+        return 'A';
+      }
       if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
         c = 'U';
       else if (bind == STB_LOCAL) {
@@ -39,6 +43,9 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
         c = 'D';
       else if (bind == STB_GLOBAL && ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN && !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
         c = 'R';          
+      else if (!sym.st_value && bind!= STB_WEAK) {
+        return 'A';
+      }
       else if (sym.st_shndx == SHN_UNDEF)
         return 'U';
       else {

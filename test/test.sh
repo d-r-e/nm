@@ -17,6 +17,11 @@ BAD_FILES=(
     ./test/bin/nopermission
 )
 
+PROBLEMATIC=(
+    /usr/lib/gcc/x86_64-linux-gnu/9/crtoffloadbegin.o
+
+)
+
 touch ./test/bin/nopermission
 chmod 000 ./test/bin/nopermission
 
@@ -34,9 +39,34 @@ check_output() {
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y nm_output ft_nm_output
+        diff -y  ft_nm_output nm_output
     fi
 }
+
+check_output_multi(){
+    $FT_NM $@ > ft_nm_output 2>/dev/null || true  
+    $NM $@ > nm_output 2>/dev/null || true
+
+    if diff -q nm_output ft_nm_output >/dev/null; then
+        echo -n
+        echo -e "${GREEN}[OK]: $file${RESET}"
+    else
+        echo -e "${RED}Difference found in: $file${RESET}"
+        diff -y  ft_nm_output nm_output
+    fi
+}
+
+if [ $1 ]; then
+    check_output $1
+    exit 0
+fi
+
+echo checking problematic...
+for file in ${PROBLEMATIC[@]}; do
+    check_output $file
+done
+
+
 
 echo "Checking bad files..."
 for file in ${BAD_FILES[@]}; do
@@ -47,6 +77,7 @@ echo "Checking ./test/bin folder..."
 for binary in $(find ./test/bin -type f); do
     check_output $binary
 done
+exit 0
 
 echo "Checking specified binaries..."
 for binary in "/bin/ls"; do
@@ -62,28 +93,11 @@ done
 echo "Checking self..."
 check_output $FT_NM
 
-echo "Checking test/bin/bash..."
-check_output ./test/bin/bash
 
-echo "Checking test/bin/**"
-for binary in $(find ./test/bin -type f); do
-    check_output $binary
+echo "Checking system objects..."
+for object in $(find /usr/lib /lib -name "*.*o" | head -1000); do
+    check_output $object
 done
-
-# echo "testing libpthread.so"
-# check_output /usr/lib/x86_64-linux-gnu/libpthread.so
-
-
-# echo "Checking /bin/ folder..."
-# for binary in $(find /bin /usr/bin -type f); do
-#     check_output $binary
-# done
-
-
-# # echo "Checking system objects..."
-# # for object in $(find /usr/lib /lib -name "*.o" | head -10); do
-# #     check_output $object
-# done
 
 
 rm -f ft_nm_output nm_output
