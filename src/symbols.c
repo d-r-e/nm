@@ -7,12 +7,14 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 
   // return 'C';
   switch (type) {
+    case STT_TLS:
+        c = 'U'; break;
     case STT_NOTYPE:
-      if (!sym.st_value && bind != STB_WEAK){
-        return 'A';
-      }
       if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
         c = 'U';
+      else if (!sym.st_value && bind != STB_WEAK){
+        return 'A';
+      }
       else if (bind == STB_LOCAL) {
         if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) c = 'R';
         else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) c = 'D';
@@ -74,6 +76,8 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
         c = 'w';
       else if (sym.st_shndx == SHN_UNDEF)
         return 'U';
+      else if (bind == STB_WEAK)
+        return 'W';
       else
         c = 'T';
       break;
