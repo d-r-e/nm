@@ -8,16 +8,18 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
   // return 'C';
   switch (type) {
     case STT_TLS:
-        c = 'U'; break;
+      c = 'U';
+      break;
     case STT_NOTYPE:
       if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
         c = 'U';
-      else if (!sym.st_value && bind != STB_WEAK){
+      else if (!sym.st_value && bind != STB_WEAK) {
         return 'A';
-      }
-      else if (bind == STB_LOCAL) {
-        if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS) c = 'R';
-        else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY) c = 'D';
+      } else if (bind == STB_LOCAL) {
+        if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+          c = 'R';
+        else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
+          c = 'D';
         else
           c = '?';
       } else if (bind == STB_WEAK) {
@@ -37,18 +39,26 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
     case STT_OBJECT:
       // printf("%08x\n",  sym.st_other);
       // printf("%d\n",ELF64_ST_VISIBILITY(sym.st_other));
-      if (bind == STB_WEAK) c = 'V';
+      if (bind == STB_WEAK)
+        c = 'V';
+      else if (!shdr[sym.st_shndx].sh_flags & SHF_WRITE)
+       c = 'R';
+        else if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+            c = 'B';
+      else if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+        c = 'D';
       else if (bind == STB_LOCAL &&
                (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
                 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
                 shdr[sym.st_shndx].sh_type == SHT_DYNAMIC))
         c = 'D';
-      else if (bind == STB_GLOBAL && ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN && !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
-        c = 'R';          
-      else if (!sym.st_value && bind!= STB_WEAK) {
+      else if (bind == STB_GLOBAL &&
+               ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN &&
+               !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+        c = 'R';
+      else if (!sym.st_value && bind != STB_WEAK) {
         return 'A';
-      }
-      else if (sym.st_shndx == SHN_UNDEF)
+      } else if (sym.st_shndx == SHN_UNDEF)
         return 'U';
       else {
         switch (shdr[sym.st_shndx].sh_type) {
@@ -277,7 +287,6 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
   }
   printf("%10s %14s %14s ", type_str, bind_str, shn_str);
 }
-
 
 void print_Elf64_Shdr(Elf64_Shdr* shdr) {
   printf("Elf64_Word  sh_name: %d\n", shdr->sh_name);

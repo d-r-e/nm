@@ -34,7 +34,7 @@ check_output() {
     $FT_NM $file > ft_nm_output 2>/dev/null || true  
     $NM $file > nm_output 2>/dev/null || true
 
-    if diff -q nm_output ft_nm_output >/dev/null; then
+    if diff -q ft_nm_output nm_output >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
@@ -77,7 +77,6 @@ echo "Checking ./test/bin folder..."
 for binary in $(find ./test/bin -type f); do
     check_output $binary
 done
-exit 0
 
 echo "Checking specified binaries..."
 for binary in "/bin/ls"; do
@@ -89,6 +88,9 @@ for object in $(find ./libft -name "*.o"); do
     check_output $object
 done
 
+# check_output_multi $(ls /bin/*)
+
+exit 0
 
 echo "Checking self..."
 check_output $FT_NM

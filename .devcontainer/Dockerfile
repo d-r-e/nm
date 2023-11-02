@@ -10,6 +10,6 @@ RUN apt-get update && apt-get install -yq \
     binutils \
     binwalk \
     build-essential \
-    git
-RUN apt-get install -yq man
-RUN yes | unminimize
+    git \
+    man
+RUN apt-get autoremove -y && apt-get clean -y
