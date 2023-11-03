@@ -12,6 +12,19 @@
 
 #include "libft.h"
 
+/***
+ * ft_strchr - locate the first occurrence of a character in a string
+ * @s: the string to be scanned
+ * @c: the character to be searched for
+ *
+ * This function locates the first occurrence of the character c (converted to a
+ * char) in the string pointed to by s. The terminating null character is
+ * considered to be part of the string, so it can also be located to obtain a
+ * pointer to the end of a string.
+ *
+ * Return: a pointer to the first occurrence of the character c in the string s,
+ * or NULL if the character is not found.
+ */
 char	*ft_strchr(const char *s, int c)
 {
 	char *ptr;

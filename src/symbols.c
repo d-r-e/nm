@@ -45,14 +45,23 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 			else if (sym.st_shndx == SHN_UNDEF) c = 'U';
 			else if (!bind && sym.st_shndx && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
-			else if (!bind  && sym.st_shndx &&
-					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+			else if (!bind && sym.st_shndx &&
+					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+           c = 'N';
+			else if (!bind && sym.st_shndx &&
+					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
+						   (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+					   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+					   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
+					   shdr[sym.st_shndx].sh_type == SHT_PROGBITS)))
 				c = 'R';
-			else if (!bind &&
-					 (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
-					  shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
-					  shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
-					  shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
+			else if (!bind && sym.st_shndx &&
+					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
+				c = 'N';
+			else if (!bind && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+							   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+							   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
+							   shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
 				c = 'D';
 			else if (bind == STB_GLOBAL &&
 					 ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN &&

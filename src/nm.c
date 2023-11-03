@@ -166,13 +166,14 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						symbols = symbols->next;
 						continue;
 					}
+					// if (!ft_strcmp(
+					// 		symbols->name,
+					// 		"__evoke_link_warning_pthread_attr_getstackaddr"))
+					// 	print_Elf64_Shdr(&shdr[symbols->sym->st_shndx]);
 
 					if (!ft_strchr("Uw", symbols->type)) {
-						printf(
-							"%016lx %c %s\n",
-							symbols->sym
-								->st_value,
-							symbols->type, symbols->name);
+						printf("%016lx %c %s\n", symbols->sym->st_value,
+							   symbols->type, symbols->name);
 						(void)print_Elf64_Shdr;
 						// if (!ft_strcmp(symbols->name, "status"))
 						//     print_Elf64_Shdr(&shdr[symbols->sym->st_shndx]);
