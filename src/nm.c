@@ -161,14 +161,9 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->sym = &symtab[j];
 					new_symbol->name = strtab + symtab[j].st_name;
 					// printf("%d %s\n",j, new_symbol->name);
-					new_symbol->type = _get_symbol_char(symtab[j], shdr);
-					if (new_symbol->type == 'r' &&
-						!ft_strncmp(new_symbol->name, "__evoke", 7)) {
-						// printf("%s\n", new_symbol->name);
-						print_type_bind_shn(shdr, symtab[j].st_info,
-										   symtab[j].st_info);
-						print_Elf64_Shdr(&shdr[symtab[j].st_shndx]);
-					}
+					new_symbol->type =
+						_get_symbol_char(symtab[j], shdr, ehdr->e_shnum);
+
 					
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
@@ -193,8 +188,8 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					// 					   symbol->sym->st_info);
 					// }
 
-					// if (!ft_strcmp(symbol->name, "_IO_stdin_used"))
-					// 	print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
+					// if (!ft_strcmp(symbol->name, "__data_start"))
+						// print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					if (!ft_strchr("Uvw", symbol->type)) {
 						printf("%016lx %c %s\n", symbol->sym->st_value,
 							   symbol->type, symbol->name);
