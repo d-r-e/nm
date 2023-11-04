@@ -186,20 +186,19 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						symbol = symbol->next;
 						continue;
 					}
-					// if (!ft_strncmp(
-					// 		symbol->name,
-					// 		"__evoke", 7)) {
+					// if (!ft_strcmp(symbol->name,"__tsan_report_race_thunk"))
+					// {
 					// 	// printf("%s\n", symbol->name);
-					// }
 					// 	print_type_bind_shn(shdr, symbol->sym->st_info,
 					// 					   symbol->sym->st_info);
+					// }
 
-					if (!ft_strchr("Uw", symbol->type)) {
+					// if (!ft_strcmp(symbol->name, "_IO_stdin_used"))
+					// 	print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
+					if (!ft_strchr("Uvw", symbol->type)) {
 						printf("%016lx %c %s\n", symbol->sym->st_value,
 							   symbol->type, symbol->name);
 						(void)print_Elf64_Shdr;
-						// if (!ft_strcmp(symbol->name, "status"))
-						//     print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					} else
 						printf("%16c %c %s\n", ' ', symbol->type,
 							   symbol->name);

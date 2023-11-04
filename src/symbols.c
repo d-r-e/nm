@@ -8,21 +8,30 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 	// return 'C';
 	switch (type) {
 		case STT_TLS:
-			if (bind == STB_LOCAL &&
-					 shdr[sym.st_shndx].sh_type == SHT_NOBITS) c = 'B';
+			if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+				c = 'B';
+			else if (bind == STB_WEAK)
+				c = 'W';
 			else
-			c = 'U';
+				c = 'U';
 			break;
 		case STT_NOTYPE:
 			if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
 				c = 'U';
-			else if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			else if (bind == STB_LOCAL &&
+					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
-			else if (!sym.st_value && bind != STB_WEAK) {
+			else if (!sym.st_value && bind != STB_WEAK)
 				return 'A';
-			} else if (bind == STB_LOCAL) {
-				if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+			else if (bind == STB_LOCAL) {
+				if (shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK)
+					c = 'T';
+				else if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS){
+					if (shdr[sym.st_shndx].sh_flags & SHF_EXECINSTR)
+						c = 'T';
+					else
 					c = 'R';
+				}
 				else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
 					c = 'D';
 				else
@@ -43,8 +52,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 				c = '?';
 			break;
 		case STT_OBJECT:
-			if (bind == STB_WEAK) c = 'V';
-			else if (sym.st_shndx == SHN_UNDEF) c = 'U';
+			if (bind == STB_WEAK)
+				c = 'V';
+			else if (sym.st_shndx == SHN_UNDEF)
+				c = 'U';
+
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
@@ -53,24 +65,25 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 				c = 'N';
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
-						   (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
-					   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
-					   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
-					   shdr[sym.st_shndx].sh_type == SHT_PROGBITS)))
+					   (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+						shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+						shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
+						shdr[sym.st_shndx].sh_type == SHT_PROGBITS)))
 				c = 'R';
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
 				c = 'N';
-			else if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
-							   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
-							   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
-							   shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
+			else if (bind == STB_LOCAL &&
+					 (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+					  shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+					  shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
+					  shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
 				c = 'D';
 			else if (bind == STB_GLOBAL &&
 					 ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
 				c = 'R';
-			else if (!sym.st_value && bind != STB_WEAK) 
+			else if (!sym.st_value && bind != STB_WEAK)
 				return 'A';
 			else {
 				switch (shdr[sym.st_shndx].sh_type) {
@@ -118,11 +131,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 	if (sym.st_shndx == SHN_ABS) {
 		c = 'A';
 	}
-	if (type == STT_NOTYPE && bind == STB_WEAK &&
+	if (bind == STB_WEAK &&
 		shdr[sym.st_shndx].sh_type == SHT_NULL) {
 		c = ft_tolower(c);
-	} else if ((bind == STB_LOCAL || (bind == STB_WEAK && c != 'W')) && c != 'U' &&
-			   c != 'V') {
+	} else if ((bind == STB_LOCAL || (bind == STB_WEAK && c != 'W')) &&
+			   c != 'U' && c != 'V') {
 		c = ft_tolower(c);
 	}
 	return c;
@@ -301,7 +314,7 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
 void print_Elf64_Shdr(Elf64_Shdr* shdr) {
 	printf("Elf64_Word  sh_name: %d\n", shdr->sh_name);
 	printf("Elf64_Word  sh_type: %d\n", shdr->sh_type);
-	printf("Elf64_Xword sh_flags: %ld\n", shdr->sh_flags);
+	printf("Elf64_Xword sh_flags: %08lx\n", shdr->sh_flags);
 	printf("Elf64_Addr  sh_addr: %p\n", (void*)shdr->sh_addr);
 	printf("Elf64_Off   sh_offset: %ld\n", shdr->sh_offset);
 	printf("Elf64_Xword sh_size: %ld\n", shdr->sh_size);
