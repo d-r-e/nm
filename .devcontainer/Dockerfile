@@ -8,8 +8,6 @@ RUN apt-get update && apt-get install -yq \
     watch \
     valgrind \
     binutils \
-    binwalk \
     build-essential \
-    git \
-    man
+    git
 RUN apt-get autoremove -y && apt-get clean -y
