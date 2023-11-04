@@ -42,6 +42,7 @@ static t_symbol* sort(t_symbol* symbols, int flags) {
 	t_symbol* tmp = NULL;
 	t_symbol* prev = NULL;
 	t_symbol* next = NULL;
+	int str_cmp;
 
 	while (symbols) {
 		next = symbols->next;
@@ -52,7 +53,6 @@ static t_symbol* sort(t_symbol* symbols, int flags) {
 			tmp = sorted;
 			prev = NULL;
 			while (tmp) {
-				int str_cmp;
 				if (flags & FLAG_R)
 					str_cmp = -ft_strcmp(symbols->name, tmp->name);
 				else
@@ -163,8 +163,8 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					symbols = new_symbol;
 				}
 			}
-
-			symbols = sort(symbols, flags);
+			if (flags & FLAG_P)
+				symbols = sort(symbols, flags);
 			while (symbols) {
 				if (!flags) {
 					if (is_debug(*symbols->sym) ||
