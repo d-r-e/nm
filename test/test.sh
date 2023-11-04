@@ -31,8 +31,8 @@ check_output() {
     local file=$1
 
     
-    $FT_NM $file > ft_nm_output 2>/dev/null || true  
-    $NM $file > nm_output 2>/dev/null || true
+    $FT_NM -p $file > ft_nm_output 2>/dev/null || true  
+    $NM -p $file > nm_output 2>/dev/null || true
 
     if diff -q ft_nm_output nm_output >/dev/null; then
         echo -n
