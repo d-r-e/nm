@@ -13,11 +13,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 		case STT_NOTYPE:
 			if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
 				c = 'U';
-			else if (!bind && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			else if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
 			else if (!sym.st_value && bind != STB_WEAK) {
 				return 'A';
-			} else if (!bind) {
+			} else if (bind == STB_LOCAL) {
 				if (shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
 					c = 'R';
 				else if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY)
@@ -42,13 +42,9 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 		case STT_OBJECT:
 			if (bind == STB_WEAK) c = 'V';
 			else if (sym.st_shndx == SHN_UNDEF) c = 'U';
-			else if (!bind && sym.st_shndx &&
+			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
-			else if (!bind && sym.st_shndx &&
-					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
-				c = 'N';
-			//  case no sh_addr
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 !shdr[sym.st_shndx].sh_flags)
 				c = 'N';
@@ -59,10 +55,10 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 					   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
 					   shdr[sym.st_shndx].sh_type == SHT_PROGBITS)))
 				c = 'R';
-			else if (!bind && sym.st_shndx &&
+			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
 				c = 'N';
-			else if (!bind && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+			else if (bind == STB_LOCAL && (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
 							   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
 							   shdr[sym.st_shndx].sh_type == SHT_DYNAMIC ||
 							   shdr[sym.st_shndx].sh_type == SHT_PROGBITS))
@@ -124,7 +120,7 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 	if (type == STT_NOTYPE && bind == STB_WEAK &&
 		shdr[sym.st_shndx].sh_type == SHT_NULL) {
 		c = ft_tolower(c);
-	} else if ((!bind || (bind == STB_WEAK && c != 'W')) && c != 'U' &&
+	} else if ((bind == STB_LOCAL || (bind == STB_WEAK && c != 'W')) && c != 'U' &&
 			   c != 'V') {
 		c = ft_tolower(c);
 	}
