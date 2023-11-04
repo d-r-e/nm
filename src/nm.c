@@ -162,12 +162,13 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->name = strtab + symtab[j].st_name;
 					// printf("%d %s\n",j, new_symbol->name);
 					new_symbol->type = _get_symbol_char(symtab[j], shdr);
-					// if (new_symbol->type == 'r' &&
-					// 	!ft_strncmp("__evoke_link", new_symbol->name, 12)) {
-					// 	// printf("%s\n", new_symbol->name);
-					// 	print_type_bind_shn(shdr, symtab[j].st_info,
-					// 					   symtab[j].st_info);
-					// }
+					if (new_symbol->type == 'r' &&
+						!ft_strncmp(new_symbol->name, "__evoke", 7)) {
+						// printf("%s\n", new_symbol->name);
+						print_type_bind_shn(shdr, symtab[j].st_info,
+										   symtab[j].st_info);
+					}
+					
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->next = symbols;
@@ -219,7 +220,6 @@ void nm(char* filename, int flags) {
 	struct stat statbuf;
 	void* ptr;
 
-	(void)_print_ehdr;
 	if ((fd = open(filename, O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: %s: %s\n", PROGRAM_NAME, filename,
 				strerror(errno));
@@ -234,6 +234,11 @@ void nm(char* filename, int flags) {
 		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 				filename);
 		close_file(fd, NULL, &statbuf);
+		return;
+	}
+	if (S_ISDIR(statbuf.st_mode)) {
+		fprintf(stderr, "%s: %s: Is a directory\n", PROGRAM_NAME, filename);
+		close(fd);
 		return;
 	}
 	if ((ptr = mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) ==
@@ -266,6 +271,8 @@ void nm(char* filename, int flags) {
 	close_file(fd, ptr, &statbuf);
 }
 
+
+
 int main(int argc, char** argv) {
 	int flags = 0;
 	int opt;
@@ -286,8 +293,13 @@ int main(int argc, char** argv) {
 			case 'u':
 				flags |= FLAG_U;
 				break;
+			case 'g':
+				flags |= FLAG_G;
+				break;
 			default:
-				fprintf(stderr, "Usage: %s [-flags] [file]\n", PROGRAM_NAME);
+				ft_putstr_fd("Usage: ", 2);
+				ft_putstr_fd(PROGRAM_NAME, 2);
+				ft_putstr_fd(" [-flags] [file1, ..., file-n]\n", 2);
 				exit(EXIT_FAILURE);
 		}
 	}

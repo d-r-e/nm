@@ -298,7 +298,7 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
 	} else {
 		shn_str = "UNKNOWN";
 	}
-	printf("%10s %14s %14s \n", type_str, bind_str, shn_str);
+	printf("%10s %14s %14s  ", type_str, bind_str, shn_str);
 }
 
 void print_Elf64_Shdr(Elf64_Shdr* shdr) {
