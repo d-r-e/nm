@@ -9,7 +9,12 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	(void)shnum;
 	switch (type) {
 		case STT_TLS:
-			if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
+				shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
+				shdr[sym.st_shndx].sh_type == SHT_PREINIT_ARRAY ||
+				shdr[sym.st_shndx].sh_type == SHT_PROGBITS)
+				c = 'D';
+			else if (bind == STB_LOCAL && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
 			else if (bind == STB_WEAK)
 				c = 'W';

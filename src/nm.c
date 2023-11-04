@@ -1,8 +1,9 @@
 #include <nm.h>
 
-void close_file(int fd, void* ptr, struct stat* statbuf) {
+void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
+	(void)statbuf;
 	if (ptr && ptr != MAP_FAILED)
-		munmap(ptr, statbuf->st_size);
+		munmap(ptr, size);
 	if (fd > 0)
 		close(fd);
 }
@@ -30,7 +31,7 @@ void _file_format_no_recognized(char* filename,
 								struct stat* statbuf) {
 	fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 			filename);
-	close_file(fd, ptr, statbuf);
+	close_file(fd, ptr, statbuf, sizeof(Elf64_Ehdr));
 }
 
 bool is_debug(Elf64_Sym sym) {
@@ -128,7 +129,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 				shdr[shdr[i].sh_link].sh_offset > (size_t)statbuff->st_size) {
 				fprintf(stderr, "%s: %s: File format not recognized\n",
 						PROGRAM_NAME, filename);
-				close_file(-1, ptr, statbuff);
+				close_file(-1, ptr, statbuff, statbuff->st_size);
 			}
 			Elf64_Sym* symtab = (Elf64_Sym*)(ptr + shdr[i].sh_offset);
 			char* strtab = (char*)(ptr + shdr[shdr[i].sh_link].sh_offset);
@@ -139,14 +140,14 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					(size_t)(ptr + statbuff->st_size)) {
 					fprintf(stderr, "%s: %s: File format not recognized\n",
 							PROGRAM_NAME, filename);
-					close_file(-1, ptr, statbuff);
+					close_file(-1, ptr, statbuff, statbuff->st_size);
 				}
 			}
 		}
 	}
 	if (!symtab_found) {
 		fprintf(stderr, "%s: %s: no symbols\n", PROGRAM_NAME, filename);
-		close_file(-1, ptr, statbuff);
+		close_file(-1, ptr, statbuff, statbuff->st_size);
 		return;
 	}
 	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
@@ -160,7 +161,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					t_symbol* new_symbol = malloc(sizeof(t_symbol));
 					new_symbol->sym = &symtab[j];
 					new_symbol->name = strtab + symtab[j].st_name;
-					// printf("%d %s\n",j, new_symbol->name);
 					new_symbol->type =
 						_get_symbol_char(symtab[j], shdr, ehdr->e_shnum);
 
@@ -181,13 +181,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						symbol = symbol->next;
 						continue;
 					}
-					// if (!ft_strcmp(symbol->name,"__tsan_report_race_thunk"))
-					// {
-					// 	// printf("%s\n", symbol->name);
-					// 	print_type_bind_shn(shdr, symbol->sym->st_info,
-					// 					   symbol->sym->st_info);
-					// }
-
 					// if (!ft_strcmp(symbol->name, "__progname@GLIBC_2.2.5"))
 					// print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					if (!ft_strchr("Uvw", symbol->type)) {
@@ -222,13 +215,13 @@ void nm(char* filename, int flags) {
 	if (fstat(fd, &statbuf) < 0) {
 		fprintf(stderr, "%s: %s: %s\n", PROGRAM_NAME, filename,
 				strerror(errno));
-		close_file(fd, NULL, &statbuf);
+		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
 	}
 	if ((unsigned int)statbuf.st_size < (sizeof(Elf64_Ehdr))) {
 		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 				filename);
-		close_file(fd, NULL, &statbuf);
+		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
 	}
 	if (S_ISDIR(statbuf.st_mode)) {
@@ -236,16 +229,23 @@ void nm(char* filename, int flags) {
 		close(fd);
 		return;
 	}
+	if ((ptr = mmap(0, sizeof(Elf64_Ehdr), PROT_READ, MAP_PRIVATE, fd, 0)) ==
+		MAP_FAILED) {
+		perror("mmap");
+		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
+		return;
+	}
+	munmap(ptr, sizeof(Elf64_Ehdr));
 	if ((ptr = mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) ==
 		MAP_FAILED) {
 		perror("mmap");
-		close_file(fd, NULL, &statbuf);
+		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
 	}
 	if (ft_memcmp(ELFMAG, ptr, SELFMAG) != 0) {
 		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 				filename);
-		close_file(fd, ptr, &statbuf);
+		close_file(fd, ptr, &statbuf, statbuf.st_size);
 		return;
 	}
 	Elf64_Ehdr* ehdr = (Elf64_Ehdr*)ptr;
@@ -254,7 +254,7 @@ void nm(char* filename, int flags) {
 		ehdr->e_ident[EI_VERSION] != EV_CURRENT) {
 		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 				filename);
-		close_file(fd, ptr, &statbuf);
+		close_file(fd, ptr, &statbuf, statbuf.st_size);
 		return;
 	}
 	if (ehdr->e_ident[EI_CLASS] == ELFCLASS64) {
@@ -263,7 +263,7 @@ void nm(char* filename, int flags) {
 		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
 				filename);
 	}
-	close_file(fd, ptr, &statbuf);
+	close_file(fd, ptr, &statbuf, statbuf.st_size);
 }
 
 
