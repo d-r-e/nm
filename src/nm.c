@@ -85,6 +85,17 @@ static t_symbol* sort(t_symbol* symbols, int flags) {
 	}
 	return sorted;
 }
+static void clear_symbol_list(t_symbol* symbols) {
+	t_symbol* tmp;
+
+	while (symbols) {
+		tmp = symbols->next;
+		free(symbols->shndx);
+		free(symbols->value);
+		free(symbols);
+		symbols = tmp;
+	}
+}
 
 static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	(void)flags;
@@ -110,7 +121,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
 		if (shdr[i].sh_name >= shstrtab->sh_size)
 			_file_format_no_recognized(filename, -1, ptr, statbuff);
-		if (ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name) == 0) {
+		if (!ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name)) {
 			symtab_found = true;
 			if (shdr[i].sh_offset + shdr[i].sh_size >
 					(size_t)statbuff->st_size ||
@@ -151,49 +162,56 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->name = strtab + symtab[j].st_name;
 					// printf("%d %s\n",j, new_symbol->name);
 					new_symbol->type = _get_symbol_char(symtab[j], shdr);
-					if (new_symbol->type == 'r' &&
-						!ft_strncmp("__evoke_link", new_symbol->name, 12)) {
-						// printf("%s\n", new_symbol->name);
-						print_type_bind_shn(shdr, symtab[j].st_info,
-										   symtab[j].st_info);
-					}
+					// if (new_symbol->type == 'r' &&
+					// 	!ft_strncmp("__evoke_link", new_symbol->name, 12)) {
+					// 	// printf("%s\n", new_symbol->name);
+					// 	print_type_bind_shn(shdr, symtab[j].st_info,
+					// 					   symtab[j].st_info);
+					// }
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->next = symbols;
 					symbols = new_symbol;
 				}
 			}
-			if (flags & FLAG_P)
-				symbols = sort(symbols, flags);
-			while (symbols) {
+			(void)sort;
+			symbols = sort(symbols, flags);
+			t_symbol* symbol = symbols;
+			while (symbol) {
 				if (!flags) {
-					if (is_debug(*symbols->sym) ||
-						ft_strchr("a", symbols->type)) {
-						symbols = symbols->next;
+					if (is_debug(*symbol->sym) ||
+						ft_strchr("a", symbol->type)) {
+						symbol = symbol->next;
 						continue;
 					}
-					// if (!ft_strcmp(
-					// 		symbols->name,
-					// 		"__evoke_link_warning_pthread_attr_getstackaddr"))
-					// 	print_Elf64_Shdr(&shdr[symbols->sym->st_shndx]);
+					// if (!ft_strncmp(
+					// 		symbol->name,
+					// 		"__evoke", 7)) {
+					// 	// printf("%s\n", symbol->name);
+					// }
+					// 	print_type_bind_shn(shdr, symbol->sym->st_info,
+					// 					   symbol->sym->st_info);
 
-					if (!ft_strchr("Uw", symbols->type)) {
-						printf("%016lx %c %s\n", symbols->sym->st_value,
-							   symbols->type, symbols->name);
+					if (!ft_strchr("Uw", symbol->type)) {
+						printf("%016lx %c %s\n", symbol->sym->st_value,
+							   symbol->type, symbol->name);
 						(void)print_Elf64_Shdr;
-						// if (!ft_strcmp(symbols->name, "status"))
-						//     print_Elf64_Shdr(&shdr[symbols->sym->st_shndx]);
+						// if (!ft_strcmp(symbol->name, "status"))
+						//     print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					} else
-						printf("%16c %c %s\n", ' ', symbols->type,
-							   symbols->name);
+						printf("%16c %c %s\n", ' ', symbol->type,
+							   symbol->name);
 				}
-				free(symbols->shndx);
-				free(symbols->value);
-				symbols = symbols->next;
+				symbol = symbol->next;
 			}
+			clear_symbol_list(symbols);
 		}
+
 	}
+
 }
+
+
 
 // https://docs.oracle.com/cd/E19683-01/816-1386/chapter6-35342/index.html
 void nm(char* filename, int flags) {
