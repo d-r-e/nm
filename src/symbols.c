@@ -58,8 +58,12 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 				c = '?';
 			break;
 		case STT_OBJECT:
-			if (bind == STB_WEAK)
-				c = 'V';
+			if (bind == STB_WEAK){
+				if (sym.st_shndx == SHN_UNDEF)
+					c = 'v';
+				else
+					c = 'V';
+			}
 			else if (sym.st_shndx == SHN_UNDEF)
 				c = 'U';
 
@@ -148,11 +152,12 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	if (sym.st_shndx == SHN_ABS) {
 		c = 'A';
 	}
-	if (bind == STB_WEAK && c != 'A' && c != 'V' && shdr[sym.st_shndx].sh_addr &&
-		shdr[sym.st_shndx].sh_type == SHT_NULL) {
+	if (bind == STB_WEAK && c != 'A' && c != 'V' &&
+		shdr[sym.st_shndx].sh_addr && shdr[sym.st_shndx].sh_type == SHT_NULL) {
 		c = ft_tolower(c);
-	} else if (((bind == STB_LOCAL )|| (bind == STB_WEAK && c != 'W')) &&
-			   c != 'U' ) {
+	} else if (((bind == STB_LOCAL) ||
+				(bind == STB_WEAK && c != 'W' && c != 'V')) &&
+			   c != 'U') {
 		c = ft_tolower(c);
 	}
 	return c;
