@@ -19,7 +19,7 @@ BAD_FILES=(
 
 PROBLEMATIC=(
     /usr/lib/gcc/x86_64-linux-gnu/9/crtoffloadbegin.o
-
+    /usr/lib/x86_64-linux-gnu/Scrt1.o
 )
 
 touch ./test/bin/nopermission
@@ -31,8 +31,8 @@ check_output() {
     local file=$1
 
     
-    $FT_NM -p $file > ft_nm_output 2>/dev/null || true  
-    $NM -p $file > nm_output 2>/dev/null || true
+    $FT_NM $file > ft_nm_output 2>/dev/null || true  
+    $NM  $file > nm_output 2>/dev/null || true
 
     if diff -q ft_nm_output nm_output >/dev/null; then
         echo -n
@@ -73,6 +73,9 @@ for file in ${BAD_FILES[@]}; do
     check_output $file
 done
 
+echo "Checking in /usr/lib/debug..."
+
+
 echo "Checking object files inside libft"
 for object in $(find ./libft -name "*.o"); do
     check_output $object
@@ -87,20 +90,41 @@ echo "Checking specified binaries..."
 for binary in "/bin/ls"; do
     check_output $binary
 done
-
-# check_output_multi $(ls /bin/*)
-
-exit 0
-
 echo "Checking self..."
 check_output $FT_NM
 
+check_output /usr/lib/x86_64-linux-gnu/Scrt1.o
+
+# check_output_multi $(ls /bin/*)
+
+
+# exit 0
 
 echo "Checking system objects..."
-for object in $(find /usr/lib /lib -name "*.*o" | head -1000); do
+for object in $(find /usr/lib /lib -name "*.*o" ); do
     check_output $object
 done
 
+echo "Checking system binaries..."
+for binary in $(find /bin /usr/bin -type f ); do
+    check_output $binary
+done
+
+echo "checking all files in /fedora/**"
+for binary in $(find /fedora -type f); do
+    check_output $binary
+done;
+
+# echo "checking all files in vagrant/bin/bin/**"
+# for binary in $(find ./vagrant/bin/bin -type f); do
+#     check_output $binary
+# done;
+
+
+echo "checking all files in vagrant/filtered_files/**"
+for binary in $(find ./vagrant/filtered_files -type f); do
+    check_output $binary
+done;
 
 rm -f ft_nm_output nm_output
 rm test/bin/nopermission
