@@ -151,6 +151,12 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->name = strtab + symtab[j].st_name;
 					// printf("%d %s\n",j, new_symbol->name);
 					new_symbol->type = _get_symbol_char(symtab[j], shdr);
+					if (new_symbol->type == 'r' &&
+						!ft_strncmp("__evoke_link", new_symbol->name, 12)) {
+						// printf("%s\n", new_symbol->name);
+						print_type_bind_shn(shdr, symtab[j].st_info,
+										   symtab[j].st_info);
+					}
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->next = symbols;

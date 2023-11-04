@@ -13,8 +13,7 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 		case STT_NOTYPE:
 			if (sym.st_shndx == SHN_UNDEF && bind == STB_GLOBAL)
 				c = 'U';
-			else if (!bind &&
-					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			else if (!bind && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
 			else if (!sym.st_value && bind != STB_WEAK) {
 				return 'A';
@@ -41,13 +40,18 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 				c = '?';
 			break;
 		case STT_OBJECT:
-      if (bind == STB_WEAK) c = 'V';
+			if (bind == STB_WEAK) c = 'V';
 			else if (sym.st_shndx == SHN_UNDEF) c = 'U';
-			else if (!bind && sym.st_shndx && shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+			else if (!bind && sym.st_shndx &&
+					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
 			else if (!bind && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
-           c = 'N';
+				c = 'N';
+				// else if (!bind && sym.st_shndx &&
+				// 	 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
+				// 	   (shdr[sym.st_shndx].sh_type == SHT_NULL)))
+				// 	   		c = 'N';
 			else if (!bind && sym.st_shndx &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
 						   (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
@@ -120,8 +124,8 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 	if (type == STT_NOTYPE && bind == STB_WEAK &&
 		shdr[sym.st_shndx].sh_type == SHT_NULL) {
 		c = ft_tolower(c);
-	} else if ((!bind || (bind == STB_WEAK && c != 'W')) &&
-			   c != 'U' && c != 'V') {
+	} else if ((!bind || (bind == STB_WEAK && c != 'W')) && c != 'U' &&
+			   c != 'V') {
 		c = ft_tolower(c);
 	}
 	return c;
@@ -294,7 +298,7 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
 	} else {
 		shn_str = "UNKNOWN";
 	}
-	printf("%10s %14s %14s ", type_str, bind_str, shn_str);
+	printf("%10s %14s %14s \n", type_str, bind_str, shn_str);
 }
 
 void print_Elf64_Shdr(Elf64_Shdr* shdr) {

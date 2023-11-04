@@ -39,7 +39,7 @@ check_output() {
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y  ft_nm_output nm_output
+        diff -y --suppress-common-lines ft_nm_output nm_output
     fi
 }
 
@@ -73,6 +73,11 @@ for file in ${BAD_FILES[@]}; do
     check_output $file
 done
 
+echo "Checking object files inside libft"
+for object in $(find ./libft -name "*.o"); do
+    check_output $object
+done
+
 echo "Checking ./test/bin folder..."
 for binary in $(find ./test/bin -type f); do
     check_output $binary
@@ -81,11 +86,6 @@ done
 echo "Checking specified binaries..."
 for binary in "/bin/ls"; do
     check_output $binary
-done
-
-echo "Checking object files inside libft"
-for object in $(find ./libft -name "*.o"); do
-    check_output $object
 done
 
 # check_output_multi $(ls /bin/*)
