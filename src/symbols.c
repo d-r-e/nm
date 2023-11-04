@@ -48,11 +48,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 			else if (!bind && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'N';
-				// else if (!bind && sym.st_shndx &&
-				// 	 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
-				// 	   (shdr[sym.st_shndx].sh_type == SHT_NULL)))
-				// 	   		c = 'N';
-			else if (!bind && sym.st_shndx &&
+			//  case no sh_addr
+			else if (bind == STB_LOCAL && sym.st_shndx &&
+					 !shdr[sym.st_shndx].sh_flags)
+				c = 'N';
+			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE &&
 						   (shdr[sym.st_shndx].sh_type == SHT_FINI_ARRAY ||
 					   shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||

@@ -167,6 +167,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						// printf("%s\n", new_symbol->name);
 						print_type_bind_shn(shdr, symtab[j].st_info,
 										   symtab[j].st_info);
+						print_Elf64_Shdr(&shdr[symtab[j].st_shndx]);
 					}
 					
 					new_symbol->value = ft_itoa(symtab[j].st_value);
