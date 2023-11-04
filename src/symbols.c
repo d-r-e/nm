@@ -8,6 +8,9 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 	// return 'C';
 	switch (type) {
 		case STT_TLS:
+			if (bind == STB_LOCAL &&
+					 shdr[sym.st_shndx].sh_type == SHT_NOBITS) c = 'B';
+			else
 			c = 'U';
 			break;
 		case STT_NOTYPE:
@@ -67,10 +70,8 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr) {
 					 ELF64_ST_VISIBILITY(sym.st_other) == STV_HIDDEN &&
 					 !(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
 				c = 'R';
-			else if (!sym.st_value && bind != STB_WEAK) {
+			else if (!sym.st_value && bind != STB_WEAK) 
 				return 'A';
-			} else if (sym.st_shndx == SHN_UNDEF)
-				c = 'U';
 			else {
 				switch (shdr[sym.st_shndx].sh_type) {
 					case SHT_NOBITS:
