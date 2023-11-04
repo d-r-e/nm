@@ -188,8 +188,8 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					// 					   symbol->sym->st_info);
 					// }
 
-					// if (!ft_strcmp(symbol->name, "__data_start"))
-						// print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
+					// if (!ft_strcmp(symbol->name, "__TMC_END__"))
+					// print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					if (!ft_strchr("Uvw", symbol->type)) {
 						printf("%016lx %c %s\n", symbol->sym->st_value,
 							   symbol->type, symbol->name);

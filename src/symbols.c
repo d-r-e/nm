@@ -98,6 +98,9 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 				if (sym.st_shndx <= shnum && !shdr[sym.st_shndx].sh_addr &&
 					!(shdr[sym.st_shndx].sh_flags & SHF_WRITE))
 					c = 'R';
+				else if (sym.st_shndx <= shnum && !shdr[sym.st_shndx].sh_addr &&
+						 (shdr[sym.st_shndx].sh_flags & (SHF_WRITE | SHF_ALLOC)))
+					c = 'D';
 				else
 					c = 'A';
 			} else {
@@ -145,11 +148,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	if (sym.st_shndx == SHN_ABS) {
 		c = 'A';
 	}
-	if (bind == STB_WEAK && c != 'A' && shdr[sym.st_shndx].sh_addr &&
+	if (bind == STB_WEAK && c != 'A' && c != 'V' && shdr[sym.st_shndx].sh_addr &&
 		shdr[sym.st_shndx].sh_type == SHT_NULL) {
 		c = ft_tolower(c);
-	} else if ((bind == STB_LOCAL || (bind == STB_WEAK && c != 'W')) &&
-			   c != 'U' && c != 'V') {
+	} else if (((bind == STB_LOCAL )|| (bind == STB_WEAK && c != 'W')) &&
+			   c != 'U' ) {
 		c = ft_tolower(c);
 	}
 	return c;
