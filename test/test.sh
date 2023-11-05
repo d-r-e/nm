@@ -113,6 +113,11 @@ for binary in $(find /bin /usr/bin -type f ); do
     check_output $binary
 done
 
+echo "Checking objects in test/lib..."
+for object in $(find ./test/lib -name "*.o"); do
+    check_output $object
+done
+
 echo "checking all files in /fedora/**"
 for binary in $(find /fedora -type f); do
     check_output $binary
@@ -123,11 +128,10 @@ done;
 #     check_output $binary
 # done;
 
-echo "checking Kompose..."
-if [ -f ./test/bin/kompose ]; then
+if [ ! -f ./test/bin/kompose ]; then
     curl -L https://github.com/kubernetes/kompose/releases/download/v1.31.2/kompose-linux-amd64 -o ./test/bin/kompose
-    check_output ./test/bin/kompose
 fi
+check_output ./test/bin/kompose
 
 
 rm -f /tmp/ft_nm_output /tmp/nm_output

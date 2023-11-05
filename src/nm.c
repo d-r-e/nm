@@ -218,7 +218,8 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->sym = NULL;
 					new_symbol->sym32 = &symtab[j];
 					new_symbol->name = strtab + symtab[j].st_name;
-					new_symbol->type = '?';
+					new_symbol->type = _get_symbol_char32(symtab[j], shdr,
+														 ehdr->e_shnum);
 
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
