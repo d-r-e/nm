@@ -1,38 +1,34 @@
 #include <nm.h>
 
-static int compare_symbols64(t_symbol *symbol1, t_symbol *symbol2, int flags);
-static int compare_symbols32(t_symbol *symbol1, t_symbol *symbol2, int flags);
+static int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags);
+static int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags);
 
-
-t_symbol *insert_sorted(t_symbol *symbols, t_symbol *new_symbol, int flags,
+t_symbol* insert_sorted(t_symbol* symbols,
+						t_symbol* new_symbol,
+						int flags,
 						int (*compare_func)(t_symbol*, t_symbol*, int)) {
-	t_symbol *tmp = symbols;
-	t_symbol *prev = NULL;
-	while (tmp && compare_func(new_symbol, tmp, flags) > 0)
-	{
+	t_symbol* tmp = symbols;
+	t_symbol* prev = NULL;
+	while (tmp && compare_func(new_symbol, tmp, flags) > 0) {
 		prev = tmp;
 		tmp = tmp->next;
 	}
-	if (prev == NULL)
-	{
+	if (prev == NULL) {
 		new_symbol->next = symbols;
 		symbols = new_symbol;
-	}
-	else
-	{
+	} else {
 		new_symbol->next = prev->next;
 		prev->next = new_symbol;
 	}
 	return symbols;
 }
 
+t_symbol* sort_symbols(t_symbol* symbols,
+					   int flags,
+					   int (*compare_func)(t_symbol*, t_symbol*, int)) {
+	t_symbol* sorted = NULL;
+	t_symbol* next = NULL;
 
-t_symbol *sort_symbols(t_symbol *symbols, int flags,
-					   int (*compare_func)(t_symbol*, t_symbol*, int))
-{
-	t_symbol *sorted = NULL;
-	t_symbol *next = NULL;
-	
 	while (symbols) {
 		next = symbols->next;
 		symbols->next = NULL;
@@ -42,57 +38,57 @@ t_symbol *sort_symbols(t_symbol *symbols, int flags,
 	return sorted;
 }
 
+int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
+	int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
+	if (flags & FLAG_R)
+		str_cmp = -str_cmp;
 
-int compare_symbols64(t_symbol *symbol1, t_symbol *symbol2, int flags) {
-    
-    int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
-    if (flags & FLAG_R) str_cmp = -str_cmp;
+	if (str_cmp == 0) {
+		unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
+		unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
 
-    
-    if (str_cmp == 0) {
-        unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
-        unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
-        
-        if (type1 != type2) {
-            return (type1 > type2) ? 1 : -1;
-        }
-        
-        
-        if (symbol1->sym->st_value != symbol2->sym->st_value) {
-            return ((flags & FLAG_R) ^ (symbol1->sym->st_value > symbol2->sym->st_value)) ? 1 : -1;
-        }
-    }
+		if (type1 != type2) {
+			return (type1 > type2) ? 1 : -1;
+		}
+		if (symbol1->sym->st_value != symbol2->sym->st_value) {
+			return ((flags & FLAG_R) ^
+					(symbol1->sym->st_value > symbol2->sym->st_value))
+					   ? 1
+					   : -1;
+		}
+	}
 
-    return str_cmp;
+	return str_cmp;
 }
 
-int compare_symbols32(t_symbol *symbol1, t_symbol *symbol2, int flags) {
-    int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
-    if (flags & FLAG_R) str_cmp = -str_cmp;
+int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
+	int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
+	if (flags & FLAG_R)
+		str_cmp = -str_cmp;
 
-    if (str_cmp == 0) {
-        unsigned char type1 = ELF32_ST_TYPE(symbol1->sym32->st_info);
-        unsigned char type2 = ELF32_ST_TYPE(symbol2->sym32->st_info);
-        
-        if (type1 != type2) {
-            return (type1 > type2) ? 1 : -1;
-        }
-        
-        if (symbol1->sym32->st_value != symbol2->sym32->st_value) {
-            return ((flags & FLAG_R) ^ (symbol1->sym32->st_value > symbol2->sym32->st_value)) ? 1 : -1;
-        }
-    }
+	if (str_cmp == 0) {
+		unsigned char type1 = ELF32_ST_TYPE(symbol1->sym32->st_info);
+		unsigned char type2 = ELF32_ST_TYPE(symbol2->sym32->st_info);
 
-    return str_cmp;
+		if (type1 != type2) {
+			return (type1 > type2) ? 1 : -1;
+		}
+
+		if (symbol1->sym32->st_value != symbol2->sym32->st_value) {
+			return ((flags & FLAG_R) ^
+					(symbol1->sym32->st_value > symbol2->sym32->st_value))
+					   ? 1
+					   : -1;
+		}
+	}
+
+	return str_cmp;
 }
 
-
-
-t_symbol	*_sort64(t_symbol *symbols, int flags) {
+t_symbol* _sort64(t_symbol* symbols, int flags) {
 	return (sort_symbols(symbols, flags, compare_symbols64));
 }
 
-t_symbol	*_sort32(t_symbol *symbols, int flags)
-{
+t_symbol* _sort32(t_symbol* symbols, int flags) {
 	return (sort_symbols(symbols, flags, compare_symbols32));
 }
