@@ -39,6 +39,9 @@ bool is_debug(Elf64_Sym sym) {
 	return sym.st_shndx == SHN_UNDEF && ELF64_ST_BIND(sym.st_info) == STB_LOCAL;
 }
 
+static bool is_debug32(Elf32_Sym sym) {
+	return sym.st_shndx == SHN_UNDEF && ELF32_ST_BIND(sym.st_info) == STB_LOCAL;
+}
 
 static void clear_symbol_list(t_symbol* symbols) {
 	t_symbol* tmp;
@@ -227,11 +230,11 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 			t_symbol* symbol = symbols;
 			while (symbol) {
 				if (!flags) {
-					// if (is_debug(*symbol->sym32) ||
-					// 	ft_strchr("a", symbol->type)) {
-					// 	symbol = symbol->next;
-					// 	continue;
-					// }
+					if (is_debug32(*symbol->sym32) ||
+						ft_strchr("a", symbol->type)) {
+						symbol = symbol->next;
+						continue;
+					}
 					if (!ft_strchr("Uvw", symbol->type)) {
 						printf("%08x %c %s\n", symbol->sym32->st_value,
 							   symbol->type, symbol->name);
