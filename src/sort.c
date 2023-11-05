@@ -72,7 +72,7 @@ int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 
 		if (type1 != type2) {
 			return (type1 > type2) ? 1 : -1;
-		}
+		} 
 		if (ft_tolower(symbol1->type) == ft_tolower(symbol2->type)) {
 			return (symbol1->type < symbol2->type)
 					   ? 1
