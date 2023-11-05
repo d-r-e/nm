@@ -1,102 +1,75 @@
 #include <nm.h>
 
-t_symbol* _sort64(t_symbol* symbols, int flags) {
-	t_symbol* sorted = NULL;
-	t_symbol* tmp = NULL;
-	t_symbol* prev = NULL;
-	t_symbol* next = NULL;
-	int str_cmp;
+static int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags);
+static int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags);
 
-	while (symbols) {
-		next = symbols->next;
-		if (sorted == NULL) {
-			sorted = symbols;
-			sorted->next = NULL;
-		} else {
-			tmp = sorted;
-			prev = NULL;
-			while (tmp) {
-				if (flags & FLAG_R)
-					str_cmp = -ft_strcmp(symbols->name, tmp->name);
-				else
-					str_cmp = ft_strcmp(symbols->name, tmp->name);
-				if (str_cmp < 0 || str_cmp == 0) {
-					if (str_cmp == 0 && (flags & FLAG_R)) {
-						if (symbols->sym->st_value > tmp->sym->st_value)
-							break;
-					} else if (str_cmp == 0 && !(flags & FLAG_R)) {
-						if (symbols->sym->st_value < tmp->sym->st_value) {
-							break;
-						}
-					} else if (str_cmp < 0) {
-						break;
-					}
-					break;
-				}
-				prev = tmp;
-				tmp = tmp->next;
-			}
-			if (prev == NULL) {
-				symbols->next = sorted;
-				sorted = symbols;
-			} else {
-				symbols->next = prev->next;
-				prev->next = symbols;
-			}
-		}
-		symbols = next;
-	}
-	return sorted;
+
+t_symbol* insert_sorted(t_symbol* symbols, t_symbol* new_symbol, int flags,
+                        int (*compare_func)(t_symbol*, t_symbol*, int)) {
+    t_symbol* tmp = symbols;
+    t_symbol* prev = NULL;
+    while (tmp && compare_func(new_symbol, tmp, flags) > 0) {
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    if (prev == NULL) {
+        new_symbol->next = symbols;
+        symbols = new_symbol;
+    } else {
+        new_symbol->next = prev->next;
+        prev->next = new_symbol;
+    }
+    return symbols;
 }
 
-t_symbol *_sort32(t_symbol* symbols, int flags){
-    /** igual, pero usa ->sym32 en lugar de ->sym*/
-    t_symbol* sorted = NULL;
-    t_symbol* tmp = NULL;
-    t_symbol* prev = NULL;
-    t_symbol* next = NULL;
 
-    int str_cmp;
+t_symbol* sort_symbols(t_symbol* symbols, int flags,
+                       int (*compare_func)(t_symbol*, t_symbol*, int)) {
+    t_symbol* sorted = NULL;
+    t_symbol* next = NULL;
     
     while (symbols) {
         next = symbols->next;
-        if (sorted == NULL) {
-            sorted = symbols;
-            sorted->next = NULL;
-        } else {
-            tmp = sorted;
-            prev = NULL;
-            while (tmp) {
-                if (flags & FLAG_R)
-                    str_cmp = -ft_strcmp(symbols->name, tmp->name);
-                else
-                    str_cmp = ft_strcmp(symbols->name, tmp->name);
-                if (str_cmp < 0 || str_cmp == 0) {
-                    if (str_cmp == 0 && (flags & FLAG_R)) {
-                        if (symbols->sym32->st_value > tmp->sym32->st_value)
-                            break;
-                    } else if (str_cmp == 0 && !(flags & FLAG_R)) {
-                        if (symbols->sym32->st_value < tmp->sym32->st_value) {
-                            break;
-                        }
-                    } else if (str_cmp < 0) {
-                        break;
-                    }
-                    break;
-                }
-                prev = tmp;
-                tmp = tmp->next;
-            }
-            if (prev == NULL) {
-                symbols->next = sorted;
-                sorted = symbols;
-            } else {
-                symbols->next = prev->next;
-                prev->next = symbols;
-            }
-        }
+        symbols->next = NULL;
+        sorted = insert_sorted(sorted, symbols, flags, compare_func);
         symbols = next;
     }
-
     return sorted;
+}
+
+
+int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
+    int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
+    if (flags & FLAG_R) str_cmp = -str_cmp;
+
+    
+    if (str_cmp == 0) {
+        if ((flags & FLAG_R) && symbol1->sym->st_value > symbol2->sym->st_value) return 1;
+        if (!(flags & FLAG_R) && symbol1->sym->st_value < symbol2->sym->st_value) return 1;
+        return -1;
+    }
+    return str_cmp;
+}
+
+
+int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
+    int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
+    if (flags & FLAG_R) str_cmp = -str_cmp;
+
+    
+    if (str_cmp == 0) {
+        if ((flags & FLAG_R) && symbol1->sym32->st_value > symbol2->sym32->st_value) return 1;
+        if (!(flags & FLAG_R) && symbol1->sym32->st_value < symbol2->sym32->st_value) return 1;
+        return -1;
+    }
+    return str_cmp;
+}
+
+
+t_symbol* _sort64(t_symbol* symbols, int flags) {
+    return sort_symbols(symbols, flags, compare_symbols64);
+}
+
+t_symbol* _sort32(t_symbol* symbols, int flags){
+    return sort_symbols(symbols, flags, compare_symbols32);
 }
