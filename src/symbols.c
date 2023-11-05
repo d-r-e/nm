@@ -68,7 +68,8 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 					c = 'V';
 			} else if (sym.st_shndx == SHN_UNDEF)
 				c = 'U';
-
+			else if (sym.st_shndx == SHN_COMMON)
+				c = 'C';
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
@@ -235,7 +236,8 @@ char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t shnum) {
 					c = 'V';
 			} else if (sym.st_shndx == SHN_UNDEF)
 				c = 'U';
-
+			else if (sym.st_shndx == SHN_COMMON)
+				c = 'C';
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
@@ -274,7 +276,7 @@ char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t shnum) {
 					c = 'D';
 				else
 					c = 'A';
-			} else if (sym.st_shndx <= shnum){
+			} else if (sym.st_shndx <= shnum) {
 				switch (shdr[sym.st_shndx].sh_type) {
 					case SHT_NOBITS:
 						if (shdr[sym.st_shndx].sh_flags & SHF_WRITE)
