@@ -39,54 +39,7 @@ bool is_debug(Elf64_Sym sym) {
 	return sym.st_shndx == SHN_UNDEF && ELF64_ST_BIND(sym.st_info) == STB_LOCAL;
 }
 
-static t_symbol* sort(t_symbol* symbols, int flags) {
-	t_symbol* sorted = NULL;
-	t_symbol* tmp = NULL;
-	t_symbol* prev = NULL;
-	t_symbol* next = NULL;
-	int str_cmp;
 
-	while (symbols) {
-		next = symbols->next;
-		if (sorted == NULL) {
-			sorted = symbols;
-			sorted->next = NULL;
-		} else {
-			tmp = sorted;
-			prev = NULL;
-			while (tmp) {
-				if (flags & FLAG_R)
-					str_cmp = -ft_strcmp(symbols->name, tmp->name);
-				else
-					str_cmp = ft_strcmp(symbols->name, tmp->name);
-				if (str_cmp < 0 || str_cmp == 0) {
-					if (str_cmp == 0 && (flags & FLAG_R)) {
-						if (symbols->sym->st_value > tmp->sym->st_value)
-							break;
-					} else if (str_cmp == 0 && !(flags & FLAG_R)) {
-						if (symbols->sym->st_value < tmp->sym->st_value) {
-							break;
-						}
-					} else if (str_cmp < 0) {
-						break;
-					}
-					break;
-				}
-				prev = tmp;
-				tmp = tmp->next;
-			}
-			if (prev == NULL) {
-				symbols->next = sorted;
-				sorted = symbols;
-			} else {
-				symbols->next = prev->next;
-				prev->next = symbols;
-			}
-		}
-		symbols = next;
-	}
-	return sorted;
-}
 static void clear_symbol_list(t_symbol* symbols) {
 	t_symbol* tmp;
 
@@ -171,8 +124,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					symbols = new_symbol;
 				}
 			}
-			(void)sort;
-			symbols = sort(symbols, flags);
+			symbols = _sort64(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
 				if (!flags) {
@@ -271,7 +223,7 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					symbols = new_symbol;
 				}
 			}
-			// symbols = sort(symbols, flags);
+			symbols = _sort32(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
 				if (!flags) {

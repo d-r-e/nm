@@ -1,5 +1,5 @@
 NAME = ft_nm
-SRC = src/nm.c src/symbols.c
+SRC = src/nm.c src/symbols.c src/sort.c
 INC = -I inc
 OBJ = $(SRC:.c=.o)
 CC = gcc
