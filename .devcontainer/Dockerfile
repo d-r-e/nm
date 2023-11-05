@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -yq \
     valgrind \
     binutils \
     build-essential \
-    git
+    git \
+    curl
 # RUN echo "deb http://debug.mirrors.debian.org/debian-debug/ bullseye-debug main" >> /etc/apt/sources.list.d/debug.list
 
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
