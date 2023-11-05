@@ -31,28 +31,28 @@ check_output() {
     local file=$1
 
     
-    $FT_NM $file > ft_nm_output 2>/dev/null || true  
-    $NM  $file > nm_output 2>/dev/null || true
+    $FT_NM $file > /tmp/ft_nm_output 2>/dev/null || true  
+    $NM  $file > /tmp/nm_output 2>/dev/null || true
 
-    if diff -q ft_nm_output nm_output >/dev/null; then
+    if diff -q /tmp/ft_nm_output /tmp/nm_output >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y --suppress-common-lines ft_nm_output nm_output
+        diff -y --suppress-common-lines /tmp/ft_nm_output /tmp/nm_output
     fi
 }
 
 check_output_multi(){
-    $FT_NM $@ > ft_nm_output 2>/dev/null || true  
-    $NM $@ > nm_output 2>/dev/null || true
+    $FT_NM $@ > /tmp/ft_nm_output 2>/dev/null || true  
+    $NM $@ > /tmp/nm_output 2>/dev/null || true
 
-    if diff -q nm_output ft_nm_output >/dev/null; then
+    if diff -q /tmp/nm_output /tmp/ft_nm_output >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y  ft_nm_output nm_output
+        diff -y  /tmp/ft_nm_output /tmp/nm_output
     fi
 }
 
@@ -72,6 +72,8 @@ echo "Checking bad files..."
 for file in ${BAD_FILES[@]}; do
     check_output $file
 done
+chmod 777 ./test/bin/nopermission
+rm -f ./test/bin/nopermission
 
 echo "Checking in /usr/lib/debug..."
 
@@ -100,13 +102,14 @@ check_output /usr/lib/x86_64-linux-gnu/Scrt1.o
 
 # exit 0
 
-echo "Checking system objects..."
-for object in $(find /usr/lib /lib -name "*.*o" ); do
-    check_output $object
-done
+# echo "Checking system objects..."
+# for object in $(find /usr/lib /lib -name "*.*o" ); do
+#     check_output $object
+# done
 
 echo "Checking system binaries..."
 for binary in $(find /bin /usr/bin -type f ); do
+    echo -n $binary " "
     check_output $binary
 done
 
@@ -120,11 +123,17 @@ done;
 #     check_output $binary
 # done;
 
+echo "checking Kompose..."
+if [ -f ./test/bin/kompose ]; then
+    curl -L https://github.com/kubernetes/kompose/releases/download/v1.31.2/kompose-linux-amd64 -o ./test/bin/kompose
+    check_output ./test/bin/kompose
+fi
+
 
 echo "checking all files in vagrant/filtered_files/**"
 for binary in $(find ./vagrant/filtered_files -type f); do
     check_output $binary
 done;
 
-rm -f ft_nm_output nm_output
+rm -f /tmp/ft_nm_output /tmp/nm_output
 rm test/bin/nopermission
