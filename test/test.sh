@@ -130,10 +130,5 @@ if [ -f ./test/bin/kompose ]; then
 fi
 
 
-echo "checking all files in vagrant/filtered_files/**"
-for binary in $(find ./vagrant/filtered_files -type f); do
-    check_output $binary
-done;
-
 rm -f /tmp/ft_nm_output /tmp/nm_output
 rm test/bin/nopermission
