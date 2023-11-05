@@ -5,6 +5,10 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	unsigned char type = ELF64_ST_TYPE(sym.st_info);
 	unsigned char bind = ELF64_ST_BIND(sym.st_info);
 
+	// protection against shnum overflow
+	if (sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS && sym.st_shndx > shnum)
+		return ('?');
+
 	switch (type) {
 		case STT_TLS:
 			if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
@@ -238,7 +242,7 @@ char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t shnum) {
 				c = 'U';
 			else if (sym.st_shndx == SHN_COMMON)
 				c = 'C';
-			else if (bind == STB_LOCAL && sym.st_shndx &&
+			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
 			else if (bind == STB_LOCAL && sym.st_shndx &&
@@ -503,7 +507,6 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
 }
 
 static char print_elf_shdr_flags(Elf64_Xword flags) {
-	// Prints WRITE ALLOC EXEC
 	if (flags & SHF_WRITE)
 		return ('W');
 	else if (flags & SHF_ALLOC)
@@ -514,7 +517,7 @@ static char print_elf_shdr_flags(Elf64_Xword flags) {
 		return (' ');
 }
 
-void print_Elf64_Shdr(Elf64_Shdr* shdr) {
+void print_Elf64_Shdr(Elf64_Shdr *shdr) {
 	printf("Elf64_Word  sh_name: %d\n", shdr->sh_name);
 	printf("Elf64_Word  sh_type: %d\n", shdr->sh_type);
 	printf("Elf64_Xword sh_flags: %08lx %c\n", shdr->sh_flags,
@@ -527,3 +530,4 @@ void print_Elf64_Shdr(Elf64_Shdr* shdr) {
 	printf("Elf64_Xword sh_addralign: %ld\n", shdr->sh_addralign);
 	printf("Elf64_Xword sh_entsize: %ld\n", shdr->sh_entsize);
 }
+
