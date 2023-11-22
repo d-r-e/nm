@@ -48,9 +48,12 @@ int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 		unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
 
 		if (type1 != type2) {
+			
 			return (type1 > type2) ? 1 : -1;
 		}
 		if (symbol1->sym->st_value != symbol2->sym->st_value) {
+			if (symbol1->type > symbol2->type)
+				return -1;
 			return ((flags & FLAG_R) ^
 					(symbol1->sym->st_value > symbol2->sym->st_value))
 					   ? 1
