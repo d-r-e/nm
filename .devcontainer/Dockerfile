@@ -1,7 +1,7 @@
 FROM debian:bullseye-slim
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -yq \
-    gcc \
+    gcc-multilib \
     make \
     vim \
     tree \
@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -yq \
     binutils \
     build-essential \
     git \
-    curl
+    curl \
+    file
 # RUN echo "deb http://debug.mirrors.debian.org/debian-debug/ bullseye-debug main" >> /etc/apt/sources.list.d/debug.list
 
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*

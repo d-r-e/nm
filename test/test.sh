@@ -52,7 +52,7 @@ check_output_multi(){
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y  /tmp/ft_nm_output /tmp/nm_output
+        diff -y --suppress-common-lines /tmp/ft_nm_output /tmp/nm_output
     fi
 }
 
@@ -135,4 +135,6 @@ check_output ./test/bin/kompose
 
 
 rm -f /tmp/ft_nm_output /tmp/nm_output
-rm test/bin/nopermission
+rm -f test/bin/nopermission
+
+check_output_multi $(find ./test/bin -type f  )
