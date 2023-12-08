@@ -46,19 +46,36 @@ int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 	if (str_cmp == 0) {
 		unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
 		unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
-
+		if (type1 == type2){
+			printf("st_value: %lx\n", symbol1->sym->st_value);
+			printf("st_value: %lx\n", symbol2->sym->st_value);
+		}
+		// 	// compare by st_value
+		// 	if (symbol1->sym->st_value != symbol2->sym->st_value) {
+		// 		return ((flags & FLAG_R) ^
+		// 				(symbol1->sym->st_value < symbol2->sym->st_value))
+		// 				   ? 1
+		// 				   : -1;
+		// 	}
+		// }
 		if (type1 != type2) {
-			
 			return (type1 > type2) ? 1 : -1;
 		}
-		if (symbol1->sym->st_value != symbol2->sym->st_value) {
-			if (symbol1->type > symbol2->type)
-				return -1;
-			return ((flags & FLAG_R) ^
-					(symbol1->sym->st_value > symbol2->sym->st_value))
-					   ? 1
-					   : -1;
-		}
+		// if (symbol1->sym->st_value != symbol2->sym->st_value) {
+		// 	if (symbol1->type > symbol2->type)
+		// 		return -1;
+
+		// 	return ((flags & FLAG_R) ^
+		// 			(symbol1->sym->st_value <= symbol2->sym->st_value))
+		// 			   ? -1
+		// 			   : 1;
+		// } else {
+
+		// 	return ((flags & FLAG_R) ^
+		// 			(symbol1->sym->st_value < symbol2->sym->st_value))
+		// 			   ? 1
+		// 			   : -1;
+		// }
 	}
 
 	return str_cmp;
