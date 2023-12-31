@@ -8,7 +8,6 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	// protection against shnum overflow
 	if (sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS && sym.st_shndx > shnum)
 		return ('?');
-
 	switch (type) {
 		case STT_TLS:
 			if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||

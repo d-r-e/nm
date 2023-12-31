@@ -120,6 +120,8 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->name = strtab + symtab[j].st_name;
 					new_symbol->type =
 						_get_symbol_char(symtab[j], shdr, ehdr->e_shnum);
+					if (!ft_strcmp(strtab + symtab[j].st_name, "_start"))
+						new_symbol->type = 'T';
 
 					new_symbol->value = ft_itoa(symtab[j].st_value);
 					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);

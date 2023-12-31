@@ -7,7 +7,10 @@ RED='\033[0;31m'
 RESET='\033[0m'  
 
 FT_NM=./ft_nm
-NM=./test/bin/binutils_nm
+NM=nm
+
+# if there is an argument, only test that file
+# otherwise, test all files
 
 BAD_FILES=(
     /dev/null
@@ -39,9 +42,20 @@ check_output() {
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y --suppress-common-lines /tmp/ft_nm_output /tmp/nm_output
+        diff -c --color /tmp/ft_nm_output /tmp/nm_output
+        exit -1
     fi
 }
+
+if [ $1 ]; then
+    diff -y --color <(./ft_nm $1) <(nm $1)
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}[OK]: $1${RESET}"
+    else
+        echo -e "${RED}Difference found in: $1${RESET}"
+    fi
+    exit 0
+fi
 
 check_output_multi(){
     $FT_NM $@ > /tmp/ft_nm_output 2>/dev/null || true  
