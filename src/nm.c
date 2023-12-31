@@ -249,7 +249,6 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	}
 }
 
-// https://docs.oracle.com/cd/E19683-01/816-1386/chapter6-35342/index.html
 void nm(char* filename, int flags) {
 	int fd;
 	struct stat statbuf;
@@ -258,6 +257,7 @@ void nm(char* filename, int flags) {
 	if ((fd = open(filename, O_RDONLY)) < 0) {
 		fprintf(stderr, "%s: %s: %s\n", PROGRAM_NAME, filename,
 				strerror(errno));
+		return;
 	}
 	if (fstat(fd, &statbuf) < 0) {
 		fprintf(stderr, "%s: %s: %s\n", PROGRAM_NAME, filename,
@@ -358,7 +358,7 @@ int main(int argc, char** argv) {
 				printf("%s:\n", argv[optind]);
 			}
 			nm(argv[optind], flags);
-			// if (optind < argc - 1)
+			if (optind < argc - 1)
 				printf("\n");
 		}
 	}

@@ -7,7 +7,7 @@ RED='\033[0;31m'
 RESET='\033[0m'  
 
 FT_NM=./ft_nm
-NM=nm
+NM=./test/bin/binutils_nm
 
 BAD_FILES=(
     /dev/null
