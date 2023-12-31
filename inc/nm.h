@@ -22,12 +22,13 @@
 
 typedef struct s_symbol
 {
+    int     index;
     Elf64_Sym *sym;
     Elf32_Sym *sym32;
     char *name;
     char type;
     char *value;
-    char *shndx;
+    char * shndx;
     struct s_symbol *next;
 } t_symbol;
 

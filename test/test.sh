@@ -17,7 +17,6 @@ BAD_FILES=(
     /etc/passwd
     Makefile
     /dev/random
-    ./test/bin/nopermission
 )
 
 PROBLEMATIC=(
@@ -25,15 +24,10 @@ PROBLEMATIC=(
     /usr/lib/x86_64-linux-gnu/Scrt1.o
 )
 
-touch ./test/bin/nopermission
-chmod 000 ./test/bin/nopermission
-
 make
 
 check_output() {
     local file=$1
-
-
     if diff -q <($FT_NM $file) <($NM $file) >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
@@ -54,15 +48,12 @@ if [ $1 ]; then
 fi
 
 check_output_multi(){
-    $FT_NM $@ > /tmp/ft_nm_output 2>/dev/null || true  
-    $NM $@ > /tmp/nm_output 2>/dev/null || true
-
-    if diff -q /tmp/nm_output /tmp/ft_nm_output >/dev/null; then
+    if diff -q <(./ft_nm $@) <(nm $@) >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -y --suppress-common-lines /tmp/ft_nm_output /tmp/nm_output
+        diff -y --suppress-common-lines --color <(./ft_nm $@) <(nm $@)
     fi
 }
 
@@ -82,8 +73,7 @@ echo "Checking bad files..."
 for file in ${BAD_FILES[@]}; do
     check_output $file
 done
-chmod 777 ./test/bin/nopermission
-rm -f ./test/bin/nopermission
+
 
 echo "Checking in /usr/lib/debug..."
 
@@ -112,10 +102,10 @@ check_output /usr/lib/x86_64-linux-gnu/Scrt1.o
 
 # exit 0
 
-# echo "Checking system objects..."
-# for object in $(find /usr/lib /lib -name "*.*o" ); do
-#     check_output $object
-# done
+echo "Checking system objects..."
+for object in $(find /usr/lib /lib -name "*.*o" ); do
+    check_output $object
+done
 
 echo "Checking system binaries..."
 for binary in $(find /bin /usr/bin -type f ); do
@@ -123,20 +113,11 @@ for binary in $(find /bin /usr/bin -type f ); do
     check_output $binary
 done
 
-echo "Checking objects in test/lib..."
-for object in $(find ./test/lib -name "*.o"); do
-    check_output $object
-done
+# echo "Checking objects in test/lib..."
+# for object in $(find ./test/lib -name "*.o"); do
+#     check_output $object
+# done
 
-echo "checking all files in /fedora/**"
-for binary in $(find /fedora -type f); do
-    check_output $binary
-done;
-
-# echo "checking all files in vagrant/bin/bin/**"
-# for binary in $(find ./vagrant/bin/bin -type f); do
-#     check_output $binary
-# done;
 
 if [ ! -f ./test/bin/kompose ]; then
     curl -L https://github.com/kubernetes/kompose/releases/download/v1.31.2/kompose-linux-amd64 -o ./test/bin/kompose
