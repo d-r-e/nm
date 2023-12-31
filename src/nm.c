@@ -115,16 +115,19 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 				 j++) {
 				if (symtab[j].st_name != 0) {
 					t_symbol* new_symbol = malloc(sizeof(t_symbol));
+					new_symbol->index = j;
 					new_symbol->sym = &symtab[j];
 					new_symbol->sym32 = NULL;
 					new_symbol->name = strtab + symtab[j].st_name;
+					if (symtab[j].st_shndx > ehdr->e_shnum)
+						new_symbol->shndx = ft_strdup("-1");
+					else
+						new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->type =
 						_get_symbol_char(symtab[j], shdr, ehdr->e_shnum);
 					if (!ft_strcmp(strtab + symtab[j].st_name, "_start"))
 						new_symbol->type = 'T';
-
 					new_symbol->value = ft_itoa(symtab[j].st_value);
-					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->next = symbols;
 					symbols = new_symbol;
 				}
@@ -220,11 +223,15 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->sym = NULL;
 					new_symbol->sym32 = &symtab[j];
 					new_symbol->name = strtab + symtab[j].st_name;
+					if (symtab[j].st_shndx > ehdr->e_shnum)
+						new_symbol->shndx = ft_strdup("-1");
+					else
+						new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
 					new_symbol->type = _get_symbol_char32(symtab[j], shdr,
 														 ehdr->e_shnum);
 
 					new_symbol->value = ft_itoa(symtab[j].st_value);
-					new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
+					
 					new_symbol->next = symbols;
 					symbols = new_symbol;
 				}

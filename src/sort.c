@@ -75,50 +75,79 @@ t_symbol* sort_symbols(t_symbol* symbols,
 	return sorted;
 }
 
-// static 
-// const char *get_first_alphanum_char(const char *str){
-// 	while (!ft_isalnum(*str))
-// 		++str;
-// 	return str;
-// }
+int ft_alnum_strcmp(const char *s1, const char *s2){
+	// the same as strcmp but taking only into account alpahnumeric characters.
+	// for example, _GGGGG < _HHHHH < iiiii
+
+	while (*s1 && *s2){
+		while (!ft_isalnum(*s1) && *s1)
+			++s1;
+		while (!ft_isalnum(*s2) && *s2)
+			++s2;
+		if (ft_isalnum(*s1) && ft_isalnum(*s2)){
+			if (ft_tolower(*s1) != ft_tolower(*s2))
+				return ft_tolower(*s1) - ft_tolower(*s2);
+			++s1;
+			++s2;
+		}
+		else if (ft_isalnum(*s1))
+			return 1;
+		else if (ft_isalnum(*s2))
+			return -1;
+		else {
+			++s1;
+			++s2;
+		}
+	}
+	
+	if (*s1)
+		return 1;
+	if (*s2)
+		return -1;
+	return 0;
+}
 
 int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
-	unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
-	unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
-	int str_cmp = ft_strcmp((symbol1->name),
-								  (symbol2->name));
+	int str_cmp = ft_strcmp((symbol1->name), (symbol2->name));
+
 	if (flags & FLAG_R)
 		str_cmp = -str_cmp;
+// if (!strcmp("HeaderLayout_layouts", symbol1->name))
+	// printf("index: %s\n", symbol1->shndx);
+		// unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
+		// unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
+		// if (str_cmp == 0) {
 
-	if (str_cmp == 0) {
+		// 	// if (type1 == type2){
+		// 	// 	printf("st_value: %lx\n", symbol1->sym->st_value);
+		// 	// 	printf("st_value: %lx\n", symbol2->sym->st_value);
+		// 	// }
+		// 	// 	// compare by st_value
+		// 	if (type1 != type2) {
+		// 		return ((flags & FLAG_R)^  (type1 < type2)) ? 1 : -1;
+		// 	}
+		// 	else if (ft_tolower(symbol1->type) == ft_tolower(symbol2->type)) {
+		// 		return ((flags & FLAG_R) ^ (symbol1->type > symbol2->type))
+		// 				   ? 1
+		// 				   : -1;
+		// 	}
+		// 	else if (symbol1->sym->st_value != symbol2->sym->st_value) {
+		// 		return ((flags & FLAG_R) ^
+		// 				(symbol1->sym->st_value > symbol2->sym->st_value))
+		// 				   ? 1
+		// 				   : -1;
+		// 	}
+		// 	// return ((flags & FLAG_R) ^ (type1 <= type2)) ? 1 : -1;
 
-		// if (type1 == type2){
-		// 	printf("st_value: %lx\n", symbol1->sym->st_value);
-		// 	printf("st_value: %lx\n", symbol2->sym->st_value);
+		// 	// if (symbol1->sym->st_value != symbol2->sym->st_value) {
+
 		// }
-		// 	// compare by st_value
-		if (type1 != type2) {
-			return ((flags & FLAG_R)^  (type1 < type2)) ? 1 : -1;
-		}
-		else if (ft_tolower(symbol1->type) == ft_tolower(symbol2->type)) {
-			return ((flags & FLAG_R) ^ (symbol1->type > symbol2->type))
-					   ? 1
-					   : -1;
-		}
-		else if (symbol1->sym->st_value != symbol2->sym->st_value) {
-			return ((flags & FLAG_R) ^
-					(symbol1->sym->st_value > symbol2->sym->st_value))
-					   ? 1
-					   : -1;
-		}
-		// return ((flags & FLAG_R) ^ (type1 <= type2)) ? 1 : -1;
-		
-		
-		// if (symbol1->sym->st_value != symbol2->sym->st_value) {
-		
-	}
-	if (!str_cmp && (flags & FLAG_R))
-		str_cmp = -1;
+
+		// if (!str_cmp)
+		// 	str_cmp= symbol1->type - symbol2->type;
+		if (!str_cmp)
+			{str_cmp = symbol2->index < symbol1->index;
+			}
 	return str_cmp;
 }
 
@@ -149,10 +178,6 @@ int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 
 		
 	}
-	if (!str_cmp && (flags & FLAG_R))
-		str_cmp = -1;
-	if (!str_cmp)
-		return symbol1->type - symbol2->type;
 	return str_cmp;
 }
 

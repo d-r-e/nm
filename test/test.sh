@@ -33,17 +33,13 @@ make
 check_output() {
     local file=$1
 
-    
-    $FT_NM $file > /tmp/ft_nm_output 2>/dev/null || true  
-    $NM  $file > /tmp/nm_output 2>/dev/null || true
 
-    if diff -q /tmp/ft_nm_output /tmp/nm_output >/dev/null; then
+    if diff -q <($FT_NM $file) <($NM $file) >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -c --color /tmp/ft_nm_output /tmp/nm_output
-        exit -1
+        diff -c --color <($FT_NM $file) <($NM $file)
     fi
 }
 
