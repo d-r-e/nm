@@ -8,22 +8,6 @@ void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
 		close(fd);
 }
 
-void _print_ehdr(Elf64_Ehdr* ehdr) {
-	printf("e_ident: %s\n", ehdr->e_ident);
-	printf("e_type: %d\n", ehdr->e_type);
-	printf("e_machine: %d\n", ehdr->e_machine);
-	printf("e_version: %d\n", ehdr->e_version);
-	printf("e_entry: %p\n", (void*)ehdr->e_entry);
-	printf("e_phoff: %ld\n", ehdr->e_phoff);
-	printf("e_shoff: %ld\n", ehdr->e_shoff);
-	printf("e_flags: %d\n", ehdr->e_flags);
-	printf("e_ehsize: %d\n", ehdr->e_ehsize);
-	printf("e_phentsize: %d\n", ehdr->e_phentsize);
-	printf("e_phnum: %d\n", ehdr->e_phnum);
-	printf("e_shentsize: %d\n", ehdr->e_shentsize);
-	printf("e_shnum: %d\n", ehdr->e_shnum);
-	printf("e_shstrndx: %d\n", ehdr->e_shstrndx);
-}
 
 static void _file_format_no_recognized(char* filename,
 									   int fd,
