@@ -1,7 +1,7 @@
 #include <nm.h>
 
 static int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags);
-static int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags);
+// static int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags);
 
 t_symbol* insert_sorted(t_symbol* symbols,
 						t_symbol* new_symbol,
@@ -39,7 +39,12 @@ static t_symbol* sort_symbols(t_symbol* symbols,
 }
 
 int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
-	int str_cmp = ft_strcmp((symbol1->name), (symbol2->name));
+	int str_cmp;
+	if (flags & FLAG_P) {
+		str_cmp = symbol2->index < symbol1->index;
+	}
+	else
+		str_cmp = ft_strcmp((symbol1->name), (symbol2->name));
 	if (!str_cmp)
 		str_cmp = symbol2->index < symbol1->index;
 	if (flags & FLAG_R)
@@ -47,24 +52,20 @@ int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 	return str_cmp;
 }
 
-int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
-	int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
-	if (flags & FLAG_R)
-		str_cmp = -str_cmp;
-	if (str_cmp == 0) {
-		str_cmp = (symbol1->index < symbol2->index) ? 1 : -1;
-	}
-	return str_cmp;
-}
+// int compare_symbols32(t_symbol* symbol1, t_symbol* symbol2, int flags) {
+// 	int str_cmp = ft_strcmp(symbol1->name, symbol2->name);
+// 	if (str_cmp == 0) {
+// 		str_cmp = (symbol1->index < symbol2->index) ? 1 : -1;
+// 	}
+// 	if (flags & FLAG_R)
+// 		str_cmp = -str_cmp;
+// 	return str_cmp;
+// }
 
 t_symbol* _sort64(t_symbol* symbols, int flags) {
-	if (flags & FLAG_P)
-		return (symbols);
 	return (sort_symbols(symbols, flags, compare_symbols64));
 }
 
 t_symbol* _sort32(t_symbol* symbols, int flags) {
-	if (flags & FLAG_P)
-		return (symbols);
-	return (sort_symbols(symbols, flags, compare_symbols32));
+	return (sort_symbols(symbols, flags, compare_symbols64));
 }

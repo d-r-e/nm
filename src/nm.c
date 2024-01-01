@@ -135,7 +135,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 			symbols = _sort64(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
-				if (!flags) {
 					if (is_debug(*symbol->sym) ||
 						ft_strchr("a", symbol->type)) {
 						symbol = symbol->next;
@@ -147,7 +146,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						(void)print_Elf64_Shdr;
 					} else
 						printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
-				}
+				
 				symbol = symbol->next;
 			}
 			clear_symbol_list(symbols);
@@ -226,6 +225,7 @@ void print_symbols(Elf32_Ehdr* ehdr,
 				if (symtab[j].st_name != 0) {
 					t_symbol* new_symbol = malloc(sizeof(t_symbol));
 					new_symbol->sym = NULL;
+					new_symbol->index = j;
 					new_symbol->sym32 = &symtab[j];
 					new_symbol->name = strtab + symtab[j].st_name;
 					if (symtab[j].st_shndx > ehdr->e_shnum)
@@ -244,7 +244,6 @@ void print_symbols(Elf32_Ehdr* ehdr,
 			symbols = _sort32(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
-				if (!flags) {
 					if (is_debug32(*symbol->sym32) ||
 						ft_strchr("a", symbol->type)) {
 						symbol = symbol->next;
@@ -255,7 +254,7 @@ void print_symbols(Elf32_Ehdr* ehdr,
 							   symbol->type, symbol->name);
 					} else
 						printf("%8c %c %s\n", ' ', symbol->type, symbol->name);
-				}
+				
 				symbol = symbol->next;
 			}
 			clear_symbol_list(symbols);
