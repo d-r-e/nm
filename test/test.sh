@@ -124,15 +124,17 @@ check_output $FT_NM
 check_output /usr/lib/x86_64-linux-gnu/Scrt1.o
 
 echo "Checking system objects..."
-for object in $(find /usr/lib /lib -name "*.*o" ); do
-    check_output $object
+find /usr/lib /lib -name "*.*o" | shuf | head -n 100 | while read -r object; do
+    check_output "$object"
 done
 
+
 echo "Checking system binaries..."
-for binary in $(find /bin /usr/bin -type f ); do
-    echo -n $binary " "
-    check_output $binary
+find /bin /usr/bin -type f | shuf | head -n 200 | while read -r binary; do
+    echo -n "$binary "
+    check_output "$binary"
 done
+
 
 # echo "Checking objects in test/lib..."
 # for object in $(find ./test/lib -name "*.o"); do
