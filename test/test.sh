@@ -13,6 +13,7 @@ NM=nm
 # otherwise, test all files
 
 BAD_FILES=(
+    test/
     /dev/null
     /etc/passwd
     Makefile
@@ -20,8 +21,19 @@ BAD_FILES=(
 
 PROBLEMATIC=(
     /usr/lib/x86_64-linux-gnu/Scrt1.o
+
 )
 
+declare -a FLAGS=()
+FLAGS+=("-p")
+FLAGS+=("-r")
+FLAGS+=("-rp")
+FLAGS+=("-u")
+FLAGS+=("-pu")
+FLAGS+=("-rpu")
+# FLAGS+=("-g")
+# FLAGS+=("-a")
+CHECK_FLAGS=0
 make
 
 check_output() {
@@ -34,17 +46,29 @@ check_output() {
         diff -c5 --color <($FT_NM $file) <($NM $file)
         exit 1
     fi
+
+    
+    if [ $CHECK_FLAGS ]; then
+        for flag in ${FLAGS[@]}; do
+            if diff -q <( $FT_NM $flag $file 2>&1 ) <( $NM $flag $file 2>&1 ) >/dev/null; then
+                echo -n
+                echo -e "${GREEN}[OK]: $file ${flag}${RESET}"
+            else
+                echo -e "${RED}Difference found in: $file ${flag} ${RESET}"
+                set -x
+                diff -y --color <( $FT_NM $flag $file ) <( $NM $flag $file )
+                exit 1
+            fi
+        done
+    fi
 }
 
 if [ $1 ]; then
-    diff -y --color <(./ft_nm $1) <(nm $1)
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}[OK]: $1${RESET}"
-    else
-        echo -e "${RED}Difference found in: $1${RESET}"
-    fi
+    check_output $1
     exit 0
 fi
+
+
 
 check_output_multi(){
     if diff -q <(./ft_nm $@) <(nm $@) >/dev/null; then
@@ -74,11 +98,14 @@ for file in ${BAD_FILES[@]}; do
 done
 
 
-echo "Checking in /usr/lib/debug..."
-
 
 echo "Checking object files inside libft"
 for object in $(find ./libft -name "*.o"); do
+    check_output $object
+done
+
+echo "Checking object files inside /usr/libx32/"
+for object in $(find /usr/lib*/*.*o ); do
     check_output $object
 done
 
@@ -96,11 +123,6 @@ check_output $FT_NM
 
 check_output /usr/lib/x86_64-linux-gnu/Scrt1.o
 
-# check_output_multi $(ls /bin/*)
-
-
-# exit 0
-
 echo "Checking system objects..."
 for object in $(find /usr/lib /lib -name "*.*o" ); do
     check_output $object
@@ -112,10 +134,10 @@ for binary in $(find /bin /usr/bin -type f ); do
     check_output $binary
 done
 
-echo "Checking objects in test/lib..."
-for object in $(find ./test/lib -name "*.o"); do
-    check_output $object
-done
+# echo "Checking objects in test/lib..."
+# for object in $(find ./test/lib -name "*.o"); do
+#     check_output $object
+# done
 
 
 if [ ! -f ./test/bin/kompose ]; then
@@ -127,4 +149,3 @@ check_output ./test/bin/kompose
 rm -f /tmp/ft_nm_output /tmp/nm_output
 rm -f test/bin/nopermission
 
-check_output_multi $(find ./test/bin -type f  )

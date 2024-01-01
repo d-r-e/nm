@@ -4,7 +4,7 @@ INC = -I inc
 OBJ = $(SRC:.c=.o)
 CC = gcc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror -O2
 LIBFT = libft/libft.a
 MAKE = make -j$(shell nproc) --no-print-directory -C 
 

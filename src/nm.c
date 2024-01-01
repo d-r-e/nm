@@ -135,18 +135,22 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 			symbols = _sort64(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
-					if (is_debug(*symbol->sym) ||
-						ft_strchr("a", symbol->type)) {
-						symbol = symbol->next;
-						continue;
-					}
-					if (!ft_strchr("Uvw", symbol->type)) {
-						printf("%016lx %c %s\n", symbol->sym->st_value,
-							   symbol->type, symbol->name);
-						(void)print_Elf64_Shdr;
-					} else
+				if ((is_debug(*symbol->sym) || ft_strchr("a", symbol->type)) &&
+					!(flags & FLAG_A)) {
+					symbol = symbol->next;
+					continue;
+				}
+				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)){
+					printf("%016lx %c %s\n", symbol->sym->st_value,
+						   symbol->type, symbol->name);
+					(void)print_Elf64_Shdr;
+				} else if (flags & FLAG_U){
+					if (ft_strchr("Uwv", symbol->type))
 						printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
-				
+				}
+				 else
+					printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
+
 				symbol = symbol->next;
 			}
 			clear_symbol_list(symbols);
@@ -244,17 +248,20 @@ void print_symbols(Elf32_Ehdr* ehdr,
 			symbols = _sort32(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
-					if (is_debug32(*symbol->sym32) ||
-						ft_strchr("a", symbol->type)) {
-						symbol = symbol->next;
-						continue;
-					}
-					if (!ft_strchr("Uvw", symbol->type)) {
-						printf("%08x %c %s\n", symbol->sym32->st_value,
-							   symbol->type, symbol->name);
-					} else
+				if (is_debug32(*symbol->sym32) ||
+					ft_strchr("a", symbol->type)) {
+					symbol = symbol->next;
+					continue;
+				}
+				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U))
+					printf("%08x %c %s\n", symbol->sym32->st_value,
+						   symbol->type, symbol->name);
+				else if (flags & FLAG_U){
+					if (ft_strchr("Uwv", symbol->type))
 						printf("%8c %c %s\n", ' ', symbol->type, symbol->name);
-				
+				} else
+					printf("%8c %c %s\n", ' ', symbol->type, symbol->name);
+
 				symbol = symbol->next;
 			}
 			clear_symbol_list(symbols);
@@ -279,7 +286,8 @@ void nm(char* filename, int flags) {
 		return;
 	}
 	if (S_ISDIR(statbuf.st_mode)) {
-		fprintf(stderr, "%s: Warning: \'%s\' is a directory\n", PROGRAM_NAME, filename);
+		fprintf(stderr, "%s: Warning: \'%s\' is a directory\n", PROGRAM_NAME,
+				filename);
 		close(fd);
 		return;
 	}
