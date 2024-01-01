@@ -16,11 +16,9 @@ BAD_FILES=(
     /dev/null
     /etc/passwd
     Makefile
-    /dev/random
 )
 
 PROBLEMATIC=(
-    /usr/lib/gcc/x86_64-linux-gnu/9/crtoffloadbegin.o
     /usr/lib/x86_64-linux-gnu/Scrt1.o
 )
 
@@ -28,12 +26,13 @@ make
 
 check_output() {
     local file=$1
-    if diff -q <($FT_NM $file) <($NM $file) >/dev/null; then
+    if diff -q <($FT_NM $file 2>&1) <($NM $file 2>&1) >/dev/null; then
         echo -n
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -c --color <($FT_NM $file) <($NM $file)
+        diff -c5 --color <($FT_NM $file) <($NM $file)
+        exit 1
     fi
 }
 
@@ -113,10 +112,10 @@ for binary in $(find /bin /usr/bin -type f ); do
     check_output $binary
 done
 
-# echo "Checking objects in test/lib..."
-# for object in $(find ./test/lib -name "*.o"); do
-#     check_output $object
-# done
+echo "Checking objects in test/lib..."
+for object in $(find ./test/lib -name "*.o"); do
+    check_output $object
+done
 
 
 if [ ! -f ./test/bin/kompose ]; then

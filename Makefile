@@ -6,7 +6,7 @@ CC = gcc
 RM = rm -f
 CFLAGS = -Wall -Wextra -Werror -g3
 LIBFT = libft/libft.a
-MAKE = make -C
+MAKE = make -j$(shell nproc) --no-print-directory -C 
 
 $(NAME): $(LIBFT) $(SRC) $(OBJ)
 	gcc -o $(NAME) $(OBJ) -L libft -lft

@@ -41,3 +41,9 @@ void print_type_bind_shn(Elf64_Shdr* shdr,
 t_symbol* _sort64(t_symbol* symbols, int flags);
 t_symbol* _sort32(t_symbol* symbols, int flags);
 #endif
+
+void print_symbols(Elf32_Ehdr* ehdr,
+				   char* shstrtab_p,
+				   Elf32_Shdr* shdr,
+				   void* ptr,
+				   int flags);
