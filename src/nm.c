@@ -279,6 +279,11 @@ void nm(char* filename, int flags) {
 		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
 	}
+	if (S_ISDIR(statbuf.st_mode)) {
+		fprintf(stderr, "%s: Warning: \'%s\' is a directory\n", PROGRAM_NAME, filename);
+		close(fd);
+		return;
+	}
 	if (!S_ISREG(statbuf.st_mode)) {
 		fprintf(stderr, "%s: Warning: '%s' is not an ordinary file\n",
 				PROGRAM_NAME, filename);
@@ -286,14 +291,7 @@ void nm(char* filename, int flags) {
 		return;
 	}
 	if ((unsigned int)statbuf.st_size < (sizeof(Elf64_Ehdr))) {
-		fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
-				filename);
-		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
-		return;
-	}
-	if (S_ISDIR(statbuf.st_mode)) {
-		fprintf(stderr, "%s: %s: Is a directory\n", PROGRAM_NAME, filename);
-		close(fd);
+		_file_format_no_recognized(filename, -1, NULL, &statbuf);
 		return;
 	}
 	if ((ptr = mmap(0, sizeof(Elf64_Ehdr), PROT_READ, MAP_PRIVATE, fd, 0)) ==
@@ -319,7 +317,7 @@ void nm(char* filename, int flags) {
 	if ((ehdr->e_ident[EI_CLASS] != ELFCLASS64 &&
 		 ehdr->e_ident[EI_CLASS] != ELFCLASS32) ||
 		ehdr->e_ident[EI_VERSION] != EV_CURRENT) {
-		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
+		fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 				filename);
 		close_file(fd, ptr, &statbuf, statbuf.st_size);
 		return;
@@ -330,7 +328,7 @@ void nm(char* filename, int flags) {
 		_nm32(ptr, flags, &statbuf, filename);
 
 	} else {
-		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
+		fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 				filename);
 	}
 	close_file(fd, ptr, &statbuf, statbuf.st_size);
