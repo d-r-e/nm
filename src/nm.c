@@ -25,17 +25,16 @@ void _print_ehdr(Elf64_Ehdr* ehdr) {
 	printf("e_shstrndx: %d\n", ehdr->e_shstrndx);
 }
 
-void _file_format_no_recognized(char* filename,
-								int fd,
-								void* ptr,
-								struct stat* statbuf) {
-	fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
+static void _file_format_no_recognized(char* filename,
+									   int fd,
+									   void* ptr,
+									   struct stat* statbuf) {
+	fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 			filename);
 	close_file(fd, ptr, statbuf, sizeof(Elf64_Ehdr));
 }
 
-static
-bool is_debug(Elf64_Sym sym) {
+static bool is_debug(Elf64_Sym sym) {
 	return sym.st_shndx == SHN_UNDEF && ELF64_ST_BIND(sym.st_info) == STB_LOCAL;
 }
 
@@ -65,6 +64,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	if (ehdr->e_shoff + sizeof(Elf64_Shdr) * ehdr->e_shnum >
 		(size_t)statbuff->st_size)
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
+
 	shdr = (Elf64_Shdr*)(ptr + ehdr->e_shoff);
 	shstrtab = &shdr[ehdr->e_shstrndx];
 	if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
@@ -141,8 +141,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						symbol = symbol->next;
 						continue;
 					}
-					// if (!ft_strcmp(symbol->name, "__progname@GLIBC_2.2.5"))
-					// print_Elf64_Shdr(&shdr[symbol->sym->st_shndx]);
 					if (!ft_strchr("Uvw", symbol->type)) {
 						printf("%016lx %c %s\n", symbol->sym->st_value,
 							   symbol->type, symbol->name);
@@ -157,59 +155,66 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	}
 }
 
-void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
-    bool symtab_found = false;
-    Elf32_Ehdr* ehdr = (Elf32_Ehdr*)ptr;
-    Elf32_Shdr* shdr;
-    Elf32_Shdr* shstrtab;
-    char* shstrtab_p;
+int _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
+	bool symtab_found = false;
+	Elf32_Ehdr* ehdr = (Elf32_Ehdr*)ptr;
+	Elf32_Shdr* shdr;
+	Elf32_Shdr* shstrtab;
+	char* shstrtab_p;
 
-    if (ehdr->e_shoff + sizeof(Elf32_Shdr) * ehdr->e_shnum >
-        (size_t)statbuff->st_size)
-        _file_format_no_recognized(filename, -1, ptr, statbuff);
-    shdr = (Elf32_Shdr*)(ptr + ehdr->e_shoff);
-    shstrtab = &shdr[ehdr->e_shstrndx];
-    if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
-        _file_format_no_recognized(filename, -1, ptr, statbuff);
+	if (ehdr->e_shoff + sizeof(Elf32_Shdr) * ehdr->e_shnum >
+		(size_t)statbuff->st_size)
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+	shdr = (Elf32_Shdr*)(ptr + ehdr->e_shoff);
+	shstrtab = &shdr[ehdr->e_shstrndx];
+	if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
 
-    shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
+	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
 
-    if (ehdr->e_shnum == 0 || ehdr->e_shstrndx == SHN_UNDEF)
-        _file_format_no_recognized(filename, -1, ptr, statbuff);
+	if (ehdr->e_shnum == 0 || ehdr->e_shstrndx == SHN_UNDEF)
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
 
-    for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
-        if (shdr[i].sh_name >= shstrtab->sh_size)
-            _file_format_no_recognized(filename, -1, ptr, statbuff);
-        if (!ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name)) {
-            symtab_found = true;
-            if (shdr[i].sh_offset + shdr[i].sh_size >
-                    (size_t)statbuff->st_size ||
-                shdr[shdr[i].sh_link].sh_offset > (size_t)statbuff->st_size) {
-                fprintf(stderr, "%s: %s: File format not recognized\n",
-                        PROGRAM_NAME, filename);
-                close_file(-1, ptr, statbuff, statbuff->st_size);
-            }
-            Elf32_Sym* symtab = (Elf32_Sym*)(ptr + shdr[i].sh_offset);
-            char* strtab = (char*)(ptr + shdr[shdr[i].sh_link].sh_offset);
+	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
+		if (shdr[i].sh_name >= shstrtab->sh_size)
+			_file_format_no_recognized(filename, -1, ptr, statbuff);
+		if (!ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name)) {
+			symtab_found = true;
+			if (shdr[i].sh_offset + shdr[i].sh_size >
+					(size_t)statbuff->st_size ||
+				shdr[shdr[i].sh_link].sh_offset > (size_t)statbuff->st_size) {
+				fprintf(stderr, "%s: %s: file format not recognized\n",
+						PROGRAM_NAME, filename);
+				close_file(-1, ptr, statbuff, statbuff->st_size);
+			}
+			Elf32_Sym* symtab = (Elf32_Sym*)(ptr + shdr[i].sh_offset);
+			char* strtab = (char*)(ptr + shdr[shdr[i].sh_link].sh_offset);
 
-            for (unsigned int j = 0; j < shdr[i].sh_size / sizeof(Elf32_Sym);
-                 j++) {
-                if ((size_t)(strtab + symtab[j].st_name) >=
-                    (size_t)(ptr + statbuff->st_size)) {
-                    fprintf(stderr, "%s: %s: File format not recognized\n",
-                            PROGRAM_NAME, filename);
-                    close_file(-1, ptr, statbuff, statbuff->st_size);
-                }
-            }
-        }
-    }
-    if (!symtab_found) {
-        fprintf(stderr, "%s: %s: no symbols\n", PROGRAM_NAME, filename);
-        close_file(-1, ptr, statbuff, statbuff->st_size);
-        return;
-    }
-	(void)flags;
-	
+			for (unsigned int j = 0; j < shdr[i].sh_size / sizeof(Elf32_Sym);
+				 j++) {
+				if ((size_t)(strtab + symtab[j].st_name) >=
+					(size_t)(ptr + statbuff->st_size)) {
+					fprintf(stderr, "%s: %s: file format not recognized\n",
+							PROGRAM_NAME, filename);
+					close_file(-1, ptr, statbuff, statbuff->st_size);
+				}
+			}
+		}
+	}
+	if (!symtab_found) {
+		fprintf(stderr, "%s: %s: no symbols\n", PROGRAM_NAME, filename);
+		close_file(-1, ptr, statbuff, statbuff->st_size);
+		return (EXIT_FAILURE);
+	}
+	print_symbols(ehdr, shstrtab_p, shdr, ptr, flags);
+	return (EXIT_SUCCESS);
+}
+
+void print_symbols(Elf32_Ehdr* ehdr,
+				   char* shstrtab_p,
+				   Elf32_Shdr* shdr,
+				   void* ptr,
+				   int flags) {
 	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
 		if (ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name) == 0) {
 			Elf32_Sym* symtab = (Elf32_Sym*)(ptr + shdr[i].sh_offset);
@@ -227,11 +232,11 @@ void _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 						new_symbol->shndx = ft_strdup("-1");
 					else
 						new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
-					new_symbol->type = _get_symbol_char32(symtab[j], shdr,
-														 ehdr->e_shnum);
+					new_symbol->type =
+						_get_symbol_char32(symtab[j], shdr, ehdr->e_shnum);
 
 					new_symbol->value = ft_itoa(symtab[j].st_value);
-					
+
 					new_symbol->next = symbols;
 					symbols = new_symbol;
 				}
@@ -274,8 +279,14 @@ void nm(char* filename, int flags) {
 		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
 	}
+	if (!S_ISREG(statbuf.st_mode)) {
+		fprintf(stderr, "%s: Warning: '%s' is not an ordinary file\n",
+				PROGRAM_NAME, filename);
+		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
+		return;
+	}
 	if ((unsigned int)statbuf.st_size < (sizeof(Elf64_Ehdr))) {
-		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
+		fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 				filename);
 		close_file(fd, NULL, &statbuf, sizeof(Elf64_Ehdr));
 		return;
@@ -299,7 +310,7 @@ void nm(char* filename, int flags) {
 		return;
 	}
 	if (ft_memcmp(ELFMAG, ptr, SELFMAG) != 0) {
-		fprintf(stderr, "%s: %s: File format not recognized\n", PROGRAM_NAME,
+		fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 				filename);
 		close_file(fd, ptr, &statbuf, statbuf.st_size);
 		return;

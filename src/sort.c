@@ -109,45 +109,10 @@ int ft_alnum_strcmp(const char *s1, const char *s2){
 
 int compare_symbols64(t_symbol* symbol1, t_symbol* symbol2, int flags) {
 	int str_cmp = ft_strcmp((symbol1->name), (symbol2->name));
-
+	if (!str_cmp)
+		str_cmp = symbol2->index < symbol1->index;
 	if (flags & FLAG_R)
 		str_cmp = -str_cmp;
-// if (!strcmp("HeaderLayout_layouts", symbol1->name))
-	// printf("index: %s\n", symbol1->shndx);
-		// unsigned char type1 = ELF64_ST_TYPE(symbol1->sym->st_info);
-		// unsigned char type2 = ELF64_ST_TYPE(symbol2->sym->st_info);
-		// if (str_cmp == 0) {
-
-		// 	// if (type1 == type2){
-		// 	// 	printf("st_value: %lx\n", symbol1->sym->st_value);
-		// 	// 	printf("st_value: %lx\n", symbol2->sym->st_value);
-		// 	// }
-		// 	// 	// compare by st_value
-		// 	if (type1 != type2) {
-		// 		return ((flags & FLAG_R)^  (type1 < type2)) ? 1 : -1;
-		// 	}
-		// 	else if (ft_tolower(symbol1->type) == ft_tolower(symbol2->type)) {
-		// 		return ((flags & FLAG_R) ^ (symbol1->type > symbol2->type))
-		// 				   ? 1
-		// 				   : -1;
-		// 	}
-		// 	else if (symbol1->sym->st_value != symbol2->sym->st_value) {
-		// 		return ((flags & FLAG_R) ^
-		// 				(symbol1->sym->st_value > symbol2->sym->st_value))
-		// 				   ? 1
-		// 				   : -1;
-		// 	}
-		// 	// return ((flags & FLAG_R) ^ (type1 <= type2)) ? 1 : -1;
-
-		// 	// if (symbol1->sym->st_value != symbol2->sym->st_value) {
-
-		// }
-
-		// if (!str_cmp)
-		// 	str_cmp= symbol1->type - symbol2->type;
-		if (!str_cmp)
-			{str_cmp = symbol2->index < symbol1->index;
-			}
 	return str_cmp;
 }
 
