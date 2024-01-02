@@ -5,7 +5,6 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 	unsigned char type = ELF64_ST_TYPE(sym.st_info);
 	unsigned char bind = ELF64_ST_BIND(sym.st_info);
 
-	// protection against shnum overflow
 	if (sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS && sym.st_shndx > shnum)
 		return ('?');
 	switch (type) {

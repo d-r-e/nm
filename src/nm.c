@@ -134,7 +134,6 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 				}
 				 else
 					printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
-
 				symbol = symbol->next;
 			}
 			clear_symbol_list(symbols);
@@ -237,9 +236,17 @@ void print_symbols(Elf32_Ehdr* ehdr,
 					symbol = symbol->next;
 					continue;
 				}
-				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U))
-					printf("%08x %c %s\n", symbol->sym32->st_value,
-						   symbol->type, symbol->name);
+				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)){
+
+					if (symbol->type == 'C'){
+						printf("%08x %c %s\n", symbol->sym32->st_size,
+							   symbol->type, symbol->name);
+					} else {
+						printf("%08x %c %s\n", symbol->sym32->st_value,
+							   symbol->type, symbol->name);
+					}
+					
+				}
 				else if (flags & FLAG_U){
 					if (ft_strchr("Uwv", symbol->type))
 						printf("%8c %c %s\n", ' ', symbol->type, symbol->name);
