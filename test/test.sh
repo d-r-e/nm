@@ -50,7 +50,7 @@ check_output() {
     
     if [ $CHECK_FLAGS ]; then
         for flag in ${FLAGS[@]}; do
-            if diff -q <( $FT_NM $flag $file 2>&1 ) <( $NM $flag $file 2>&1 ) >/dev/null; then
+            if diff -q <( $FT_NM $flag "$file" 2>&1 ) <( $NM $flag "$file" 2>&1 ) >/dev/null; then
                 echo -n
                 echo -e "${GREEN}[OK]: $file ${flag}${RESET}"
             else
@@ -64,7 +64,7 @@ check_output() {
 }
 
 if [ $1 ]; then
-    check_output $1
+    check_output "$1"
     exit 0
 fi
 
@@ -131,15 +131,19 @@ done
 
 echo "Checking system binaries..."
 find /bin /usr/bin -type f | shuf | head -n 200 | while read -r binary; do
-    echo -n "$binary "
     check_output "$binary"
 done
 
 
-# echo "Checking objects in test/lib..."
-# for object in $(find ./test/lib -name "*.o"); do
-#     check_output $object
-# done
+echo "Checking objects in test/lib..."
+for object in $(find ./test/lib -name "*.o"); do
+    check_output "$object"
+done
+
+echo "Checking objects in test/lib..."
+for object in $(find /usr/local/lib /usr/local/lib -name "*.o"); do
+    check_output "$object"
+done
 
 
 if [ ! -f ./test/bin/kompose ]; then
