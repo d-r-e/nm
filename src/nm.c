@@ -368,9 +368,6 @@ int main(int argc, char** argv) {
 	} else {
 		for (unsigned int i = 0; optind < argc; optind++, i++) {
 			if (file_count > 1) {
-				// ft_putstr("\n");
-				// write(1, argv[optind], ft_strlen(argv[optind]));
-				// ft_puts(":");
 				printf("%s:\n", argv[optind]);
 			}
 			nm(argv[optind], flags);
