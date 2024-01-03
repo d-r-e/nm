@@ -9,9 +9,6 @@ RESET='\033[0m'
 FT_NM=./ft_nm
 NM=nm
 
-# if there is an argument, only test that file
-# otherwise, test all files
-
 BAD_FILES=(
     test/
     /dev/null
@@ -43,7 +40,7 @@ check_output() {
         echo -e "${GREEN}[OK]: $file${RESET}"
     else
         echo -e "${RED}Difference found in: $file${RESET}"
-        diff -c5 --color <($FT_NM $file) <($NM $file)
+        diff -c5 --color <($FT_NM "$file") <($NM "$file")
         exit 1
     fi
 
