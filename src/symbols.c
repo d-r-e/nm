@@ -34,7 +34,7 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 					 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
 					c = 'D';
 				else
-					return 'A';
+					c = 'R';
 			} else if (bind == STB_LOCAL) {
 				if (shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK)
 					c = 'T';
@@ -152,7 +152,7 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 			c = '?';
 			break;
 	}
-	if (sym.st_shndx == SHN_ABS) {
+	if (sym.st_shndx == SHN_ABS && c != 'r') {
 		c = 'A';
 	}
 	if (bind == STB_WEAK && c != 'A' && c != 'V' &&
@@ -197,8 +197,8 @@ char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t shnum) {
 					(shdr[sym.st_shndx].sh_type == SHT_PROGBITS ||
 					 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
 					c = 'D';
-				else
-					return 'A';
+				// else
+				// 	return 'A';
 			} else if (bind == STB_LOCAL) {
 				if (shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK)
 					c = 'T';

@@ -37,7 +37,12 @@ check_output() {
     local file=$1
     if diff -q <($FT_NM $file 2>&1) <($NM $file 2>&1) >/dev/null; then
         echo -n
+        if file $file | grep "ELF" | grep -q "not stripped"; then
+            echo -e "${GREEN}[OK]: $file${RESET}"
         echo -e "${GREEN}[OK]: $file${RESET}"
+        else
+            return 0
+        fi
     else
         echo -e "${RED}Difference found in: $file${RESET}"
         diff -c5 --color <($FT_NM "$file") <($NM "$file")
@@ -59,6 +64,13 @@ check_output() {
         done
     fi
 }
+
+if [ $1 == "--extreme" ];then
+    for file in $(find / -name "*.*o" | file -f - | grep "ELF" | grep "not stripped" | cut -d ":" -f 1); do
+        check_output "$file"
+    done
+    exit 0
+fi
 
 if [ $1 ]; then
     check_output "$1"
