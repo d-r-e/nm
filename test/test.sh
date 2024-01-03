@@ -28,8 +28,7 @@ FLAGS+=("-rp")
 FLAGS+=("-u")
 FLAGS+=("-pu")
 FLAGS+=("-rpu")
-# FLAGS+=("-g")
-# FLAGS+=("-a")
+FLAGS+=("-g")
 CHECK_FLAGS=0
 make
 

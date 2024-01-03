@@ -1,5 +1,6 @@
 #include <nm.h>
 
+static
 void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
 	(void)statbuf;
 	if (ptr && ptr != MAP_FAILED)
@@ -62,6 +63,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
 		if (shdr[i].sh_name >= shstrtab->sh_size)
 			_file_format_no_recognized(filename, -1, ptr, statbuff);
+
 		if (!ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name)) {
 			symtab_found = true;
 			if (shdr[i].sh_offset + shdr[i].sh_size >
@@ -119,6 +121,11 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 			symbols = _sort64(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
+				if ((flags & FLAG_G) && ft_tolower(symbol->type) == symbol->type && symbol->type != 'w')
+				{
+					symbol = symbol->next;
+					continue;
+				}
 				if ((is_debug(*symbol->sym) || ft_strchr("a", symbol->type)) &&
 					!(flags & FLAG_A)) {
 					symbol = symbol->next;
@@ -151,13 +158,13 @@ int _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	if (ehdr->e_shoff + sizeof(Elf32_Shdr) * ehdr->e_shnum >
 		(size_t)statbuff->st_size)
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
+
 	shdr = (Elf32_Shdr*)(ptr + ehdr->e_shoff);
 	shstrtab = &shdr[ehdr->e_shstrndx];
 	if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
 
 	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
-
 	if (ehdr->e_shnum == 0 || ehdr->e_shstrndx == SHN_UNDEF)
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
 
@@ -205,7 +212,6 @@ void print_symbols(Elf32_Ehdr* ehdr,
 		if (ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name) == 0) {
 			Elf32_Sym* symtab = (Elf32_Sym*)(ptr + shdr[i].sh_offset);
 			char* strtab = (char*)(ptr + shdr[shdr[i].sh_link].sh_offset);
-			// initialization of symbols list
 			t_symbol* symbols = NULL;
 			for (unsigned int j = 0; j < shdr[i].sh_size / sizeof(Elf32_Sym);
 				 j++) {
@@ -236,6 +242,11 @@ void print_symbols(Elf32_Ehdr* ehdr,
 					symbol = symbol->next;
 					continue;
 				}
+				if (flags & FLAG_G && ft_tolower(symbol->type) == symbol->type && symbol->type != 'w')
+				{
+					symbol = symbol->next;
+					continue;
+				}
 				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)){
 
 					if (symbol->type == 'C'){
@@ -245,7 +256,6 @@ void print_symbols(Elf32_Ehdr* ehdr,
 						printf("%08x %c %s\n", symbol->sym32->st_value,
 							   symbol->type, symbol->name);
 					}
-					
 				}
 				else if (flags & FLAG_U){
 					if (ft_strchr("Uwv", symbol->type))
