@@ -52,7 +52,7 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 
 	shdr = (Elf64_Shdr*)(ptr + ehdr->e_shoff);
 	shstrtab = &shdr[ehdr->e_shstrndx];
-	if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
+	if (shstrtab->sh_offset + shstrtab->sh_size >= (size_t)statbuff->st_size)
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
 
 	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
@@ -104,13 +104,21 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					new_symbol->index = j;
 					new_symbol->sym = &symtab[j];
 					new_symbol->sym32 = NULL;
+					// check strtab offset is valid
+					if ((size_t)(strtab + symtab[j].st_name) >=
+						(size_t)(ptr + statbuff->st_size)) {
+						fprintf(stderr, "%s: %s: file format not recognized\n",
+								PROGRAM_NAME, filename);
+						close_file(-1, ptr, statbuff, statbuff->st_size);
+					}
+
 					new_symbol->name = strtab + symtab[j].st_name;
 					if (symtab[j].st_shndx > ehdr->e_shnum)
 						new_symbol->shndx = ft_strdup("-1");
 					else
 						new_symbol->shndx = ft_itoa(symtab[j].st_shndx);
-					new_symbol->type =
-						_get_symbol_char(symtab[j], shdr, ehdr->e_shnum);
+					new_symbol->type = _get_symbol_char(
+						symtab[j], shdr, ehdr->e_shnum, shstrtab_p);
 					if (!ft_strcmp(strtab + symtab[j].st_name, "_start"))
 						new_symbol->type = 'T';
 					new_symbol->value = ft_itoa(symtab[j].st_value);

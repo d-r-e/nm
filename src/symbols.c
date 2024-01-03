@@ -1,12 +1,16 @@
 #include <nm.h>
 
-char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
+char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum, char* strtab) {
 	char c = 0;
 	unsigned char type = ELF64_ST_TYPE(sym.st_info);
 	unsigned char bind = ELF64_ST_BIND(sym.st_info);
 
 	if (sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS && sym.st_shndx > shnum)
 		return ('?');
+	// if shndx, printf it
+	// if (sym.st_shndx != SHN_UNDEF){
+	// 	printf("%s\n", &strtab[shdr[sym.st_shndx].sh_name]);
+	// }
 	switch (type) {
 		case STT_TLS:
 			if (shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY ||
@@ -27,6 +31,11 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 				c = 'U';
 			else if (bind == STB_LOCAL &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
+				c = 'B';
+			else if (bind != STB_WEAK && sym.st_shndx != SHN_UNDEF && !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
+				c = 'D';
+			else if (bind != STB_WEAK && sym.st_shndx != SHN_UNDEF &&
+					 !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".bss"))
 				c = 'B';
 			else if (!sym.st_value && bind != STB_WEAK) {
 				if (bind == STB_GLOBAL &&
@@ -72,6 +81,13 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum) {
 				c = 'U';
 			else if (sym.st_shndx == SHN_COMMON)
 				c = 'C';
+			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) && \
+				sym.st_shndx  != SHN_UNDEF && !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
+				c = 'D';
+			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) && \
+				sym.st_shndx  != SHN_UNDEF && !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
+				c = 'D';
+			
 			else if (bind == STB_LOCAL && sym.st_shndx &&
 					 shdr[sym.st_shndx].sh_type == SHT_NOBITS)
 				c = 'B';
@@ -197,8 +213,6 @@ char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t shnum) {
 					(shdr[sym.st_shndx].sh_type == SHT_PROGBITS ||
 					 shdr[sym.st_shndx].sh_type == SHT_INIT_ARRAY))
 					c = 'D';
-				// else
-				// 	return 'A';
 			} else if (bind == STB_LOCAL) {
 				if (shdr[sym.st_shndx].sh_flags & SHF_INFO_LINK)
 					c = 'T';
