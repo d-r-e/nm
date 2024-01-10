@@ -81,11 +81,13 @@ char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t shnum, char* strta
 				c = 'U';
 			else if (sym.st_shndx == SHN_COMMON)
 				c = 'C';
-			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) && \
-				sym.st_shndx  != SHN_UNDEF && !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
+			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) &&
+					 sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS &&
+					 !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
 				c = 'D';
-			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) && \
-				sym.st_shndx  != SHN_UNDEF && !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
+			else if ((bind == STB_LOCAL || bind == STB_GLOBAL) &&
+					 sym.st_shndx != SHN_UNDEF && sym.st_shndx != SHN_ABS &&
+					 !ft_strcmp(&strtab[shdr[sym.st_shndx].sh_name], ".data"))
 				c = 'D';
 			
 			else if (bind == STB_LOCAL && sym.st_shndx &&
