@@ -162,8 +162,8 @@ for object in $(find ./test/lib -name "*.o"); do
     check_output "$object"
 done
 
-echo "Checking objects in test/lib..."
-for object in $(find /usr/local/lib /usr/local/lib -name "*.o"); do
+echo "Checking objects in /usr/local/lib..."
+for object in $(find /usr/local/lib /usr/local/lib -name "*.*o"); do
     check_output "$object"
 done
 

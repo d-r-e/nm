@@ -8,13 +8,14 @@ static void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
 		close(fd);
 }
 
-static void _file_format_no_recognized(char* filename,
+static int _file_format_no_recognized(char* filename,
 									   int fd,
 									   void* ptr,
 									   struct stat* statbuf) {
 	fprintf(stderr, "%s: %s: file format not recognized\n", PROGRAM_NAME,
 			filename);
 	close_file(fd, ptr, statbuf, sizeof(Elf64_Ehdr));
+	return (EXIT_FAILURE);
 }
 
 static bool is_debug(Elf64_Sym sym) {
@@ -97,6 +98,48 @@ static int validate_binary(void* ptr, struct stat* statbuff, char* filename) {
 					return (EXIT_FAILURE);
 				}
 			}
+		}
+	}
+	return (EXIT_SUCCESS);
+}
+
+static int validate_binary32(void* ptr, struct stat* statbuff, char* filename) {
+	Elf32_Ehdr* ehdr = (Elf32_Ehdr*)ptr;
+	Elf32_Shdr* shdr;
+	Elf32_Shdr* shstrtab;
+
+	if (ehdr->e_shoff + sizeof(Elf32_Shdr) * ehdr->e_shnum >
+		(size_t)statbuff->st_size) {
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+
+	shdr = (Elf32_Shdr*)(ptr + ehdr->e_shoff);
+	if (ehdr->e_shstrndx >= ehdr->e_shnum || ehdr->e_shnum <= 2) {
+		dprintf(2,"%s: warning: %s has a corrupt string table index - ignoring\n", PROGRAM_NAME, filename);
+		dprintf(2,"%s: %s: no symbols\n", PROGRAM_NAME, filename);
+		return (EXIT_FAILURE);
+	}
+	shstrtab = &shdr[ehdr->e_shstrndx];
+	if (shdr[ehdr->e_shstrndx].sh_offset + shdr[ehdr->e_shstrndx].sh_size >
+		(size_t)statbuff->st_size || shstrtab->sh_size <= 1) {
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+	if (shstrtab->sh_offset + shstrtab->sh_size >= (size_t)statbuff->st_size) {
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+
+	if (ehdr->e_shnum == 0 || ehdr->e_shstrndx <= SHN_UNDEF) {
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+
+	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
+		if (shdr[i].sh_name >= shstrtab->sh_size) {
+			_file_format_no_recognized(filename, -1, ptr, statbuff);
+			return (EXIT_FAILURE);
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -230,18 +273,19 @@ int _nm32(void* ptr, int flags, struct stat* statbuff, char* filename) {
 	Elf32_Shdr* shstrtab;
 	char* shstrtab_p;
 
+	validate_binary32(ptr, statbuff, filename);
 	if (ehdr->e_shoff + sizeof(Elf32_Shdr) * ehdr->e_shnum >
 		(size_t)statbuff->st_size)
-		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return _file_format_no_recognized(filename, -1, ptr, statbuff);
 
 	shdr = (Elf32_Shdr*)(ptr + ehdr->e_shoff);
 	shstrtab = &shdr[ehdr->e_shstrndx];
 	if (shstrtab->sh_offset + shstrtab->sh_size > (size_t)statbuff->st_size)
-		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return _file_format_no_recognized(filename, -1, ptr, statbuff);
 
 	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
 	if (ehdr->e_shnum == 0 || ehdr->e_shstrndx == SHN_UNDEF)
-		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return _file_format_no_recognized(filename, -1, ptr, statbuff);
 
 	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
 		if (shdr[i].sh_name >= shstrtab->sh_size)
