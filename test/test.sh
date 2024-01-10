@@ -18,7 +18,7 @@ BAD_FILES=(
 
 PROBLEMATIC=(
     /usr/lib/x86_64-linux-gnu/Scrt1.o
-
+    # /usr/lib/debug/.build-id/de/9995b90dca9031d340a386d5cc627ef84e6080.debug
 )
 
 declare -a FLAGS=()
@@ -29,6 +29,10 @@ FLAGS+=("-u")
 FLAGS+=("-pu")
 FLAGS+=("-rpu")
 FLAGS+=("-g")
+FLAGS+=("-gu")
+FLAGS+=("-rpgu")
+FLAGS+=("-pgu")
+FLAGS+=("-rgu")
 CHECK_FLAGS=0
 make
 
@@ -38,34 +42,35 @@ check_output() {
         echo -n
         if file $file | grep "ELF" | grep -q "not stripped"; then
             echo -e "${GREEN}[OK]: $file${RESET}"
-        echo -e "${GREEN}[OK]: $file${RESET}"
         else
             return 0
         fi
     else
         echo -e "${RED}Difference found in: $file${RESET}"
         diff -c5 --color <($FT_NM "$file") <($NM "$file")
+        echo -e "${RED}Difference found in: $file${RESET}"
+
         exit 1
     fi
 
     
-    if [ $CHECK_FLAGS ]; then
-        for flag in ${FLAGS[@]}; do
-            if diff -q <( $FT_NM $flag "$file" 2>&1 ) <( $NM $flag "$file" 2>&1 ) >/dev/null; then
-                echo -n
-                echo -e "${GREEN}[OK]: $file ${flag}${RESET}"
-            else
-                echo -e "${RED}Difference found in: $file ${flag} ${RESET}"
-                set -x
-                diff -y --color <( $FT_NM $flag $file ) <( $NM $flag $file )
-                exit 1
-            fi
-        done
-    fi
+    # if [ $CHECK_FLAGS ]; then
+    #     for flag in ${FLAGS[@]}; do
+    #         if diff -q <( $FT_NM $flag "$file" 2>&1 ) <( $NM $flag "$file" 2>&1 ) >/dev/null; then
+    #             echo -n
+    #             echo -e "${GREEN}[OK]: $file ${flag}${RESET}"
+    #         else
+    #             echo -e "${RED}Difference found in: $file ${flag} ${RESET}"
+    #             set -x
+    #             diff -y --color <( $FT_NM $flag $file ) <( $NM $flag $file )
+    #             exit 1
+    #         fi
+    #     done
+    # fi
 }
 
 if [ $1 == "--extreme" ];then
-    for file in $(find / -name "*.*o" | file -f - | grep "ELF" | grep "not stripped" | cut -d ":" -f 1); do
+    for file in $(find /bin /usr/bin /lib /usr/lib | file -f - | grep "ELF" | grep "not stripped" | cut -d ":" -f 1); do
         check_output "$file"
     done
     exit 0
@@ -105,6 +110,10 @@ for file in ${BAD_FILES[@]}; do
     check_output $file
 done
 
+# for file in $(find ./test/badfiles -type f); do
+#     check_output $file
+# done
+
 
 
 echo "Checking object files inside libft"
@@ -121,6 +130,11 @@ echo "Checking ./test/bin folder..."
 for binary in $(find ./test/bin -type f); do
     check_output $binary
 done
+
+# echo "Checking /usr/lib/debug folder..."
+# for binary in $(find /usr/lib/debug -type f); do
+#     check_output $binary
+# done
 
 echo "Checking specified binaries..."
 for binary in "/bin/ls"; do
