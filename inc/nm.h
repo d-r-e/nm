@@ -32,7 +32,7 @@ typedef struct s_symbol
     struct s_symbol *next;
 } t_symbol;
 
-char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t);
+char _get_symbol_char(Elf64_Sym sym, Elf64_Shdr* shdr, size_t, char *strtab);
 char _get_symbol_char32(Elf32_Sym sym, Elf32_Shdr* shdr, size_t);
 void print_Elf64_Shdr(Elf64_Shdr* shdr);
 void print_type_bind_shn(Elf64_Shdr* shdr,

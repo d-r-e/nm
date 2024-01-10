@@ -1,14 +1,12 @@
 #include <nm.h>
 
-static
-void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
+static void close_file(int fd, void* ptr, struct stat* statbuf, size_t size) {
 	(void)statbuf;
 	if (ptr && ptr != MAP_FAILED)
 		munmap(ptr, size);
 	if (fd > 0)
 		close(fd);
 }
-
 
 static void _file_format_no_recognized(char* filename,
 									   int fd,
@@ -39,21 +37,90 @@ static void clear_symbol_list(t_symbol* symbols) {
 	}
 }
 
-static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
-	bool symtab_found = false;
+static int validate_binary(void* ptr, struct stat* statbuff, char* filename) {
 	Elf64_Ehdr* ehdr = (Elf64_Ehdr*)ptr;
 	Elf64_Shdr* shdr;
 	Elf64_Shdr* shstrtab;
 	char* shstrtab_p;
 
 	if (ehdr->e_shoff + sizeof(Elf64_Shdr) * ehdr->e_shnum >
-		(size_t)statbuff->st_size)
+		(size_t)statbuff->st_size) {
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
 
 	shdr = (Elf64_Shdr*)(ptr + ehdr->e_shoff);
+	if (ehdr->e_shstrndx >= ehdr->e_shnum || ehdr->e_shnum <= 2) 
+	{
+		dprintf(2,"%s: warning: %s has a corrupt string table index - ignoring\n", PROGRAM_NAME, filename);
+		dprintf(2,"%s: %s: no symbols\n", PROGRAM_NAME, filename);
+		return (EXIT_FAILURE);
+	}
 	shstrtab = &shdr[ehdr->e_shstrndx];
-	if (shstrtab->sh_offset + shstrtab->sh_size >= (size_t)statbuff->st_size)
+	if (shdr[ehdr->e_shstrndx].sh_offset + shdr[ehdr->e_shstrndx].sh_size >
+		(size_t)statbuff->st_size || shstrtab->sh_size <= 1) {
 		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+		}
+	if (shstrtab->sh_offset + shstrtab->sh_size >= (size_t)statbuff->st_size)
+	{
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+
+	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
+
+	if (ehdr->e_shnum == 0 || ehdr->e_shstrndx <= SHN_UNDEF){
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return (EXIT_FAILURE);
+	}
+
+	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
+		if (shdr[i].sh_name >= shstrtab->sh_size){
+			_file_format_no_recognized(filename, -1, ptr, statbuff);
+			return (EXIT_FAILURE);
+		}
+	}
+
+	for (unsigned int i = 0; i < ehdr->e_shnum; i++) {
+		if (ft_strcmp(".symtab", shstrtab_p + shdr[i].sh_name) == 0) {
+			Elf64_Sym* symtab = (Elf64_Sym*)(ptr + shdr[i].sh_offset);
+			char* strtab = (char*)(ptr + shdr[shdr[i].sh_link].sh_offset);
+
+			for (unsigned int j = 0; j < shdr[i].sh_size / sizeof(Elf64_Sym);
+				 j++) {
+				if ((size_t)(strtab + symtab[j].st_name) >=
+					(size_t)(ptr + statbuff->st_size)) {
+					fprintf(stderr, "%s: %s: file format not recognized\n",
+							PROGRAM_NAME, filename);
+					close_file(-1, ptr, statbuff, statbuff->st_size);
+					return (EXIT_FAILURE);
+				}
+			}
+		}
+	}
+	return (EXIT_SUCCESS);
+}
+
+static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
+	bool symtab_found = false;
+	Elf64_Ehdr* ehdr = (Elf64_Ehdr*)ptr;
+	Elf64_Shdr* shdr;
+	Elf64_Shdr* shstrtab;
+	char* shstrtab_p;
+	unsigned int valid_binary = 0;
+
+	if (ehdr->e_shoff + sizeof(Elf64_Shdr) * ehdr->e_shnum >
+		(size_t)statbuff->st_size || ehdr->e_shnum <= 2){
+		_file_format_no_recognized(filename, -1, ptr, statbuff);
+		return;
+		}
+
+	shdr = (Elf64_Shdr*)(ptr + ehdr->e_shoff);
+	valid_binary = validate_binary(ptr, statbuff, filename);
+	if (valid_binary == EXIT_FAILURE)
+		return;
+	shstrtab = &shdr[ehdr->e_shstrndx];
 
 	shstrtab_p = (char*)(ptr + shstrtab->sh_offset);
 
@@ -129,8 +196,9 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 			symbols = _sort64(symbols, flags);
 			t_symbol* symbol = symbols;
 			while (symbol) {
-				if ((flags & FLAG_G) && ft_tolower(symbol->type) == symbol->type && symbol->type != 'w')
-				{
+				if ((flags & FLAG_G) &&
+					ft_tolower(symbol->type) == symbol->type &&
+					symbol->type != 'w') {
 					symbol = symbol->next;
 					continue;
 				}
@@ -139,15 +207,14 @@ static void _nm64(void* ptr, int flags, struct stat* statbuff, char* filename) {
 					symbol = symbol->next;
 					continue;
 				}
-				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)){
+				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)) {
 					printf("%016lx %c %s\n", symbol->sym->st_value,
 						   symbol->type, symbol->name);
 					(void)print_Elf64_Shdr;
-				} else if (flags & FLAG_U){
+				} else if (flags & FLAG_U) {
 					if (ft_strchr("Uwv", symbol->type))
 						printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
-				}
-				 else
+				} else
 					printf("%16c %c %s\n", ' ', symbol->type, symbol->name);
 				symbol = symbol->next;
 			}
@@ -250,22 +317,21 @@ void print_symbols(Elf32_Ehdr* ehdr,
 					symbol = symbol->next;
 					continue;
 				}
-				if (flags & FLAG_G && ft_tolower(symbol->type) == symbol->type && symbol->type != 'w')
-				{
+				if (flags & FLAG_G &&
+					ft_tolower(symbol->type) == symbol->type &&
+					symbol->type != 'w') {
 					symbol = symbol->next;
 					continue;
 				}
-				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)){
-
-					if (symbol->type == 'C'){
+				if (!ft_strchr("Uvw", symbol->type) && !(flags & FLAG_U)) {
+					if (symbol->type == 'C') {
 						printf("%08x %c %s\n", symbol->sym32->st_size,
 							   symbol->type, symbol->name);
 					} else {
 						printf("%08x %c %s\n", symbol->sym32->st_value,
 							   symbol->type, symbol->name);
 					}
-				}
-				else if (flags & FLAG_U){
+				} else if (flags & FLAG_U) {
 					if (ft_strchr("Uwv", symbol->type))
 						printf("%8c %c %s\n", ' ', symbol->type, symbol->name);
 				} else
